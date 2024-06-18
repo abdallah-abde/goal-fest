@@ -10,9 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Group {
+  id    Int     @id @default(autoincrement())
+  name  String
+  teams Team[]
+}
+
 model Team {
   id           Int     @id @default(autoincrement())
   name         String
+  groupId Int
+  group   Group @relation(fields: [groupId], references: [id])
   matchesHome  Match[] @relation("homeTeam")
   matchesAway  Match[] @relation("awayTeam")
 }

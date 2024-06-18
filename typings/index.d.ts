@@ -3,6 +3,8 @@ export interface Team {
   name: string;
   matchesHome: Match[];
   matchesAway: Match[];
+  groupId: number;
+  group: Group;
   //   flagUrl?: string;
   //   players: Player[];
   //   tournaments: Tournament[];
@@ -41,8 +43,13 @@ export interface Tournament {
 export interface Group {
   id: number;
   name: string;
-  tournamentId: number;
   teams: Team[];
+}
+
+export interface GroupWithTeams {
+  id: number;
+  name: string;
+  teams: TeamWithStats[];
 }
 
 export interface Match {
