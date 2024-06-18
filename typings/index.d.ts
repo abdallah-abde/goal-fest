@@ -35,9 +35,9 @@ export interface Player {
 export interface Tournament {
   id: number;
   name: string;
-  logoUrl?: string;
-  groups: Group[];
-  knockoutMatches: KnockoutMatch[];
+  // logoUrl?: string;
+  // groups: Group[];
+  // knockoutMatches: KnockoutMatch[];
 }
 
 export interface Group {
