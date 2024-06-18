@@ -11,35 +11,74 @@ datasource db {
 }
 
 model Tournament {
-  id    Int     @id @default(autoincrement())
-  name  String
-  groups Group[]
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  logoUrl            String?
+  tournamentEditions TournamentEdition[]
+}
+
+model TournamentEdition {
+  id              Int             @id @default(autoincrement())
+  year            Int
+  logoUrl         String?
+  tournamentId    Int
+  tournament      Tournament      @relation(fields: [tournamentId], references: [id])
+  groups          Group[]
+  knockoutMatches KnockoutMatch[]
+  matches         Match[]
+  teams           Team[]
 }
 
 model Group {
-  id    Int     @id @default(autoincrement())
-  name  String
-  tournamentId Int
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
-  teams Team[]
+  id                  Int               @id @default(autoincrement())
+  name                String
+  tournamentEditionId Int
+  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+  teams               Team[]
+  matches             Match[]
 }
 
 model Team {
-  id           Int     @id @default(autoincrement())
-  name         String
-  groupId Int
-  group   Group @relation(fields: [groupId], references: [id])
-  matchesHome  Match[] @relation("homeTeam")
-  matchesAway  Match[] @relation("awayTeam")
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  flagUrl             String?
+  groups              Group[]
+  tournamentEdition   TournamentEdition[]
+  matchesHome         Match[]             @relation("homeTeam")
+  matchesAway         Match[]             @relation("awayTeam")
+  knockoutMatchesHome KnockoutMatch[]     @relation("homeTeam")
+  knockoutMatchesAway KnockoutMatch[]     @relation("awayTeam")
 }
 
 model Match {
-  id          Int     @id @default(autoincrement())
-  homeTeam    Team    @relation("homeTeam", fields: [homeTeamId], references: [id])
-  homeTeamId  Int
-  awayTeam    Team    @relation("awayTeam", fields: [awayTeamId], references: [id])
-  awayTeamId  Int
-  homeGoals   Int
-  awayGoals   Int
-  date        DateTime
+  id                  Int               @id @default(autoincrement())
+  homeTeam            Team              @relation("homeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId          Int
+  awayTeam            Team              @relation("awayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId          Int
+  homeGoals           Int?
+  awayGoals           Int?
+  date                DateTime?
+  groupId             Int
+  group               Group             @relation(fields: [groupId], references: [id])
+  tournamentEditionId Int
+  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+}
+
+model KnockoutMatch {
+  id                  Int               @id @default(autoincrement())
+  homeTeam            Team?             @relation("homeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId          Int?
+  awayTeam            Team?             @relation("awayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId          Int?
+  homeGoals           Int?
+  awayGoals           Int?
+  homeExtraTimeGoals  Int?
+  awayExtraTimeGoals  Int?
+  homePenaltyGoals    Int?
+  awayPenaltyGoals    Int?
+  date                DateTime?
+  tournamentEditionId Int
+  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+  round               String?
 }
