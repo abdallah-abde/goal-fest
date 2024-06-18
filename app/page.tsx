@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { calculateTeamStats } from "@/lib/calculateTeamStats";
 
 import GroupTable from "@/components/GroupTable";
+import TournamentsList from "@/components/TournamentsList";
 
 const HomePage: FC = async () => {
   const groups = await prisma.group.findMany({
@@ -23,7 +24,12 @@ const HomePage: FC = async () => {
     }))
   );
 
-  return <GroupTable groupsWithTeams={groupsWithTeams} />;
+  return (
+    <>
+      <TournamentsList />
+      <GroupTable groupsWithTeams={groupsWithTeams} />
+    </>
+  );
 };
 
 export default HomePage;
