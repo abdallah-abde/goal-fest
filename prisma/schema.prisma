@@ -10,9 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Tournament {
+  id    Int     @id @default(autoincrement())
+  name  String
+  groups Group[]
+}
+
 model Group {
   id    Int     @id @default(autoincrement())
   name  String
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
   teams Team[]
 }
 
