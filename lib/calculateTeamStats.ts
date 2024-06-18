@@ -1,11 +1,11 @@
 import prisma from "./db";
 
-export const calculateTeamStats = async (teamId: number) => {
+export const calculateTeamStats = async (teamId: number, groupId: number) => {
   const homeMatches = await prisma.match.findMany({
-    where: { homeTeamId: teamId },
+    where: { homeTeamId: teamId, groupId: groupId },
   });
   const awayMatches = await prisma.match.findMany({
-    where: { awayTeamId: teamId },
+    where: { awayTeamId: teamId, groupId: groupId },
   });
 
   let played = homeMatches.length + awayMatches.length;

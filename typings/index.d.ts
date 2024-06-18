@@ -3,8 +3,9 @@ export interface Team {
   name: string;
   matchesHome: Match[];
   matchesAway: Match[];
-  groupId: number;
-  group: Group;
+  knockoutMatchesHome: KnockoutMatch[];
+  knockoutMatchesAway: KnockoutMatch[];
+  groups: Group[];
   //   flagUrl?: string;
   //   players: Player[];
   //   tournaments: Tournament[];
@@ -35,20 +36,36 @@ export interface Player {
 export interface Tournament {
   id: number;
   name: string;
-  // logoUrl?: string;
-  // groups: Group[];
-  // knockoutMatches: KnockoutMatch[];
+  tournamentEdition: TournamentEdition[];
+  logoUrl?: string;
+}
+
+export interface TournamentEdition {
+  id: number;
+  year: number;
+  logoUrl?: string;
+  tournamentId: number;
+  tournament: Tournament;
+  groups: Group[];
+  matches: Match[];
+  knockoutMatches: KnockoutMatch[];
+  teams: Team[];
 }
 
 export interface Group {
   id: number;
   name: string;
+  tournamentEditionId: number;
+  tournamentEdition: TournamentEdition;
   teams: Team[];
+  matches: Match[];
 }
 
 export interface GroupWithTeams {
   id: number;
   name: string;
+  tournamentEditionId: number;
+  tournamentEdition: TournamentEdition;
   teams: TeamWithStats[];
 }
 
@@ -61,22 +78,22 @@ export interface Match {
   homeGoals: number;
   awayGoals: number;
   date: Date;
+  groupId: number;
+  group: Group;
+  tournamentEditionId: number;
+  tournamentEdition: TournamentEdition;
 }
 
 export interface KnockoutMatch {
   id: number;
-  tournamentId: number;
-  tournament: Tournament;
   round: string;
-  homeTeamId?: number;
-  homeTeam?: Team;
-  awayTeamId?: number;
-  awayTeam?: Team;
-  homeGoals?: number;
-  awayGoals?: number;
-  homeExtraTimeGoals?: number;
-  awayExtraTimeGoals?: number;
-  homePenaltyGoals?: number;
-  awayPenaltyGoals?: number;
+  homeTeamId: number;
+  homeTeam: Team;
+  awayTeamId: number;
+  awayTeam: Team;
+  homeGoals: number;
+  awayGoals: number;
   date: Date;
+  tournamentEditionId: number;
+  tournamentEdition: TournamentEdition;
 }

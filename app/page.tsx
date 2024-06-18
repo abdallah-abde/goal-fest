@@ -1,12 +1,12 @@
 import { FC } from "react";
 import prisma from "@/lib/db";
 
-import TournamentsList from "@/components/TournamentsList";
+import TournamentList from "@/components/TournamentList";
 
 const HomePage: FC = async () => {
   const tournaments = await prisma.tournament.findMany();
 
-  return <TournamentsList tournaments={tournaments} />;
+  return <TournamentList tournaments={tournaments} />;
 };
 
 export default HomePage;
