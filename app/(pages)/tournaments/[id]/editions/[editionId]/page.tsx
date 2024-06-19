@@ -3,7 +3,6 @@ import prisma from "@/lib/db";
 import { calculateTeamStats } from "@/lib/calculateTeamStats";
 
 import EditionGroupList from "@/components/EditionGroupList";
-import Loading from "@/app/loading";
 
 interface Props {
   params: { editionId: string };

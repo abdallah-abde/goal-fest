@@ -29,8 +29,8 @@ const TournamentEditionList: FC<TournamentEdition[]> = async ({
             <CardContent>
               <Image
                 src={`/tournaments/${logoUrl ? logoUrl : "tournament.png"}`}
-                width='150'
-                height='150'
+                width={logoUrl ? 250 : 150}
+                height={logoUrl ? 250 : 150}
                 alt={`${
                   logoUrl
                     ? tournament.name + " " + year.toString() + " Logo"
