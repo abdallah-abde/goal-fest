@@ -24,7 +24,7 @@ export default function RootLayout({
         <main className='w-full mx-auto px-8 my-8 flex-1 h-screen'>
           {children}
         </main>
-        <footer className='w-full mx-auto px-8 py-4 border-t-2'>
+        <footer className='w-full mx-auto px-8 py-4 border-t-2 fixed bottom-0 bg-primary-foreground'>
           <ul className='flex items-center justify-between'>
             <li>Footer</li>
             <li>&copy;{new Date().getFullYear().toString()}</li>
