@@ -38,19 +38,41 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {group.teams.map((team) => (
-                    <TableRow key={team.id}>
-                      <TableCell>{team.name}</TableCell>
-                      <TableCell>{team.stats.played}</TableCell>
-                      <TableCell>{team.stats.won}</TableCell>
-                      <TableCell>{team.stats.lost}</TableCell>
-                      <TableCell>{team.stats.draw}</TableCell>
-                      <TableCell>{team.stats.goalsFor}</TableCell>
-                      <TableCell>{team.stats.goalsAgainst}</TableCell>
-                      <TableCell>{team.stats.goalDifference}</TableCell>
-                      <TableCell>{team.stats.points}</TableCell>
-                    </TableRow>
-                  ))}
+                  {group.teams
+                    .sort((a, b) => {
+                      if (a.stats.points > b.stats.points) {
+                        return -1;
+                      } else if (a.stats.points < b.stats.points) {
+                        return 1;
+                      } else {
+                        if (a.stats.goalDifference > b.stats.goalDifference) {
+                          return -1;
+                        } else if (
+                          a.stats.goalDifference < b.stats.goalDifference
+                        ) {
+                          return 1;
+                        } else {
+                          if (a.stats.goalsFor > b.stats.goalsFor) {
+                            return -1;
+                          } else if (a.stats.goalsFor < b.stats.goalsFor) {
+                            return 1;
+                          } else return 0;
+                        }
+                      }
+                    })
+                    .map((team) => (
+                      <TableRow key={team.id}>
+                        <TableCell>{team.name}</TableCell>
+                        <TableCell>{team.stats.played}</TableCell>
+                        <TableCell>{team.stats.won}</TableCell>
+                        <TableCell>{team.stats.lost}</TableCell>
+                        <TableCell>{team.stats.draw}</TableCell>
+                        <TableCell>{team.stats.goalsFor}</TableCell>
+                        <TableCell>{team.stats.goalsAgainst}</TableCell>
+                        <TableCell>{team.stats.goalDifference}</TableCell>
+                        <TableCell>{team.stats.points}</TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             ) : (
