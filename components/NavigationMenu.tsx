@@ -7,20 +7,20 @@ export default function NavigationMenu() {
         <li>
           <Link
             href='/'
-            className='font-bold bg-background text-foreground hover:bg-secondary p-2 rounded-sm transition duration-150'
+            className='font-bold bg-primary text-secondary hover:bg-primary p-2 rounded-sm transition duration-150'
           >
             Goal Fest Logo
           </Link>
         </li>
         <li>
           <Link
-            className='font-bold bg-background text-foreground hover:bg-secondary p-2 rounded-sm transition duration-150 mr-4'
+            className='font-bold bg-primary text-secondary hover:bg-primary  p-2 rounded-sm transition duration-150 mr-4'
             href='#'
           >
             Login
           </Link>
           <Link
-            className='font-bold bg-background text-foreground hover:bg-secondary p-2 rounded-sm transition duration-150'
+            className='font-bold bg-primary text-secondary hover:bg-primary  p-2 rounded-sm transition duration-150'
             href='#'
           >
             Register

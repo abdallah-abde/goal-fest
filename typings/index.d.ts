@@ -70,6 +70,8 @@ export interface KnockoutMatch {
   tournamentEditionId: number;
   tournamentEdition: TournamentEdition;
   round?: string;
+  homeTeamPlacehlder?: string;
+  awayTeamPlacehlder?: string;
 }
 
 export interface TeamStats {

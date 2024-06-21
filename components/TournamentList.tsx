@@ -7,13 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tournament } from "@/typings";
 import Image from "next/image";
 
-const TournamentList: FC<Tournament[]> = async ({ tournaments }) => {
+interface Props {
+  tournaments: Tournament[];
+}
+
+const TournamentList: FC<Props> = async ({ tournaments }) => {
   return (
-    <div className='flex gap-4'>
+    <div className='flex gap-4 py-24'>
       {tournaments.length > 0 ? (
         tournaments.map(({ id, name, logoUrl }) => (
-          <Link href={`/tournaments/${id}`}>
-            <Card key={id} className='max-w-fit'>
+          <Link href={`/tournaments/${id}`} key={id}>
+            <Card className='max-w-fit bg-secondary hover:shadow-md transition duration-200'>
               <CardHeader>
                 <CardTitle className='mx-auto'>{name}</CardTitle>
               </CardHeader>
@@ -30,7 +34,7 @@ const TournamentList: FC<Tournament[]> = async ({ tournaments }) => {
           </Link>
         ))
       ) : (
-        <p>No Data Found</p>
+        <p>No Tournaments Found</p>
       )}
     </div>
   );
