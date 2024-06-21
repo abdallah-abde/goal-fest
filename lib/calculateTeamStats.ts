@@ -4,6 +4,7 @@ export const calculateTeamStats = async (teamId: number, groupId: number) => {
   const homeMatches = await prisma.match.findMany({
     where: { homeTeamId: teamId, groupId: groupId },
   });
+
   const awayMatches = await prisma.match.findMany({
     where: { awayTeamId: teamId, groupId: groupId },
   });

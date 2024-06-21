@@ -81,4 +81,6 @@ model KnockoutMatch {
   tournamentEditionId Int
   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
   round               String?
+  homeTeamPlacehlder  String?
+  awayTeamPlacehlder  String?
 }

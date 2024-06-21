@@ -30,7 +30,7 @@ const TournamentEditionPage: FC<Props> = async ({ params }) => {
     }))
   );
 
-  return <div>Tournament Edition Page</div>;
+  return <EditionGroupList groupsWithTeams={groupsWithTeams} />;
 };
 
 export default TournamentEditionPage;

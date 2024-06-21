@@ -7,8 +7,13 @@ import Image from "next/image";
 import { Badge } from "./ui/badge";
 
 import * as _ from "lodash";
+import { getFormattedDate } from "@/lib/getFormattedDate";
 
-const GroupMatchList: FC<Match[]> = async ({ matches }) => {
+interface Props {
+  matches: Match[];
+}
+
+const GroupMatchList: FC<Props> = async ({ matches }) => {
   const results = Object.entries(_.groupBy(matches, "date"));
 
   return (
@@ -19,15 +24,11 @@ const GroupMatchList: FC<Match[]> = async ({ matches }) => {
             return (
               <div>
                 <p className='mb-2 bg-sky-200 w-fit p-2 rounded-sm font-semibold'>
-                  {new Date(m[0]).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {getFormattedDate(m[0])}
                 </p>
-                <div className='flex gap-2'>
+                <div className='flex items-center justify-start gap-2'>
                   {m[1].map((match: Match) => (
-                    <Card key={match.id} className='w-1/3'>
+                    <Card key={match.id} className='w-1/3 max-w-96'>
                       <CardHeader>
                         <CardTitle className='flex flex-col items-center justify-center gap-4'>
                           <div className='mr-auto'>
@@ -36,7 +37,9 @@ const GroupMatchList: FC<Match[]> = async ({ matches }) => {
                             </Badge>
                           </div>
                           <div className='flex items-center justify-center gap-4'>
-                            <p>{match.homeTeam.name}</p>
+                            <p className='text-[16px] font-bold'>
+                              {match.homeTeam.name}
+                            </p>
                             <Image
                               src={`/teams/${match.homeTeam.flagUrl}`}
                               width={25}
@@ -56,18 +59,18 @@ const GroupMatchList: FC<Match[]> = async ({ matches }) => {
                               height={25}
                               alt={`${match.awayTeam.name} flag`}
                             />
-                            <p>{match.awayTeam.name}</p>
+                            <p className='text-[16px]  font-bold'>
+                              {match.awayTeam.name}
+                            </p>
                           </div>
                         </CardTitle>
                       </CardHeader>
                       {match.date && (
                         <CardContent className='text-right'>
                           <Badge variant='default'>
-                            {match.date.toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
+                            {match.date
+                              ? getFormattedDate(match.date.toString())
+                              : ""}
                           </Badge>
                         </CardContent>
                       )}
@@ -79,7 +82,7 @@ const GroupMatchList: FC<Match[]> = async ({ matches }) => {
           })}
         </>
       ) : (
-        <p>No Data Found</p>
+        <p>No Matches Found</p>
       )}
     </div>
   );

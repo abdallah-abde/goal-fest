@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import { sortGroupTeams } from "@/lib/sortGroupTeams";
+import { cn } from "@/lib/utils";
 
 interface Props {
   groupsWithTeams: GroupWithTeams[];
@@ -21,10 +23,12 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
     <>
       {groupsWithTeams.length > 0 ? (
         groupsWithTeams.map((group) => (
-          <div className='mb-4'>
+          <div>
             {group.teams.length > 0 ? (
-              <Table>
-                <TableCaption>{group.name}</TableCaption>
+              <Table className='mb-8'>
+                <TableCaption className={cn("mx-0 text-left")}>
+                  {group.name}
+                </TableCaption>
                 <TableHeader>
                   <TableRow>
                     <TableHead className='w-[20%] text-left'>Name</TableHead>
@@ -39,58 +43,36 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {group.teams
-                    .sort((a, b) => {
-                      if (a.stats.points > b.stats.points) {
-                        return -1;
-                      } else if (a.stats.points < b.stats.points) {
-                        return 1;
-                      } else {
-                        if (a.stats.goalDifference > b.stats.goalDifference) {
-                          return -1;
-                        } else if (
-                          a.stats.goalDifference < b.stats.goalDifference
-                        ) {
-                          return 1;
-                        } else {
-                          if (a.stats.goalsFor > b.stats.goalsFor) {
-                            return -1;
-                          } else if (a.stats.goalsFor < b.stats.goalsFor) {
-                            return 1;
-                          } else return 0;
-                        }
-                      }
-                    })
-                    .map((team) => (
-                      <TableRow key={team.id}>
-                        <TableCell className='text-left flex gap-3 items-center'>
-                          <Image
-                            src={`/teams/${team.flagUrl}`}
-                            width={25}
-                            height={25}
-                            alt={`${team.name} flag`}
-                          />
-                          {team.name}
-                        </TableCell>
-                        <TableCell>{team.stats.played}</TableCell>
-                        <TableCell>{team.stats.won}</TableCell>
-                        <TableCell>{team.stats.lost}</TableCell>
-                        <TableCell>{team.stats.draw}</TableCell>
-                        <TableCell>{team.stats.goalsFor}</TableCell>
-                        <TableCell>{team.stats.goalsAgainst}</TableCell>
-                        <TableCell>{team.stats.goalDifference}</TableCell>
-                        <TableCell>{team.stats.points}</TableCell>
-                      </TableRow>
-                    ))}
+                  {group.teams.sort(sortGroupTeams).map((team) => (
+                    <TableRow key={team.id}>
+                      <TableCell className='text-left flex gap-3 items-center'>
+                        <Image
+                          src={`/teams/${team.flagUrl}`}
+                          width={25}
+                          height={25}
+                          alt={`${team.name} flag`}
+                        />
+                        {team.name}
+                      </TableCell>
+                      <TableCell>{team.stats.played}</TableCell>
+                      <TableCell>{team.stats.won}</TableCell>
+                      <TableCell>{team.stats.lost}</TableCell>
+                      <TableCell>{team.stats.draw}</TableCell>
+                      <TableCell>{team.stats.goalsFor}</TableCell>
+                      <TableCell>{team.stats.goalsAgainst}</TableCell>
+                      <TableCell>{team.stats.goalDifference}</TableCell>
+                      <TableCell>{team.stats.points}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             ) : (
-              <p>No Data Found</p>
+              <p>No Teams in {group.name} Found</p>
             )}
           </div>
         ))
       ) : (
-        <p>No Data Found</p>
+        <p>No Groups Found</p>
       )}
     </>
   );
