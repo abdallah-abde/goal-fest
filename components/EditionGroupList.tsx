@@ -20,10 +20,10 @@ interface Props {
 
 const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
   return (
-    <>
+    <div>
       {groupsWithTeams.length > 0 ? (
         groupsWithTeams.map((group) => (
-          <div>
+          <div key={group.id}>
             {group.teams.length > 0 ? (
               <Table className='mb-8'>
                 <TableCaption className={cn("mx-0 text-left")}>
@@ -31,7 +31,7 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className='w-[20%] text-left'>Name</TableHead>
+                    <TableHead className='w-[20%] text-left'>Team</TableHead>
                     <TableHead className='w-[10%]'>Played</TableHead>
                     <TableHead className='w-[10%]'>Won</TableHead>
                     <TableHead className='w-[10%]'>Lost</TableHead>
@@ -45,7 +45,7 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
                 <TableBody>
                   {group.teams.sort(sortGroupTeams).map((team) => (
                     <TableRow key={team.id}>
-                      <TableCell className='text-left flex gap-3 items-center'>
+                      <TableCell className='text-left flex gap-3 items-center font-bold'>
                         <Image
                           src={`/teams/${team.flagUrl}`}
                           width={25}
@@ -74,7 +74,7 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
       ) : (
         <p>No Groups Found</p>
       )}
-    </>
+    </div>
   );
 };
 
