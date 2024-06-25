@@ -29,7 +29,7 @@ const TournamentEditionComponent = ({
       {tournamentEdition !== null ? (
         <div className='flex flex-col gap-y-16'>
           <div className='flex gap-x-16 items-center justify-between w-full '>
-            <div className='flex basis-2/3 items-center gap-x-12'>
+            <div className='flex basis-2/3 items-center justify-start gap-x-6'>
               <div className='flex flex-col justify-start items-center w-fit'>
                 <Image
                   src={`/tournaments/${
@@ -44,33 +44,39 @@ const TournamentEditionComponent = ({
                   height={250}
                 />
               </div>
-              <div className='flex flex-col gap-y-6'>
-                <div className='flex gap-x-2 '>
-                  <p>
-                    <span>Germany</span> Host
-                  </p>
-                </div>
-                <div className='flex gap-x-2 '>
-                  <p>
-                    <span className=''>{`[${tournamentEdition.teams.length}]`}</span>{" "}
-                    National Teams
-                  </p>
-                </div>
-                <div className='flex gap-x-2 '>
-                  <p>Current Stage</p>
-                </div>
+              <div className='flex flex-col items-center justify-start gap-y-16 '>
+                <p>Hosted by</p>
+                {tournamentEdition.hostingCountries.map((cou) => (
+                  <span
+                    key={cou.id}
+                    className='text-sm underline font-semibold bg-slate-300 p-1 px-2 rounded w-fit'
+                  >
+                    {cou.name}
+                  </span>
+                ))}
               </div>
             </div>
             <div className='flex items-center gap-x-16 basis-1/3'>
               <div className='flex flex-col items-center gap-y-2'>
-                <Image
-                  src='/teams/italy.png'
-                  width={100}
-                  height={100}
-                  alt='italy'
-                  className='shadow-2xl overflow-hidden rounded-full'
-                />
-                <p>Italy</p>
+                {tournamentEdition.winner && (
+                  <>
+                    <p className='text-yellow-400 font-bold'>Title Holder</p>
+                    <Image
+                      src={`/teams/${
+                        tournamentEdition.winner.flagUrl
+                          ? tournamentEdition.winner.flagUrl
+                          : ""
+                      }`}
+                      width={80}
+                      height={80}
+                      alt={tournamentEdition.winner.name}
+                      className='shadow-2xl overflow-hidden rounded-full'
+                    />
+                    <p className='text-lg font-bold'>
+                      {tournamentEdition.winner.name}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
             <div className='flex flex-col items-center gap-2'>
@@ -95,20 +101,22 @@ const TournamentEditionComponent = ({
                       "france",
                     ].map((_, index) => (
                       <CarouselItem key={index} className='basis-1'>
-                        <div className=''>
+                        <div className='w-[250px]'>
                           <Card>
                             <CardContent className='flex items-center justify-evenly p-2 gap-2'>
-                              <p className='text-lg font-semibold italic'>
+                              <p className='text-lg font-semibold italic basis-1'>
                                 2020
                               </p>
-
                               <Image
                                 src={`/teams/${_}.png`}
                                 alt={_}
                                 width={20}
                                 height={20}
+                                className='basis-1'
                               />
-                              <p className='text-lg font-semibold'>{_}</p>
+                              <p className='text-lg font-semibold basis-4'>
+                                {_}
+                              </p>
                             </CardContent>
                           </Card>
                         </div>
@@ -122,7 +130,13 @@ const TournamentEditionComponent = ({
             </div>
           </div>
           <div className='flex flex-col gap-y-2 items-center'>
-            <div className='flex gap-x-2'>
+            <div className='flex flex-col gap-x-2'>
+              <p className='text-center w-full'>
+                <span className='text-sm bg-slate-300 rounded p-1 px-2'>
+                  {tournamentEdition.teams.length}
+                </span>{" "}
+                National Teams
+              </p>
               <Carousel
                 plugins={[plugin.current]}
                 opts={{

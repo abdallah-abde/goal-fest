@@ -2,7 +2,7 @@ export interface Tournament {
   id: number;
   name: string;
   logoUrl?: string;
-  tournamentEdition: TournamentEdition[];
+  tournamentEditions: TournamentEdition[];
 }
 
 export interface TournamentEdition {
@@ -15,6 +15,9 @@ export interface TournamentEdition {
   knockoutMatches: KnockoutMatch[];
   matches: Match[];
   teams: Team[];
+  hostingCountries: Country[];
+  winner?: Team;
+  winnerId?: number;
 }
 
 export interface Group {
@@ -32,11 +35,19 @@ export interface Team {
   flagUrl?: string;
   groups: Group[];
   tournamentEdition: TournamentEdition[];
+  tournamentEditionWinner: TournamentEdition[];
   matchesHome: Match[];
   matchesAway: Match[];
   knockoutMatchesHome: KnockoutMatch[];
   knockoutMatchesAway: KnockoutMatch[];
   //   players: Player[];
+}
+
+export interface Country {
+  id: number;
+  name: string;
+  flagUrl?: string;
+  tournamentEditions: TournamentEdition[];
 }
 
 export interface Match {
@@ -52,6 +63,7 @@ export interface Match {
   group: Group;
   tournamentEditionId: number;
   tournamentEdition: TournamentEdition;
+  round?: string;
 }
 
 export interface KnockoutMatch {

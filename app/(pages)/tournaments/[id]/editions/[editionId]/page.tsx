@@ -15,6 +15,8 @@ const TournamentEditionPage: React.FC<Props> = async ({ params }) => {
       tournament: true,
       groups: true,
       matches: true,
+      winner: true,
+      hostingCountries: true,
     },
   });
 
