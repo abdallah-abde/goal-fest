@@ -18,15 +18,18 @@ model Tournament {
 }
 
 model TournamentEdition {
-  id              Int             @id @default(autoincrement())
-  year            Int
-  logoUrl         String?
-  tournamentId    Int
-  tournament      Tournament      @relation(fields: [tournamentId], references: [id])
-  groups          Group[]
-  knockoutMatches KnockoutMatch[]
-  matches         Match[]
-  teams           Team[]
+  id               Int             @id @default(autoincrement())
+  year             Int
+  logoUrl          String?
+  tournamentId     Int
+  tournament       Tournament      @relation(fields: [tournamentId], references: [id])
+  groups           Group[]
+  knockoutMatches  KnockoutMatch[]
+  matches          Match[]
+  teams            Team[]
+  hostingCountries Country[]
+  winner           Team?           @relation("winnerTeam", fields: [winnerId], references: [id])
+  winnerId         Int?
 }
 
 model Group {
@@ -39,15 +42,23 @@ model Group {
 }
 
 model Team {
-  id                  Int                 @id @default(autoincrement())
-  name                String
-  flagUrl             String?
-  groups              Group[]
-  tournamentEdition   TournamentEdition[]
-  matchesHome         Match[]             @relation("homeTeam")
-  matchesAway         Match[]             @relation("awayTeam")
-  knockoutMatchesHome KnockoutMatch[]     @relation("homeTeam")
-  knockoutMatchesAway KnockoutMatch[]     @relation("awayTeam")
+  id                      Int                 @id @default(autoincrement())
+  name                    String
+  flagUrl                 String?
+  groups                  Group[]
+  tournamentEdition       TournamentEdition[]
+  tournamentEditionWinner TournamentEdition[] @relation("winnerTeam")
+  matchesHome             Match[]             @relation("homeTeam")
+  matchesAway             Match[]             @relation("awayTeam")
+  knockoutMatchesHome     KnockoutMatch[]     @relation("homeTeam")
+  knockoutMatchesAway     KnockoutMatch[]     @relation("awayTeam")
+}
+
+model Country {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  flagUrl            String?
+  tournamentEditions TournamentEdition[]
 }
 
 model Match {
@@ -63,6 +74,7 @@ model Match {
   group               Group             @relation(fields: [groupId], references: [id])
   tournamentEditionId Int
   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+  round               String?
 }
 
 model KnockoutMatch {
