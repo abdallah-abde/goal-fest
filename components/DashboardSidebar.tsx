@@ -18,6 +18,13 @@ const DashboardSidebar = () => {
       href: `/dashboard/tournaments`,
       icon: <Table2 />,
     },
+    ,
+    {
+      id: 3,
+      label: "Editions",
+      href: `/dashboard/editions`,
+      icon: <Table2 />,
+    },
   ];
 
   return (
