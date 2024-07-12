@@ -28,9 +28,12 @@ const DashboardTournamentsEditionsPage = async () => {
         <Table className='my-8'>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-[30%] text-left'>Name</TableHead>
-              <TableHead className='w-[30%] text-left'>Year</TableHead>
-              <TableHead className='w-[20%] text-left'>Groups</TableHead>
+              <TableHead className='w-[25%] text-left'>Name</TableHead>
+              <TableHead className='w-[25%] text-left'>Year</TableHead>
+              <TableHead className='w-[15%] text-left'>Groups</TableHead>
+              <TableHead className='w-[15%] text-left'>
+                Knockout Matches
+              </TableHead>
               <TableHead className='w-[10%]'>Edit</TableHead>
               <TableHead className='w-[10%]'>Delete</TableHead>
             </TableRow>
@@ -47,6 +50,11 @@ const DashboardTournamentsEditionsPage = async () => {
                 <TableCell className='text-left font-bold'>
                   <Link href={`/dashboard/editions/${edi.id}/groups`}>
                     Groups
+                  </Link>
+                </TableCell>
+                <TableCell className='text-left font-bold'>
+                  <Link href={`/dashboard/editions/${edi.id}/knockout-matches`}>
+                    Knockout Matches
                   </Link>
                 </TableCell>
                 <TableCell>

@@ -20,7 +20,7 @@ const KnockoutMatches: FC<Props> = ({ matches }) => {
   const results = Object.entries(_.groupBy(matches, groupBy));
 
   return (
-    <div>
+    <div className='mb-24'>
       <div className='flex justify-end pb-2'>
         <Button
           variant='outline'

@@ -11,17 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Pencil, Trash2Icon } from "lucide-react";
+import { getFormattedDateTime } from "@/lib/getFormattedDate";
 
-const DashboardTournamentsGroupsPage = async ({
+const DashboardTournamentsGroupMatchesPage = async ({
   params,
 }: {
-  params: { id: string };
+  params: { id: string; groupId: string };
 }) => {
-  const groups = await prisma.group.findMany({
+  const matches = await prisma.match.findMany({
     where: {
-      tournamentEditionId: +params.id,
+      groupId: +params.groupId,
     },
     include: {
+      homeTeam: true,
+      awayTeam: true,
+      group: true,
       tournamentEdition: {
         include: {
           tournament: true,
@@ -31,40 +35,50 @@ const DashboardTournamentsGroupsPage = async ({
   });
 
   return (
-    <>
+    <div className='mb-24'>
       <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href={`/dashboard/editions/${params.id}/groups/new`}>
-          Add New Group
+        <Link
+          href={`/dashboard/editions/${params.id}/groups/${params.groupId}/matches/new`}
+        >
+          Add New Match
         </Link>
       </Button>
-      {groups.length > 0 ? (
+      {matches.length > 0 ? (
         <Table className='my-8'>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-[30%] text-left'>Name</TableHead>
-              <TableHead className='w-[30%] text-left'>
+              <TableHead className='w-[15%] text-left'>Home team</TableHead>
+              <TableHead className='w-[15%] text-left'>Away team</TableHead>
+              <TableHead className='w-[10%] text-left'>Home Goals</TableHead>
+              <TableHead className='w-[10%] text-left'>Away Goals</TableHead>
+              <TableHead className='w-[15%] text-left'>Date & Time</TableHead>
+              <TableHead className='w-[15%] text-left'>
                 Tournament Edition
               </TableHead>
-              <TableHead className='w-[20%] text-left'>Matches</TableHead>
               <TableHead className='w-[10%]'>Edit</TableHead>
               <TableHead className='w-[10%]'>Delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {groups.map((grp) => (
-              <TableRow key={grp.id}>
+            {matches.map((mch) => (
+              <TableRow key={mch.id}>
                 <TableCell className='text-left font-bold'>
-                  {grp.name}
+                  {mch.homeTeam.name}
                 </TableCell>
                 <TableCell className='text-left font-bold'>
-                  {`${grp.tournamentEdition.tournament.name} ${grp.tournamentEdition.year}`}
+                  {mch.awayTeam.name}
                 </TableCell>
                 <TableCell className='text-left font-bold'>
-                  <Link
-                    href={`/dashboard/editions/${params.id}/groups/${grp.id}/matches`}
-                  >
-                    Matches
-                  </Link>
+                  {mch.homeGoals}
+                </TableCell>
+                <TableCell className='text-left font-bold'>
+                  {mch.awayGoals}
+                </TableCell>
+                <TableCell className='text-left font-bold'>
+                  {mch.date ? getFormattedDateTime(mch.date.toString()) : ""}
+                </TableCell>
+                <TableCell className='text-left font-bold'>
+                  {`${mch.tournamentEdition.tournament.name} ${mch.tournamentEdition.year}`}
                 </TableCell>
                 <TableCell>
                   <Button
@@ -73,7 +87,7 @@ const DashboardTournamentsGroupsPage = async ({
                     className='transition duration-200 hover:text-blue-500 '
                   >
                     <Link
-                      href={`/dashboard/editions/${params.id}/groups/${grp.id}`}
+                      href={`/dashboard/editions/${params.id}/groups/${mch.groupId}/matches/${mch.id}`}
                     >
                       <Pencil />
                     </Link>
@@ -89,10 +103,10 @@ const DashboardTournamentsGroupsPage = async ({
           </TableBody>
         </Table>
       ) : (
-        <p>No Groups Found</p>
+        <p>No Matches Found</p>
       )}
-    </>
+    </div>
   );
 };
 
-export default DashboardTournamentsGroupsPage;
+export default DashboardTournamentsGroupMatchesPage;

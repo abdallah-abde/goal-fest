@@ -17,7 +17,7 @@ const GroupMatchList: FC<Props> = async ({ matches }) => {
   const results = Object.entries(_.groupBy(matches, "date"));
 
   return (
-    <div className='flex flex-col gap-8'>
+    <div className='flex flex-col gap-8 mb-24'>
       {results.length > 0 ? (
         <>
           {results.map((m) => {
