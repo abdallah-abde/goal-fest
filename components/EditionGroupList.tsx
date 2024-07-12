@@ -20,7 +20,7 @@ interface Props {
 
 const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
   return (
-    <div>
+    <div className='mb-24'>
       {groupsWithTeams.length > 0 ? (
         groupsWithTeams.map((group) => (
           <div key={group.id}>

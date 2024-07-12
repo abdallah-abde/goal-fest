@@ -21,7 +21,7 @@ const DashboardTeamsPage = async () => {
         <Link href='/dashboard/teams/new'>Add New Team</Link>
       </Button>
       {teams.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-8 mb-20'>
           <TableHeader>
             <TableRow>
               <TableHead className='w-[80%] text-left'>Name</TableHead>
