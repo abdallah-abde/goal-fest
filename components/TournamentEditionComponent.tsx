@@ -14,6 +14,7 @@ import {
 
 import { TournamentEdition } from "@/typings";
 import { Card, CardContent } from "./ui/card";
+import NoDataFound from "./NoDataFound";
 
 const TournamentEditionComponent = ({
   tournamentEdition,
@@ -25,21 +26,25 @@ const TournamentEditionComponent = ({
   );
 
   return (
-    <div>
+    <>
       {tournamentEdition !== null ? (
-        <div className='grid grid-cols-4 grid-rows-3 gap-4 gap-y-8'>
+        <div className='grid grid-cols-4 grid-rows-3 gap-4 gap-y-8 ml-auto '>
           <div className='col-start-1 row-start-1 grid justify-center'>
             <Image
-              src={`/tournaments/${
+              src={
                 tournamentEdition.logoUrl
                   ? tournamentEdition.logoUrl
-                  : "tournament.png"
-              }`}
-              alt={`${
-                tournamentEdition.tournament.name
-              } ${tournamentEdition.year.toString()}`}
+                  : "/tournaments/tournament.png"
+              }
+              alt={
+                tournamentEdition.logoUrl
+                  ? `${
+                      tournamentEdition.tournament.name
+                    } ${tournamentEdition.year.toString()}`
+                  : "Tournament Logo"
+              }
               width={250}
-              height={250}
+              height={350}
             />
           </div>
           <div className='col-start-2 row-start-1 grid justify-center place-content-start'>
@@ -48,7 +53,10 @@ const TournamentEditionComponent = ({
             </p>
             <div className='flex flex-wrap items-start justify-center gap-4'>
               {tournamentEdition.hostingCountries.map((cou) => (
-                <div className='flex flex-col max-w-16 min-w-16 gap-y-1'>
+                <div
+                  key={cou.id}
+                  className='flex flex-col max-w-16 min-w-16 gap-y-1'
+                >
                   <Image
                     src={`/teams/${
                       cou.flagUrl ? cou.flagUrl : cou.name + ".png"
@@ -177,9 +185,9 @@ const TournamentEditionComponent = ({
           </div> */}
         </div>
       ) : (
-        <p>No Data to Present</p>
+        <NoDataFound message='Sorry, No Data Found' />
       )}
-    </div>
+    </>
   );
 };
 

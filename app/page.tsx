@@ -5,33 +5,35 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import prisma from "@/lib/db";
+import NoDataFound from "@/components/NoDataFound";
 
 const HomePage: FC = async () => {
   const tournaments = await prisma.tournament.findMany();
 
   return (
-    <div className='flex gap-4 py-24'>
+    <div className='h-screen flex gap-4 py-24'>
       {tournaments.length > 0 ? (
         tournaments.map(({ id, name, logoUrl }) => (
           <Link href={`/tournaments/${id}`} key={id}>
-            <Card className='max-w-fit bg-secondary hover:shadow-md transition duration-200'>
+            <Card className='bg-secondary hover:shadow-md transition duration-200 p-2 pt-0'>
               <CardHeader>
-                <CardTitle className='mx-auto'>{name}</CardTitle>
+                <CardTitle className='mx-auto text-xl'>{name}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <Image
-                  src={`${logoUrl ? logoUrl : "/tournaments/tournament.png"}`}
-                  width={logoUrl ? 250 : 150}
-                  height={logoUrl ? 250 : 150}
-                  alt={`${logoUrl ? name + " Logo" : "Tournament Image"}`}
-                  className='mx-auto object-contain'
-                />
-              </CardContent>
+              {logoUrl && (
+                <CardContent className='mx-auto h-[150px] w-[150px] relative'>
+                  <Image
+                    src={logoUrl}
+                    fill
+                    alt={`${name} Logo`}
+                    className='mx-auto object-contain'
+                  />
+                </CardContent>
+              )}
             </Card>
           </Link>
         ))
       ) : (
-        <p>No Data Found</p>
+        <NoDataFound message='Sorry, No Tournaments Found' />
       )}
     </div>
   );

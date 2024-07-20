@@ -2,9 +2,9 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className='h-full flex w-full pt-20'>
+    <div className='h-screen py-24 flex gap-x-4'>
       <DashboardSidebar />
-      <main className='pl-28 flex-1'>{children}</main>
+      <main className='overflow-auto grow px-2'>{children}</main>
     </div>
   );
 };

@@ -17,6 +17,7 @@ const KnockoutMatchesPage: FC<Props> = async ({ params }) => {
       tournamentEdition: true,
     },
   });
+
   return <KnockoutMatches matches={matches} />;
 };
 

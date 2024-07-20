@@ -30,16 +30,20 @@ export default function TeamForm({ team }: { team?: Team | null }) {
       <div className='space-y-2'>
         <Label htmlFor='image'>Image</Label>
         <Input type='file' id='image' name='image' required={team === null} />
-        {team != null && (
+      </div>
+      {team != null && team?.flagUrl !== null && (
+        <div className='space-y-2'>
+          <Label>Current Image</Label>
           <Image
             src={team?.flagUrl || ""}
-            height='400'
-            width='400'
+            height='100'
+            width='100'
             alt='Team Image'
           />
-        )}
-        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
-      </div>
+
+          {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
+        </div>
+      )}
       <SubmitButton />
     </form>
   );

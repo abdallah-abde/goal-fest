@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
+import { Pencil, Trash2Icon, Plus } from "lucide-react";
 import { getFormattedDateTime } from "@/lib/getFormattedDate";
 
 const DashboardTournamentsGroupKnockoutMatchesPage = async ({
@@ -34,20 +34,22 @@ const DashboardTournamentsGroupKnockoutMatchesPage = async ({
   });
 
   return (
-    <div className='mb-24'>
-      <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href={`/dashboard/editions/${params.id}/knockout-matches/new`}>
-          Add New Match
-        </Link>
-      </Button>
+    <>
+      <Link
+        href={`/dashboard/editions/${params.id}/knockout-matches/new`}
+        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
+      >
+        <Plus className='size-5' />
+        <span>Add New Match</span>
+      </Link>
+
       {matches.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead className='text-left'>Home team</TableHead>
               <TableHead className='text-left'>Away team</TableHead>
-              <TableHead className='text-left'>Home MT Goals</TableHead>
-              <TableHead className='text-left'>Away MT Goals</TableHead>
+              <TableHead className='text-left'>MT Goals</TableHead>
               <TableHead className='text-left'>Home ET Goals</TableHead>
               <TableHead className='text-left'>Away ET Goals</TableHead>
               <TableHead className='text-left'>Home Pen Goals</TableHead>
@@ -69,10 +71,7 @@ const DashboardTournamentsGroupKnockoutMatchesPage = async ({
                   {mch.awayTeam ? mch.awayTeam.name : mch.awayTeamPlacehlder}
                 </TableCell>
                 <TableCell className='text-left font-bold'>
-                  {mch.homeGoals}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.awayGoals}
+                  {`${mch.homeGoals} - ${mch.awayGoals}`}
                 </TableCell>
                 <TableCell className='text-left font-bold'>
                   {mch.homeExtraTimeGoals}
@@ -120,7 +119,7 @@ const DashboardTournamentsGroupKnockoutMatchesPage = async ({
       ) : (
         <p>No Matches Found</p>
       )}
-    </div>
+    </>
   );
 };
 

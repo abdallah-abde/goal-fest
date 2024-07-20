@@ -2,22 +2,31 @@
 
 import prisma from "@/lib/db";
 import fs from "fs/promises";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addCountry(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
-  const imagePath = `/countries/${crypto.randomUUID()}-${data.image.name}`;
 
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  );
+  let imagePath = "";
+  if (data.image !== null && data.image.size > 0) {
+    imagePath = `/countries/${crypto.randomUUID()}-${data.image.name}`;
+
+    await fs.writeFile(
+      `public${imagePath}`,
+      Buffer.from(await data.image.arrayBuffer())
+    );
+  }
 
   await prisma.country.create({
     data: {
-      name: data.name,
-      flagUrl: imagePath,
+      name: data.name.toString(),
+      flagUrl: data.image.size > 0 ? imagePath : null,
     },
   });
+
+  revalidatePath("/dashboard/countries");
+  redirect("/dashboard/countries");
 }
 
 export async function updateCountry(
@@ -32,9 +41,11 @@ export async function updateCountry(
   if (country == null) return;
 
   let imagePath = country.flagUrl;
-  if (data.image != null && data.image.size > 0) {
-    await fs.unlink(`public${country.flagUrl}`);
+  if (data.image !== null && data.image.size > 0) {
+    if (country.flagUrl) await fs.unlink(`public${country.flagUrl}`);
+
     imagePath = `/countries/${crypto.randomUUID()}-${data.image.name}`;
+
     await fs.writeFile(
       `public${imagePath}`,
       Buffer.from(await data.image.arrayBuffer())
@@ -44,8 +55,11 @@ export async function updateCountry(
   await prisma.country.update({
     where: { id },
     data: {
-      name: data.name,
+      name: data.name.toString(),
       flagUrl: imagePath,
     },
   });
+
+  revalidatePath("/dashboard/countries");
+  redirect("/dashboard/countries");
 }

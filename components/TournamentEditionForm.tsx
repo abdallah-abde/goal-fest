@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormState, useFormStatus } from "react-dom";
@@ -8,29 +8,23 @@ import {
   addTournamentEdition,
   updateTournamentEdition,
 } from "@/actions/tournamentsEditions";
-import { TournamentEdition, Tournament } from "@prisma/client";
+import { TournamentEdition, Tournament, Team, Country } from "@prisma/client";
 import Image from "next/image";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
+
+interface TournamentEditionProps extends TournamentEdition {
+  hostingCountries: Country[];
+}
 
 export default function TournamentEditionForm({
   tournamentEdition,
   tournaments,
+  teams,
+  countries,
 }: {
-  tournamentEdition?: TournamentEdition | null;
+  tournamentEdition?: TournamentEditionProps | null;
   tournaments: Tournament[];
+  teams: Team[];
+  countries: Country[];
 }) {
   const [error, action] = useFormState(
     !tournamentEdition
@@ -39,16 +33,15 @@ export default function TournamentEditionForm({
     {}
   );
 
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(
-    tournamentEdition ? tournamentEdition?.tournamentId.toString() : ""
-  );
-
   return (
     <form action={action} className='space-y-8'>
-      <div className='space-y-2'>
+      <div className='space-y-2 flex flex-col gap-1'>
         <Label htmlFor='tournamentId'>Tournament Name</Label>
-        <select name='tournamentId' id='tournamentId'>
+        <select
+          name='tournamentId'
+          id='tournamentId'
+          className='p-2 rounded-md'
+        >
           {tournaments.map((t) => (
             <option
               value={t.id}
@@ -62,7 +55,7 @@ export default function TournamentEditionForm({
       <div className='space-y-2'>
         <Label htmlFor='year'>Year</Label>
         <Input
-          type='text'
+          type='number'
           id='year'
           name='year'
           required
@@ -78,15 +71,51 @@ export default function TournamentEditionForm({
           name='image'
           required={tournamentEdition === null}
         />
-        {tournamentEdition != null && (
+      </div>
+      {tournamentEdition != null && tournamentEdition?.logoUrl != null && (
+        <div className='space-y-2'>
+          <Label>Current Image</Label>
           <Image
             src={tournamentEdition?.logoUrl || ""}
-            height='400'
-            width='400'
+            height='100'
+            width='100'
             alt='Tournament Edition Image'
           />
-        )}
-        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
+          {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
+        </div>
+      )}
+      <div className='space-y-2 flex flex-col gap-1'>
+        <Label htmlFor='winnerId'>Winner Team</Label>
+        <select name='winnerId' id='winnerId' className='p-2 rounded-md'>
+          <option value='choose team'>Choose Team...</option>
+          {teams.map((t) => (
+            <option
+              key={t.id}
+              value={t.id}
+              selected={t.id === tournamentEdition?.winnerId}
+            >
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className='space-y-2 flex flex-col gap-1'>
+        <Label htmlFor='hostingCountries'>Hosting Countries</Label>
+        <select name='hostingCountries' id='hostingCountries' multiple={true}>
+          {countries?.map((c) => (
+            <option
+              key={c.id}
+              value={c.id}
+              selected={
+                tournamentEdition?.hostingCountries.filter((a) => c.id === a.id)
+                  .length === 1
+              }
+            >
+              {c.name}
+            </option>
+          ))}
+        </select>
+        {/* {error?.message && <div className='text-destructive'>{error?.message}</div>} */}
       </div>
       <SubmitButton />
     </form>

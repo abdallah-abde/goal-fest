@@ -6,17 +6,23 @@ const EditTournamentEditionPage = async ({
 }: {
   params: { id: string };
 }) => {
-  console.log(id);
   const tournaments = await prisma.tournament.findMany();
+  const teams = await prisma.team.findMany();
+  const countries = await prisma.country.findMany();
 
   const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id: parseInt(id) },
+    include: {
+      hostingCountries: true,
+    },
   });
 
   return (
     <TournamentEditionForm
       tournaments={tournaments}
       tournamentEdition={tournamentEdition}
+      teams={teams}
+      countries={countries}
     />
   );
 };

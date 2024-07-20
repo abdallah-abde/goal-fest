@@ -3,10 +3,15 @@
 import { Braces, Table2, LandPlot, Home } from "lucide-react";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import Image from "next/image";
 
-const Sidebar = () => {
+import { cn } from "@/lib/utils";
+
+import { useParams, usePathname } from "next/navigation";
+
+const Sidebar = ({ logoUrl, name }: { logoUrl: string; name: string }) => {
   const params = useParams();
+  const pathname = usePathname();
 
   const routes = [
     {
@@ -42,17 +47,23 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className='flex flex-col w-20 fixed'>
-      <div className='space-y-1'>
+    <div className='flex flex-col border-r-2 pr-4 min-w-max'>
+      <div className='flex items-center justify-center mb-4'>
+        <Image width={200} height={200} src={logoUrl} alt={name + " Logo"} />
+      </div>
+      <div className='space-y-2 overflow-auto'>
         {routes.map((r) => (
           <Link
             key={r.id}
-            className='flex flex-col items-center gap-y-1 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center'
+            className={cn(
+              `px-2 flex items-center gap-x-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center`,
+              pathname === r.href && "bg-primary/10"
+            )}
             href={r.href}
           >
-            {r.icon}
+            <div>{r.icon}</div>
 
-            {r.label}
+            <p>{r.label}</p>
           </Link>
         ))}
       </div>

@@ -10,27 +10,31 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
+import { Pencil, Trash2Icon, Plus } from "lucide-react";
 
 const DashboardTournamentsEditionsPage = async () => {
   const editions = await prisma.tournamentEdition.findMany({
     include: {
       tournament: true,
+      hostingCountries: true,
     },
   });
 
   return (
     <>
-      <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href='/dashboard/editions/new'>Add New Tournament Edition</Link>
-      </Button>
+      <Link
+        href='/dashboard/editions/new'
+        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
+      >
+        <Plus className='size-5' />
+        <span>Add New Edition</span>
+      </Link>
       {editions.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead className='w-[25%] text-left'>Name</TableHead>
               <TableHead className='w-[25%] text-left'>Year</TableHead>
-              <TableHead className='w-[15%] text-left'>Groups</TableHead>
               <TableHead className='w-[15%] text-left'>
                 Knockout Matches
               </TableHead>
@@ -46,11 +50,6 @@ const DashboardTournamentsEditionsPage = async () => {
                 </TableCell>
                 <TableCell className='text-left font-bold'>
                   {edi.year.toString()}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  <Link href={`/dashboard/editions/${edi.id}/groups`}>
-                    Groups
-                  </Link>
                 </TableCell>
                 <TableCell className='text-left font-bold'>
                   <Link href={`/dashboard/editions/${edi.id}/knockout-matches`}>

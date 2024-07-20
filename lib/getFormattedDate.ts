@@ -6,6 +6,13 @@ export const getFormattedDate = (date: string) => {
   });
 };
 
+export const getFormattedTime = (date: string) => {
+  return new Date(date).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 export const getFormattedDateTime = (date: string) => {
   return `${getFormattedDate(date)}, ${new Date(date).toLocaleTimeString(
     "en-US",

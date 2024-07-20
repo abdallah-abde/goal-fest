@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import { TournamentEdition } from "@/typings";
 import Image from "next/image";
+import NoDataFound from "./NoDataFound";
 
 interface Props {
   tournamentEditions: TournamentEdition[];
@@ -13,40 +14,32 @@ interface Props {
 
 const TournamentEditionList: FC<Props> = async ({ tournamentEditions }) => {
   return (
-    <div>
-      <div className='flex gap-4 py-24'>
-        {tournamentEditions.length > 0 ? (
-          tournamentEditions.map(({ id, year, logoUrl, tournament }) => (
-            <Link href={`/tournaments/${tournament.id}/editions/${id}/`}>
-              <Card
-                key={id}
-                className='max-w-fit bg-secondary hover:shadow-md transition duration-200'
-              >
-                <CardHeader>
-                  <CardTitle className='mx-auto'>
-                    {`${tournament.name} ${year.toString()}`}{" "}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+    <div className='flex gap-4 py-24'>
+      {tournamentEditions.length > 0 ? (
+        tournamentEditions.map(({ id, year, logoUrl, tournament }) => (
+          <Link key={id} href={`/tournaments/${tournament.id}/editions/${id}/`}>
+            <Card className='bg-secondary hover:shadow-md transition duration-200 p-2 pt-0'>
+              <CardHeader>
+                <CardTitle className='mx-auto text-xl'>
+                  {`${tournament.name} ${year.toString()}`}{" "}
+                </CardTitle>
+              </CardHeader>
+              {logoUrl && (
+                <CardContent className='mx-auto h-[150px] w-[150px] relative'>
                   <Image
-                    src={`/tournaments/${logoUrl ? logoUrl : "tournament.png"}`}
-                    width={logoUrl ? 250 : 150}
-                    height={logoUrl ? 250 : 150}
-                    alt={`${
-                      logoUrl
-                        ? tournament.name + " " + year.toString() + " Logo"
-                        : "Tournament Image"
-                    }`}
-                    className='mx-auto'
+                    src={logoUrl}
+                    fill
+                    alt={`${tournament.name} ${year.toString()} Logo`}
+                    className='mx-auto object-contain '
                   />
                 </CardContent>
-              </Card>
-            </Link>
-          ))
-        ) : (
-          <p>No Tournament Editions Found</p>
-        )}
-      </div>
+              )}
+            </Card>
+          </Link>
+        ))
+      ) : (
+        <NoDataFound message='Sorry, No Tournament Editions Found' />
+      )}
     </div>
   );
 };

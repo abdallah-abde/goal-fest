@@ -1,6 +1,8 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addTournamentGroupMatch(
   prevState: unknown,
@@ -20,6 +22,9 @@ export async function addTournamentGroupMatch(
       round: data.round ? data.round.toString() : null,
     },
   });
+
+  revalidatePath("/dashboard/matches");
+  redirect("/dashboard/matches");
 }
 
 export async function updateTournamentGroupMatch(
@@ -42,4 +47,7 @@ export async function updateTournamentGroupMatch(
       round: data.round ? data.round.toString() : null,
     },
   });
+
+  revalidatePath("/dashboard/matches");
+  redirect("/dashboard/matches");
 }

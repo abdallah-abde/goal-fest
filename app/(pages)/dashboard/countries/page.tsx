@@ -10,18 +10,22 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
+import { Pencil, Trash2Icon, Plus } from "lucide-react";
 
 const DashboardCountriesPage = async () => {
   const countries = await prisma.country.findMany();
 
   return (
     <>
-      <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href='/dashboard/countries/new'>Add New Country</Link>
-      </Button>
+      <Link
+        href='/dashboard/countries/new'
+        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
+      >
+        <Plus className='size-5' />
+        <span>Add New country</span>
+      </Link>
       {countries.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead className='w-[80%] text-left'>Name</TableHead>
