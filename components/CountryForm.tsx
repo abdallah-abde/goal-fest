@@ -35,16 +35,19 @@ export default function CountryForm({ country }: { country?: Country | null }) {
           name='image'
           required={country === null}
         />
-        {country != null && (
+      </div>
+      {country != null && country?.flagUrl !== null && (
+        <div className='space-y-2'>
+          <Label>Current Image</Label>
           <Image
             src={country?.flagUrl || ""}
-            height='400'
-            width='400'
+            height='100'
+            width='100'
             alt='Country Image'
           />
-        )}
-        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
-      </div>
+        </div>
+      )}
+      {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
       <SubmitButton />
     </form>
   );

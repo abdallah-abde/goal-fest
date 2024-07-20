@@ -10,18 +10,22 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
+import { Pencil, Trash2Icon, Plus } from "lucide-react";
 
 const DashboardTournamentsPage = async () => {
   const tournaments = await prisma.tournament.findMany();
 
   return (
     <>
-      <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href='/dashboard/tournaments/new'>Add New Tournament</Link>
-      </Button>
+      <Link
+        href='/dashboard/tournaments/new'
+        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
+      >
+        <Plus className='size-5' />
+        <span>Add New Tournament</span>
+      </Link>
       {tournaments.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead className='w-[80%] text-left'>Name</TableHead>

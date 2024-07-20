@@ -1,75 +1,97 @@
-import { FC } from "react";
+import { Match } from "@prisma/client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-import { Match } from "@/typings";
 import Image from "next/image";
-import { Badge } from "./ui/badge";
 
 import * as _ from "lodash";
-import { getFormattedDate } from "@/lib/getFormattedDate";
 
-interface Props {
-  matches: Match[];
-}
+import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 
-const GroupMatchList: FC<Props> = async ({ matches }) => {
-  const results = Object.entries(_.groupBy(matches, "date"));
+import NoDataFound from "./NoDataFound";
+
+const GroupMatchList = async ({ matches }: { matches: Match[] }) => {
+  const results = Object.entries(
+    _.groupBy(matches, (item) =>
+      getFormattedDate(item.date ? item.date?.toDateString() : "")
+    )
+  );
 
   return (
-    <div className='flex flex-col gap-8 mb-24'>
+    <>
       {results.length > 0 ? (
-        <>
-          {results.map((m) => {
+        <div className='flex flex-col gap-8'>
+          {results.map(([divider, list]) => {
             return (
-              <div>
+              <div key={divider}>
                 <p className='mb-2 bg-sky-200 w-fit p-2 rounded-sm font-semibold'>
-                  {getFormattedDate(m[0])}
+                  {getFormattedDate(divider)}
                 </p>
-                <div className='flex items-center justify-start gap-2'>
-                  {m[1].map((match: Match) => (
-                    <Card key={match.id} className='w-1/3 max-w-96'>
+                <div className='flex flex-wrap items-center justify-start gap-2'>
+                  {list.map((match: Match) => (
+                    <Card key={match.id} className='w-full'>
                       <CardHeader>
                         <CardTitle className='flex flex-col items-center justify-center gap-4'>
-                          <div className='mr-auto'>
-                            <Badge variant='secondary'>
-                              {match.group.name}
-                            </Badge>
+                          <div className='flex w-full justify-between'>
+                            <div>
+                              <Badge variant='secondary'>
+                                {match.group.name}
+                              </Badge>
+                            </div>
+                            {match.round && (
+                              <div>
+                                <Badge variant='outline'>{`Round ${match.round}`}</Badge>
+                              </div>
+                            )}
                           </div>
-                          <div className='flex items-center justify-center gap-4'>
-                            <p className='text-[16px] font-bold'>
+                          <div className='flex items-center justify-between gap-4'>
+                            <p className='text-[18px] font-bold'>
                               {match.homeTeam.name}
                             </p>
-                            <Image
-                              src={`/teams/${match.homeTeam.flagUrl}`}
-                              width={25}
-                              height={25}
-                              alt={`${match.homeTeam.name} flag`}
-                            />
+                            {match.homeTeam && match.homeTeam.flagUrl && (
+                              <Image
+                                src={match.homeTeam?.flagUrl}
+                                width={25}
+                                height={25}
+                                alt={`${match.homeTeam?.name} Flag`}
+                              />
+                            )}
                             {match.homeGoals !== null && (
-                              <span>{match.homeGoals}</span>
+                              <span className='text-[22px] font-bold ml-8'>
+                                {match.homeGoals}
+                              </span>
                             )}{" "}
                             -{" "}
                             {match.awayGoals !== null && (
-                              <span>{match.awayGoals}</span>
+                              <span className='text-[22px] font-bold mr-8'>
+                                {match.awayGoals}
+                              </span>
                             )}
-                            <Image
-                              src={`/teams/${match.awayTeam.flagUrl}`}
-                              width={25}
-                              height={25}
-                              alt={`${match.awayTeam.name} flag`}
-                            />
-                            <p className='text-[16px]  font-bold'>
+                            {match.awayTeam && match.awayTeam.flagUrl && (
+                              <Image
+                                src={match.awayTeam?.flagUrl}
+                                width={25}
+                                height={25}
+                                alt={`${match.awayTeam?.name} Flag`}
+                              />
+                            )}
+                            <p className='text-[18px]  font-bold'>
                               {match.awayTeam.name}
                             </p>
                           </div>
                         </CardTitle>
                       </CardHeader>
                       {match.date && (
-                        <CardContent className='text-right'>
+                        <CardContent className='flex justify-between'>
                           <Badge variant='default'>
                             {match.date
                               ? getFormattedDate(match.date.toString())
+                              : ""}
+                          </Badge>
+                          <Badge variant='outline'>
+                            {match.date
+                              ? getFormattedTime(match.date.toString())
                               : ""}
                           </Badge>
                         </CardContent>
@@ -80,11 +102,11 @@ const GroupMatchList: FC<Props> = async ({ matches }) => {
               </div>
             );
           })}
-        </>
+        </div>
       ) : (
-        <p>No Matches Found</p>
+        <NoDataFound message='Sorry, No Matches Found' />
       )}
-    </div>
+    </>
   );
 };
 

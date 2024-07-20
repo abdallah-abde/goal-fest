@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function NavigationMenu() {
   return (
-    <nav className='w-full mx-auto px-8 border-b-2'>
-      <ul className='flex justify-between items-center py-4'>
-        <li>
+    <nav className='container'>
+      <ul className='flex items-center py-6'>
+        <li className='mr-auto'>
           <Link
             href='/'
             className='font-bold bg-primary text-secondary hover:bg-primary p-2 rounded-sm transition duration-150'

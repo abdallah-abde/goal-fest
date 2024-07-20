@@ -2,28 +2,47 @@
 
 import prisma from "@/lib/db";
 import fs from "fs/promises";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addTournamentEdition(
   prevState: unknown,
   formData: FormData
 ) {
   const data = Object.fromEntries(formData.entries());
-  console.log(data);
-  const imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
-  console.log(imagePath);
 
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  );
+  let imagePath = "";
+  if (data.image !== null && data.image.size > 0) {
+    imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+
+    await fs.writeFile(
+      `public${imagePath}`,
+      Buffer.from(await data.image.arrayBuffer())
+    );
+  }
+
+  const hostingCountries = await prisma.country.findMany({
+    where: {
+      id: {
+        in: formData.getAll("countries").map((a) => +a),
+      },
+    },
+  });
 
   await prisma.tournamentEdition.create({
     data: {
-      tournamentId: parseInt(data.tournamentId),
-      year: parseInt(data.year),
-      logoUrl: imagePath,
+      tournamentId: +data.tournamentId,
+      year: +data.year,
+      logoUrl: data.image.size > 0 ? imagePath : null,
+      winnerId: data.winnerId ? +data.winnerId : null,
+      hostingCountries: {
+        connect: hostingCountries,
+      },
     },
   });
+
+  revalidatePath("/dashboard/editions");
+  redirect("/dashboard/editions");
 }
 
 export async function updateTournamentEdition(
@@ -32,7 +51,6 @@ export async function updateTournamentEdition(
   formData: FormData
 ) {
   const data = Object.fromEntries(formData.entries());
-  console.log(data);
 
   const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id },
@@ -41,21 +59,45 @@ export async function updateTournamentEdition(
   if (tournamentEdition == null) return;
 
   let imagePath = tournamentEdition.logoUrl;
-  if (data.image != null && data.image.size > 0) {
-    await fs.unlink(`public${tournamentEdition.logoUrl}`);
+  if (data.image !== null && data.image.size > 0) {
+    if (tournamentEdition.logoUrl)
+      await fs.unlink(`public${tournamentEdition.logoUrl}`);
+
     imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+
     await fs.writeFile(
       `public${imagePath}`,
       Buffer.from(await data.image.arrayBuffer())
     );
   }
 
+  const hostingCountries = await prisma.country.findMany({
+    where: {
+      id: {
+        in: formData.getAll("hostingCountries").map((a) => +a),
+      },
+    },
+  });
+
+  const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
+    where: { id },
+    include: { hostingCountries: true },
+  });
+
   await prisma.tournamentEdition.update({
     where: { id },
     data: {
-      tournamentId: parseInt(data.tournamentId),
-      year: parseInt(data.year),
+      tournamentId: +data.tournamentId,
+      year: +data.year,
       logoUrl: imagePath,
+      winnerId: data.winnerId ? +data.winnerId : null,
+      hostingCountries: {
+        disconnect: currentTournamentEdition?.hostingCountries,
+        connect: hostingCountries,
+      },
     },
   });
+
+  revalidatePath("/dashboard/editions");
+  redirect("/dashboard/editions");
 }

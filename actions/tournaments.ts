@@ -2,24 +2,31 @@
 
 import prisma from "@/lib/db";
 import fs from "fs/promises";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addTournament(prevState: unknown, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
-  console.log(data);
-  const imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
-  console.log(imagePath);
 
-  await fs.writeFile(
-    `public${imagePath}`,
-    Buffer.from(await data.image.arrayBuffer())
-  );
+  let imagePath = "";
+  if (data.image !== null && data.image.size > 0) {
+    imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+
+    await fs.writeFile(
+      `public${imagePath}`,
+      Buffer.from(await data.image.arrayBuffer())
+    );
+  }
 
   await prisma.tournament.create({
     data: {
-      name: data.name,
-      logoUrl: imagePath,
+      name: data.name.toString(),
+      logoUrl: data.image.size > 0 ? imagePath : null,
     },
   });
+
+  revalidatePath("/dashboard/tournaments");
+  redirect("/dashboard/tournaments");
 }
 
 export async function updateTournament(
@@ -28,16 +35,17 @@ export async function updateTournament(
   formData: FormData
 ) {
   const data = Object.fromEntries(formData.entries());
-  console.log(data);
 
   const tournament = await prisma.tournament.findUnique({ where: { id } });
 
   if (tournament == null) return;
 
   let imagePath = tournament.logoUrl;
-  if (data.image != null && data.image.size > 0) {
-    await fs.unlink(`public${tournament.logoUrl}`);
+  if (data.image !== null && data.image.size > 0) {
+    if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
+
     imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+
     await fs.writeFile(
       `public${imagePath}`,
       Buffer.from(await data.image.arrayBuffer())
@@ -47,8 +55,11 @@ export async function updateTournament(
   await prisma.tournament.update({
     where: { id },
     data: {
-      name: data.name,
+      name: data.name.toString(),
       logoUrl: imagePath,
     },
   });
+
+  revalidatePath("/dashboard/tournaments");
+  redirect("/dashboard/tournaments");
 }

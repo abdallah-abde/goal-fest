@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
+import { Pencil, Trash2Icon, Plus } from "lucide-react";
 
 const DashboardTournamentsGroupsPage = async ({
   params,
@@ -27,18 +27,22 @@ const DashboardTournamentsGroupsPage = async ({
           tournament: true,
         },
       },
+      teams: true,
     },
   });
 
   return (
     <>
-      <Button variant='default' asChild className='ml-auto block w-fit'>
-        <Link href={`/dashboard/editions/${params.id}/groups/new`}>
-          Add New Group
-        </Link>
-      </Button>
+      <Link
+        href={`/dashboard/editions/${params.id}/groups/new`}
+        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
+      >
+        <Plus className='size-5' />
+        <span>Add New Group</span>
+      </Link>
+
       {groups.length > 0 ? (
-        <Table className='my-8'>
+        <Table className='mt-4'>
           <TableHeader>
             <TableRow>
               <TableHead className='w-[30%] text-left'>Name</TableHead>

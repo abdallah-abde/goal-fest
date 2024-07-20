@@ -39,16 +39,21 @@ export default function TournamentForm({
           name='image'
           required={tournament === null}
         />
-        {tournament != null && (
+      </div>
+
+      {tournament != null && tournament?.logoUrl !== null && (
+        <div className='space-y-2'>
+          <Label>Current Image</Label>
           <Image
             src={tournament?.logoUrl || ""}
-            height='400'
-            width='400'
+            height='100'
+            width='100'
             alt='Tournament Image'
           />
-        )}
-        {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
-      </div>
+
+          {/* {error.image && <div className="text-destructive">{error.image}</div>} */}
+        </div>
+      )}
       <SubmitButton />
     </form>
   );

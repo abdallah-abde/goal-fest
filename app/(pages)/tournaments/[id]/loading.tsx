@@ -1,5 +1,5 @@
-import LoadingComponent from "@/components/LoadingComponent";
+import { TournamentsSkeleton } from "@/components/LoadingComponent.tsx";
 
 export default function Loading() {
-  return <LoadingComponent />;
+  return <TournamentsSkeleton />;
 }

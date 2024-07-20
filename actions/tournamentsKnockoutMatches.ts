@@ -1,6 +1,8 @@
 "use server";
 
 import prisma from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function addTournamentKnockoutMatch(
   prevState: unknown,
@@ -33,6 +35,9 @@ export async function addTournamentKnockoutMatch(
         : null,
     },
   });
+
+  revalidatePath("/dashboard/knockout-matches");
+  redirect("/dashboard/knockout-matches");
 }
 
 export async function updateTournamentKnockoutMatch(
@@ -68,4 +73,7 @@ export async function updateTournamentKnockoutMatch(
         : null,
     },
   });
+
+  revalidatePath("/dashboard/knockout-matches");
+  redirect("/dashboard/knockout-matches");
 }
