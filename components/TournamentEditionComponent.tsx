@@ -12,14 +12,21 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import { TournamentEdition } from "@/typings";
+import { TournamentEdition, Team, Tournament, Country } from "@prisma/client";
 import { Card, CardContent } from "./ui/card";
 import NoDataFound from "./NoDataFound";
+
+interface TournamentEditionProps extends TournamentEdition {
+  teams: Team[];
+  tournament: Tournament;
+  winner: Team | null;
+  hostingCountries: Country[];
+}
 
 const TournamentEditionComponent = ({
   tournamentEdition,
 }: {
-  tournamentEdition: TournamentEdition;
+  tournamentEdition: TournamentEditionProps | null;
 }) => {
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })

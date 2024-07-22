@@ -11,7 +11,7 @@ const HomePage: FC = async () => {
   const tournaments = await prisma.tournament.findMany();
 
   return (
-    <div className='h-screen flex gap-4 py-24'>
+    <div className='h-screen flex flex-col md:flex-row gap-4 py-24 overflow-auto'>
       {tournaments.length > 0 ? (
         tournaments.map(({ id, name, logoUrl }) => (
           <Link href={`/tournaments/${id}`} key={id}>

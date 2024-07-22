@@ -14,7 +14,7 @@ const TournamentLayout = async ({
   });
 
   return (
-    <div className='h-screen py-24 flex gap-x-4'>
+    <div className='h-screen flex flex-col md:flex-row gap-4 py-24'>
       <Sidebar
         logoUrl={
           tournamentEdition?.logoUrl
@@ -27,7 +27,9 @@ const TournamentLayout = async ({
             : "Tournament Logo"
         }
       />
-      <div className='overflow-auto grow pr-2'>{children}</div>
+      <div className='md:overflow-auto grow md:pr-2 pb-24 md:pb-0'>
+        {children}
+      </div>
     </div>
   );
 };

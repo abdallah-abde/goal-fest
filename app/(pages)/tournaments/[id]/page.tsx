@@ -1,13 +1,8 @@
-import { FC } from "react";
 import prisma from "@/lib/db";
 
 import TournamentEditionList from "@/components/TournamentEditionList";
 
-interface Props {
-  params: { id: string };
-}
-
-const TournamentPage: FC<Props> = async ({ params }) => {
+const TournamentPage = async ({ params }: { params: { id: string } }) => {
   const tournamentEditions = await prisma.tournamentEdition.findMany({
     where: {
       tournamentId: +params.id,
