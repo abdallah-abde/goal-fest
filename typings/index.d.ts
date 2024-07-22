@@ -108,10 +108,6 @@ export interface Player {
   teamId: number;
 }
 
-export interface GroupWithTeams {
-  id: number;
-  name: string;
-  tournamentEditionId: number;
-  tournamentEdition: TournamentEdition;
+export interface GroupWithTeams extends Group {
   teams: TeamWithStats[];
 }

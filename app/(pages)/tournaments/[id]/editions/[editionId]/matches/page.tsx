@@ -1,12 +1,11 @@
-import { FC } from "react";
 import prisma from "@/lib/db";
 import GroupMatchList from "@/components/GroupMatchList";
 
-interface Props {
+const GroupMatchesPage = async ({
+  params,
+}: {
   params: { editionId: string };
-}
-
-const GroupMatchesPage: FC<Props> = async ({ params }) => {
+}) => {
   const matches = await prisma.match.findMany({
     where: {
       tournamentEditionId: +params.editionId,

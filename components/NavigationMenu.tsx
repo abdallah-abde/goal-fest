@@ -2,14 +2,14 @@ import Link from "next/link";
 
 export default function NavigationMenu() {
   return (
-    <nav className='container'>
+    <nav className='mx-auto px-4 md:container'>
       <ul className='flex items-center py-6'>
         <li className='mr-auto'>
           <Link
             href='/'
             className='font-bold bg-primary text-secondary hover:bg-primary p-2 rounded-sm transition duration-150'
           >
-            Goal Fest Logo
+            Goal Fest
           </Link>
         </li>
         <li>

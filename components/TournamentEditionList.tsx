@@ -1,20 +1,22 @@
-import { FC } from "react";
-
 import Link from "next/link";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-import { TournamentEdition } from "@/typings";
+import { TournamentEdition, Tournament } from "@prisma/client";
 import Image from "next/image";
 import NoDataFound from "./NoDataFound";
 
-interface Props {
-  tournamentEditions: TournamentEdition[];
+interface TournamentEditionProps extends TournamentEdition {
+  tournament: Tournament;
 }
 
-const TournamentEditionList: FC<Props> = async ({ tournamentEditions }) => {
+const TournamentEditionList = async ({
+  tournamentEditions,
+}: {
+  tournamentEditions: TournamentEditionProps[];
+}) => {
   return (
-    <div className='flex gap-4 py-24'>
+    <div className='h-screen flex flex-col md:flex-row gap-4 py-24 overflow-auto'>
       {tournamentEditions.length > 0 ? (
         tournamentEditions.map(({ id, year, logoUrl, tournament }) => (
           <Link key={id} href={`/tournaments/${tournament.id}/editions/${id}/`}>

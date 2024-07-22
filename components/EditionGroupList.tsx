@@ -1,5 +1,4 @@
 import { GroupWithTeams } from "@/typings";
-import { FC } from "react";
 
 import {
   Table,
@@ -14,11 +13,11 @@ import Image from "next/image";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 import { cn } from "@/lib/utils";
 
-interface Props {
+const EditionGroupList = ({
+  groupsWithTeams,
+}: {
   groupsWithTeams: GroupWithTeams[];
-}
-
-const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
+}) => {
   return (
     <div className=''>
       {groupsWithTeams.length > 0 ? (
@@ -31,37 +30,80 @@ const EditionGroupList: FC<Props> = ({ groupsWithTeams }) => {
                 </TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className='w-[20%] text-left'>Team</TableHead>
-                    <TableHead className='w-[10%]'>Played</TableHead>
-                    <TableHead className='w-[10%]'>Won</TableHead>
-                    <TableHead className='w-[10%]'>Lost</TableHead>
-                    <TableHead className='w-[10%]'>Draw</TableHead>
-                    <TableHead className='w-[10%]'>Goals For</TableHead>
-                    <TableHead className='w-[10%]'>Goals Against</TableHead>
-                    <TableHead className='w-[10%]'>Goal Difference</TableHead>
-                    <TableHead className='w-[10%]'>Points</TableHead>
+                    <TableHead className='min-w-[150px] max-2xs:min-w-[100px] text-left'>
+                      Team
+                    </TableHead>
+                    <TableHead className='w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center'>
+                      <span className='hidden max-xs:block'>P</span>
+                      <span className='hidden xs:block'>Played</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 hidden sm:table-cell'>
+                      <span>W</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 hidden sm:table-cell'>
+                      <span>L</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 hidden sm:table-cell'>
+                      <span>D</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 hidden sm:table-cell'>
+                      <span>GF</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 hidden sm:table-cell'>
+                      <span>GA</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 max-xs:w-1/6 max-sm:w-1/3'>
+                      <span>+/-</span>
+                    </TableHead>
+                    <TableHead className='w-1/12 max-xs:w-1/6 max-sm:w-1/3'>
+                      <span className='hidden max-xs:block'>Pts</span>
+                      <span className='hidden xs:block'>Points</span>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {group.teams.sort(sortGroupTeams).map((team) => (
                     <TableRow key={team.id}>
-                      <TableCell className='text-left flex gap-3 items-center font-bold'>
+                      <TableCell className='text-left flex gap-3 items-center font-bold '>
                         {team.flagUrl && (
-                          <Image
-                            src={team.flagUrl}
-                            width={25}
-                            height={25}
-                            alt={`${team.name} flag`}
-                          />
+                          <>
+                            <Image
+                              src={team.flagUrl}
+                              width={20}
+                              height={20}
+                              alt={`${team.name} flag`}
+                              className='hidden max-xs:block'
+                            />
+                            <Image
+                              src={team.flagUrl}
+                              width={25}
+                              height={25}
+                              alt={`${team.name} flag`}
+                              className='hidden xs:block'
+                            />
+                          </>
                         )}
-                        {team.name}
+                        <span className='hidden max-2xs:block'>
+                          {team.name.substring(0, 3)}
+                        </span>
+                        <span className='hidden 2xs:block'>{team.name}</span>
                       </TableCell>
                       <TableCell>{team.stats.played}</TableCell>
-                      <TableCell>{team.stats.won}</TableCell>
-                      <TableCell>{team.stats.lost}</TableCell>
-                      <TableCell>{team.stats.draw}</TableCell>
-                      <TableCell>{team.stats.goalsFor}</TableCell>
-                      <TableCell>{team.stats.goalsAgainst}</TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        {team.stats.won}
+                      </TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        {team.stats.lost}
+                      </TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        {team.stats.draw}
+                      </TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        {team.stats.goalsFor}
+                      </TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        {team.stats.goalsAgainst}
+                      </TableCell>
                       <TableCell>{team.stats.goalDifference}</TableCell>
                       <TableCell>{team.stats.points}</TableCell>
                     </TableRow>

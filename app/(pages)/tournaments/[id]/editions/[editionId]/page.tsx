@@ -6,15 +6,13 @@ interface Props {
 }
 
 const TournamentEditionPage: React.FC<Props> = async ({ params }) => {
-  const tournamentEdition = await prisma.tournamentEdition.findFirst({
+  const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: {
       id: +params.editionId,
     },
     include: {
       teams: true,
       tournament: true,
-      groups: true,
-      matches: true,
       winner: true,
       hostingCountries: true,
     },

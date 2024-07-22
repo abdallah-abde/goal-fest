@@ -10,7 +10,7 @@ export async function addTeam(prevState: unknown, formData: FormData) {
 
   let imagePath = "";
   if (data.image !== null && data.image.size > 0) {
-    const imagePath = `/teams/${crypto.randomUUID()}-${data.image.name}`;
+    imagePath = `/teams/${crypto.randomUUID()}-${data.image.name}`;
 
     await fs.writeFile(
       `public${imagePath}`,

@@ -1,12 +1,11 @@
-import { FC } from "react";
 import prisma from "@/lib/db";
 import KnockoutMatches from "@/components/KnockoutMatches";
 
-interface Props {
+const KnockoutMatchesPage = async ({
+  params,
+}: {
   params: { editionId: string };
-}
-
-const KnockoutMatchesPage: FC<Props> = async ({ params }) => {
+}) => {
   const matches = await prisma.knockoutMatch.findMany({
     where: {
       tournamentEditionId: +params.editionId,

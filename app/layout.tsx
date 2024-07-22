@@ -23,10 +23,10 @@ export default function RootLayout({
             <NavigationMenu />
           </div>
         </header>
-        <main className='container'>{children}</main>
+        <main className='mx-auto px-4 md:container'>{children}</main>
         <footer className='fixed z-50 bottom-0 w-full bg-secondary'>
           <div className='border-t-2'>
-            <ul className='container flex justify-between py-6'>
+            <ul className='mx-auto px-4 md:container flex justify-between py-6'>
               <li>Footer</li>
               <li>&copy;{new Date().getFullYear().toString()}</li>
             </ul>
