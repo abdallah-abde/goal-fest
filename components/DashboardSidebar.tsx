@@ -63,27 +63,25 @@ const DashboardSidebar = () => {
   ];
 
   return (
-    <div className='flex flex-col border-r-2 pr-4 min-w-max'>
-      <div className='space-y-2 overflow-auto'>
-        {routes.map((r) => (
-          <Link
-            key={r.id}
-            className={cn(
-              `px-2 flex items-center gap-x-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center`,
-              pathname === r.href
-                ? "bg-primary/10"
-                : pathname.includes(r.href) && r.href !== "/dashboard"
-                ? "bg-primary/10"
-                : ""
-            )}
-            href={r.href}
-          >
-            <div>{r.icon}</div>
+    <div className='flex flex-col border-r-2 border-primary/50 pr-4 min-w-max overflow-auto'>
+      {routes.map((r) => (
+        <Link
+          key={r.id}
+          className={cn(
+            `m-1 px-2 flex items-center gap-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`,
+            pathname === r.href
+              ? "bg-primary/10"
+              : pathname.includes(r.href) && r.href !== "/dashboard"
+              ? "bg-primary/10"
+              : ""
+          )}
+          href={r.href}
+        >
+          <div>{r.icon}</div>
 
-            <p>{r.label}</p>
-          </Link>
-        ))}
-      </div>
+          <p>{r.label}</p>
+        </Link>
+      ))}
     </div>
   );
 };

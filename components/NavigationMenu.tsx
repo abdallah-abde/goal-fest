@@ -1,30 +1,28 @@
 import Link from "next/link";
+import { ModeToggle } from "./ModeToggle";
 
 export default function NavigationMenu() {
+  const linkStyles =
+    "font-bold bg-foreground text-background hover:bg-foreground/75 p-2 rounded-sm transition duration-150 focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-outline";
+
   return (
     <nav className='mx-auto px-4 md:container'>
-      <ul className='flex items-center py-6'>
-        <li className='mr-auto'>
-          <Link
-            href='/'
-            className='font-bold bg-primary text-secondary hover:bg-primary p-2 rounded-sm transition duration-150'
-          >
+      <ul className='flex items-center'>
+        <li className='mr-auto py-6 '>
+          <Link href='/' className={linkStyles}>
             Goal Fest
           </Link>
         </li>
-        <li>
-          <Link
-            className='font-bold bg-primary text-secondary hover:bg-primary  p-2 rounded-sm transition duration-150 mr-4'
-            href='#'
-          >
+        <li className='py-6'>
+          <Link className={linkStyles + " mr-4"} href='#'>
             Login
           </Link>
-          <Link
-            className='font-bold bg-primary text-secondary hover:bg-primary  p-2 rounded-sm transition duration-150'
-            href='#'
-          >
+          <Link className={linkStyles + " mr-4"} href='#'>
             Register
           </Link>
+        </li>
+        <li>
+          <ModeToggle />
         </li>
       </ul>
     </nav>

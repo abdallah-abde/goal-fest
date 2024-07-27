@@ -14,6 +14,8 @@ const EditTournamentEditionPage = async ({
     where: { id: parseInt(id) },
     include: {
       hostingCountries: true,
+      tournament: true,
+      teams: true,
     },
   });
 

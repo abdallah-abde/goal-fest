@@ -41,7 +41,10 @@ const GroupMatchList = async ({ matches }: { matches: MatchProps[] }) => {
                         <CardTitle className='flex flex-col items-center justify-center gap-4'>
                           <div className='flex w-full justify-between'>
                             <div>
-                              <Badge variant='secondary'>
+                              <Badge
+                                variant='secondary'
+                                className='hover:bg-secondary'
+                              >
                                 {match.group.name}
                               </Badge>
                             </div>
@@ -94,7 +97,7 @@ const GroupMatchList = async ({ matches }: { matches: MatchProps[] }) => {
                       </CardHeader>
                       {match.date && (
                         <CardContent className='flex justify-between'>
-                          <Badge variant='default'>
+                          <Badge variant='default' className='hover:bg-primary'>
                             {match.date
                               ? getFormattedDate(match.date.toString())
                               : ""}

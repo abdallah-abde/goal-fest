@@ -24,7 +24,23 @@ export async function addTournamentEdition(
   const hostingCountries = await prisma.country.findMany({
     where: {
       id: {
-        in: formData.getAll("countries").map((a) => +a),
+        in: formData
+          .getAll("hostingCountries")
+          .toString()
+          .split(",")
+          .map((a) => +a),
+      },
+    },
+  });
+
+  const ts = await prisma.team.findMany({
+    where: {
+      id: {
+        in: formData
+          .getAll("teams")
+          .toString()
+          .split(",")
+          .map((a) => +a),
       },
     },
   });
@@ -37,6 +53,9 @@ export async function addTournamentEdition(
       winnerId: data.winnerId ? +data.winnerId : null,
       hostingCountries: {
         connect: hostingCountries,
+      },
+      teams: {
+        connect: ts,
       },
     },
   });
@@ -74,14 +93,30 @@ export async function updateTournamentEdition(
   const hostingCountries = await prisma.country.findMany({
     where: {
       id: {
-        in: formData.getAll("hostingCountries").map((a) => +a),
+        in: formData
+          .getAll("hostingCountries")
+          .toString()
+          .split(",")
+          .map((a) => +a),
+      },
+    },
+  });
+
+  const ts = await prisma.team.findMany({
+    where: {
+      id: {
+        in: formData
+          .getAll("teams")
+          .toString()
+          .split(",")
+          .map((a) => +a),
       },
     },
   });
 
   const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id },
-    include: { hostingCountries: true },
+    include: { hostingCountries: true, teams: true },
   });
 
   await prisma.tournamentEdition.update({
@@ -94,6 +129,10 @@ export async function updateTournamentEdition(
       hostingCountries: {
         disconnect: currentTournamentEdition?.hostingCountries,
         connect: hostingCountries,
+      },
+      teams: {
+        disconnect: currentTournamentEdition?.teams,
+        connect: ts,
       },
     },
   });

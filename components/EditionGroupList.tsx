@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 import { cn } from "@/lib/utils";
+import NoDataFound from "./NoDataFound";
 
 const EditionGroupList = ({
   groupsWithTeams,
@@ -19,7 +20,7 @@ const EditionGroupList = ({
   groupsWithTeams: GroupWithTeams[];
 }) => {
   return (
-    <div className=''>
+    <>
       {groupsWithTeams.length > 0 ? (
         groupsWithTeams.map((group) => (
           <div key={group.id} className='mb-8 last:mb-0'>
@@ -116,9 +117,9 @@ const EditionGroupList = ({
           </div>
         ))
       ) : (
-        <p>No Groups Found</p>
+        <NoDataFound message='Sorry, No Groups Found' />
       )}
-    </div>
+    </>
   );
 };
 
