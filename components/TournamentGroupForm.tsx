@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormState, useFormStatus } from "react-dom";
@@ -8,9 +9,12 @@ import {
   updateTournamentGroup,
 } from "@/actions/tournamentsGroups";
 import { Group, Team, Tournament, TournamentEdition } from "@prisma/client";
-import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import MultipleSelector, {
+  MultipleSelectorRef,
+  Option,
+} from "@/components/ui/multiple-selector";
 
 interface GroupProps extends Group {
   tournamentEdition: TournamentEditionProps;
@@ -30,7 +34,6 @@ export default function TournamentGroupForm({
   teams: Team[];
   tournaments: Tournament[];
 }) {
-  const params = useParams();
   const [error, action] = useFormState(
     !group ? addTournamentGroup : updateTournamentGroup.bind(null, group.id),
     {}
@@ -62,6 +65,31 @@ export default function TournamentGroupForm({
 
     getEditions();
   }, [tournamentId]);
+
+  const teamsRef = useRef<MultipleSelectorRef>(null);
+  const [hiddenTeams, setHiddenTeams] = useState<string>(
+    (group &&
+      group.teams.length > 0 &&
+      group.teams
+        .map((a) => {
+          return a.id.toString();
+        })
+        .join(",")) ||
+      ""
+  );
+
+  const [selectedTeams, setSelectedTeams] = useState(
+    (group &&
+      group.teams.length > 0 &&
+      group.teams.map((a) => {
+        return {
+          label: a.name,
+          value: a.name,
+          dbValue: a.id.toString(),
+        };
+      })) ||
+      undefined
+  );
 
   return (
     <form action={action} className='space-y-8'>
@@ -117,33 +145,36 @@ export default function TournamentGroupForm({
       </div>
       <div className='space-y-2 flex flex-col gap-1'>
         <Label htmlFor='teams'>Teams</Label>
-        <select
-          name='teams'
-          id='teams'
-          multiple={true}
-          defaultValue={
-            (group &&
-              group.teams.length > 0 &&
-              group.teams.map((a) => {
-                return a.id.toString();
-              })) ||
-            undefined
+        <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
+        <MultipleSelector
+          ref={teamsRef}
+          defaultOptions={teams.map((t) => {
+            return {
+              label: t.name,
+              value: t.name,
+              dbValue: t.id.toString(),
+            };
+          })}
+          onChange={(options) => {
+            setHiddenTeams(
+              options
+                .map((a) => {
+                  return a.dbValue;
+                })
+                .join(",")
+            );
+          }}
+          placeholder='Select teams you like to add to the group'
+          emptyIndicator={
+            <p className='text-center text-lg leading-10 text-gray-600 dark:text-gray-400'>
+              no teams found.
+            </p>
           }
-        >
-          {teams?.map((t) => (
-            <option key={t.id} value={t.id} className='p-2 px-4'>
-              {t.name}
-            </option>
-          ))}
-        </select>
+          value={selectedTeams}
+        />
         {/* {error?.message && <div className='text-destructive'>{error?.message}</div>} */}
       </div>
-      {/* <Input
-        type='hidden'
-        id='tournamentEditionId'
-        name='tournamentEditionId'
-        defaultValue={params.id}
-      /> */}
+      {/* <pre>{JSON.stringify(hiddenTeams)}</pre> */}
       <SubmitButton />
     </form>
   );

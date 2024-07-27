@@ -13,7 +13,11 @@ export async function addTournamentGroup(
   const ts = await prisma.team.findMany({
     where: {
       id: {
-        in: formData.getAll("teams").map((a) => +a),
+        in: formData
+          .getAll("teams")
+          .toString()
+          .split(",")
+          .map((a) => +a),
       },
     },
   });
@@ -42,7 +46,11 @@ export async function updateTournamentGroup(
   const ts = await prisma.team.findMany({
     where: {
       id: {
-        in: formData.getAll("teams").map((a) => +a),
+        in: formData
+          .getAll("teams")
+          .toString()
+          .split(",")
+          .map((a) => +a),
       },
     },
   });
