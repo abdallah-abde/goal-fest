@@ -25,12 +25,16 @@ const EditionGroupList = ({
         groupsWithTeams.map((group) => (
           <div key={group.id} className='mb-8 last:mb-0'>
             {group.teams.length > 0 ? (
-              <Table className=''>
-                <TableCaption className={cn("mx-0 text-left")}>
+              <Table className='dark:border-primary/10 border-0'>
+                <TableCaption
+                  className={cn(
+                    "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10"
+                  )}
+                >
                   {group.name}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
                     <TableHead className='min-w-[150px] max-2xs:min-w-[100px] text-left'>
                       Team
                     </TableHead>
@@ -64,7 +68,10 @@ const EditionGroupList = ({
                 </TableHeader>
                 <TableBody>
                   {group.teams.sort(sortGroupTeams).map((team) => (
-                    <TableRow key={team.id}>
+                    <TableRow
+                      key={team.id}
+                      className='border-b-[1px] border-b-primary/10'
+                    >
                       <TableCell className='text-left flex gap-3 items-center font-bold '>
                         {team.flagUrl && (
                           <>

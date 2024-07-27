@@ -11,11 +11,11 @@ const HomePage: FC = async () => {
   const tournaments = await prisma.tournament.findMany();
 
   return (
-    <div className='h-screen flex flex-col md:flex-row gap-4 py-24 overflow-auto'>
+    <div className='h-screen flex flex-col md:flex-wrap md:flex-row gap-4 py-24 overflow-auto'>
       {tournaments.length > 0 ? (
         tournaments.map(({ id, name, logoUrl }) => (
           <Link href={`/tournaments/${id}`} key={id}>
-            <Card className='bg-secondary hover:shadow-md transition duration-200 p-2 pt-0'>
+            <Card className='bg-primary/5 text-secondary-foreground hover:shadow-lg transition duration-200 p-4 pt-0'>
               <CardHeader>
                 <CardTitle className='mx-auto text-xl'>{name}</CardTitle>
               </CardHeader>

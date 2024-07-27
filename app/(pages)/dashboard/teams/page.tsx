@@ -5,6 +5,7 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -49,9 +50,13 @@ const DashboardTeamsPage = async ({
         <AddNewLink href='/dashboard/teams/new' label='Add New Team' />
       </div>
       {teams.length > 0 ? (
-        <Table className={"mt-4 mb-2 caption-bottom border-0"}>
+        <Table
+          className={
+            "mt-4 mb-2 caption-bottom dark:border-primary/10  border-0"
+          }
+        >
           <TableHeader>
-            <TableRow className='*:bg-primary *:hover:bg-primary *:text-secondary '>
+            <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
               <TableHead className='text-left flex gap-2 items-center'>
                 <SortComponent />
               </TableHead>
@@ -90,9 +95,13 @@ const DashboardTeamsPage = async ({
             ))}
           </TableBody>
           {totalPages > 1 && (
-            <TableCaption>
-              <PaginationComponent totalPages={totalPages} />
-            </TableCaption>
+            <TableFooter>
+              <TableRow className='border-t-[1px] border-t-primary/10'>
+                <TableCell colSpan={9}>
+                  <PaginationComponent totalPages={totalPages} />
+                </TableCell>
+              </TableRow>
+            </TableFooter>
           )}
         </Table>
       ) : (
