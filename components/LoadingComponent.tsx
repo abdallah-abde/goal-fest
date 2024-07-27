@@ -40,23 +40,13 @@ export function MatchesSkeleton() {
 
 export function TournamentsSkeleton() {
   return (
-    <div className='flex flex-col gap-4 py-24'>
-      <div className='flex justify-between'>
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-      </div>
-      <div className='flex justify-between'>
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-        <Skeleton className='h-[250px] w-[200px] rounded-xl' />
-      </div>
+    <div className='flex flex-col md:flex-wrap md:flex-row gap-4 py-24 '>
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
+      <Skeleton className='h-[250px] w-full md:w-[200px] rounded-xl bg-primary/5' />
     </div>
   );
 }

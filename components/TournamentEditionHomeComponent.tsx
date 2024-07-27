@@ -48,19 +48,20 @@ function HostingCountriesComponent({
       <h2 className='font-bold mb-2'>Hosting Countries</h2>
       <div className='flex flex-wrap gap-2 justify-between'>
         {hostingCountries.map((country) => (
-          <Card className='flex-1 2xs:min-w-52 bg-primary/10 text-primary flex flex-col justify-between'>
+          <Card className='2xs:min-w-56 bg-primary/10 text-primary flex flex-col justify-between'>
             <CardHeader className='flex flex-row items-center justify-between'>
-              <CardTitle className='text-lg w-fit'>{country.name}</CardTitle>
-              {country.flagUrl && (
-                <div>
+              <CardTitle className='w-full text-xl flex items-center justify-center'>
+                {country.name}
+                {country.flagUrl && (
                   <Image
                     width={30}
                     height={30}
                     src={country.flagUrl}
                     alt={country.name + " Flag"}
+                    className='ml-4'
                   />
-                </div>
-              )}
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent className='text-sm flex justify-between'>
               <div className='flex flex-col items-center gap-1'>
