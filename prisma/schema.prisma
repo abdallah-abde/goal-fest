@@ -20,6 +20,7 @@ model Tournament {
 model TournamentEdition {
   id               Int             @id @default(autoincrement())
   year             Int
+  yearAsString     String
   logoUrl          String?
   tournamentId     Int
   tournament       Tournament      @relation(fields: [tournamentId], references: [id])
@@ -30,6 +31,8 @@ model TournamentEdition {
   hostingCountries Country[]
   winner           Team?           @relation("winnerTeam", fields: [winnerId], references: [id])
   winnerId         Int?
+  titleHolder      Team?           @relation("titleHolderTeam", fields: [titleHolderId], references: [id])
+  titleHolderId    Int?
 }
 
 model Group {
@@ -42,17 +45,28 @@ model Group {
 }
 
 model Team {
-  id                      Int                 @id @default(autoincrement())
-  name                    String
-  flagUrl                 String?
-  groups                  Group[]
-  tournamentEdition       TournamentEdition[]
-  tournamentEditionWinner TournamentEdition[] @relation("winnerTeam")
-  matchesHome             Match[]             @relation("homeTeam")
-  matchesAway             Match[]             @relation("awayTeam")
-  knockoutMatchesHome     KnockoutMatch[]     @relation("homeTeam")
-  knockoutMatchesAway     KnockoutMatch[]     @relation("awayTeam")
+  id                            Int                 @id @default(autoincrement())
+  name                          String
+  flagUrl                       String?
+  groups                        Group[]
+  tournamentEdition             TournamentEdition[]
+  tournamentEditionWinner       TournamentEdition[] @relation("winnerTeam")
+  tournamentEditionTitleHolders TournamentEdition[] @relation("titleHolderTeam")
+  matchesHome                   Match[]             @relation("homeTeam")
+  matchesAway                   Match[]             @relation("awayTeam")
+  knockoutMatchesHome           KnockoutMatch[]     @relation("homeTeam")
+  knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
 }
+
+// model TeamsInGroups {
+//   group    Group @relation(fields: [groupId], references: [id])
+//   groupId  Int
+//   team     Team  @relation(fields: [teamId], references: [id])
+//   teamId   Int
+//   teamRank Int?
+
+//   @@id([groupId, teamId])
+// }
 
 model Country {
   id                 Int                 @id @default(autoincrement())

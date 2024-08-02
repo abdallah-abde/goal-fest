@@ -1,11 +1,11 @@
 import prisma from "@/lib/db";
-import GroupMatchList from "@/components/GroupMatchList";
+import GroupMatchesCards from "@/components/lists/GroupMatchesCards";
 
-const GroupMatchesPage = async ({
+export default async function GroupMatchesPage({
   params,
 }: {
   params: { editionId: string };
-}) => {
+}) {
   const matches = await prisma.match.findMany({
     where: {
       tournamentEditionId: +params.editionId,
@@ -18,7 +18,5 @@ const GroupMatchesPage = async ({
     },
   });
 
-  return <GroupMatchList matches={matches} />;
-};
-
-export default GroupMatchesPage;
+  return <GroupMatchesCards matches={matches} />;
+}

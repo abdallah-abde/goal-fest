@@ -1,7 +1,5 @@
-import TournamentForm from "@/components/TournamentForm";
+import TournamentForm from "@/components/forms/TournamentForm";
 
-const AddTournamentPage = async () => {
+export default async function AddTournamentPage() {
   return <TournamentForm />;
-};
-
-export default AddTournamentPage;
+}

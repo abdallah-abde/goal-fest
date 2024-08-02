@@ -1,69 +1,122 @@
+import Link from "next/link";
+
 import prisma from "@/lib/db";
+
+import { PAGE_RECORDS_COUNT } from "@/lib/constants";
+
+import { SortDirectionValues } from "@/typings/sortValues";
 
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Pencil, Trash2Icon, Plus } from "lucide-react";
 
-const DashboardCountriesPage = async () => {
-  const countries = await prisma.country.findMany();
+import { Pencil, Trash2Icon } from "lucide-react";
+
+import AddNewLinkComponent from "@/components/AddNewLinkComponent";
+import SearchFieldComponent from "@/components/SearchFieldComponent";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
+import SortComponent from "@/components/SortComponent";
+import PaginationComponent from "@/components/PaginationComponent";
+
+export default async function DashboardCountriesPage({
+  searchParams,
+}: {
+  searchParams: {
+    page?: string;
+    query?: string;
+    sortDir?: SortDirectionValues;
+    sortField?: String;
+  };
+}) {
+  const query = searchParams?.query || "";
+  const currentPage = Number(searchParams?.page) || 1;
+  const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
+  const sortField = searchParams?.sortField || "name";
+
+  const totalCountriesCount = await prisma.country.count({
+    where: { name: { contains: query } },
+  });
+  const totalPages = Math.ceil(totalCountriesCount / PAGE_RECORDS_COUNT);
+
+  const countries = await prisma.country.findMany({
+    where: { name: { contains: query } },
+    skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+    take: PAGE_RECORDS_COUNT,
+    orderBy: { name: sortDir },
+  });
 
   return (
     <>
-      <Link
-        href='/dashboard/countries/new'
-        className='ml-auto flex items-center gap-x-2 text-sm border w-fit p-2 rounded-sm hover:bg-primary/10 transition duration-200'
-      >
-        <Plus className='size-5' />
-        <span>Add New country</span>
-      </Link>
+      <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
+        <SearchFieldComponent />
+        <AddNewLinkComponent
+          href='/dashboard/countries/new'
+          label='Add New Country'
+        />
+      </div>
       {countries.length > 0 ? (
-        <Table className='mt-4'>
+        <Table className='mt-4 mb-2 caption-bottom dark:border-primary/10 border-0 relative'>
           <TableHeader>
-            <TableRow>
-              <TableHead className='w-[80%] text-left'>Name</TableHead>
-              <TableHead className='w-[10%]'>Edit</TableHead>
-              <TableHead className='w-[10%]'>Delete</TableHead>
+            <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
+              <TableHead className='text-left flex gap-2 items-center'>
+                <SortComponent fieldName='name' />
+              </TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {countries.map((cou) => (
-              <TableRow key={cou.id}>
-                <TableCell className='text-left font-bold'>
+              <TableRow
+                key={cou.id}
+                className='border-b-[1px] border-b-primary/10'
+              >
+                <TableCell className='text-left font-bold max-w-50%'>
                   {cou.name}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    asChild
-                    variant='secondary'
-                    className='transition duration-200 hover:text-blue-500 '
-                  >
-                    <Link href={`/dashboard/countries/${cou.id}`}>
-                      <Pencil />
-                    </Link>
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button variant='secondary'>
-                    <Trash2Icon className='transition duration-200 hover:text-red-500' />
-                  </Button>
+                  <div className='flex gap-3 w-fit ml-auto'>
+                    <Button
+                      asChild
+                      size='icon'
+                      variant='outline'
+                      className='border-outline/25 hover:bg-bluish hover:text-bluish-foreground transition duration-200'
+                    >
+                      <Link href={`/dashboard/countries/${cou.id}`}>
+                        <Pencil />
+                      </Link>
+                    </Button>
+                    <Button
+                      size='icon'
+                      variant='outline'
+                      className='border-outline/25 hover:bg-redish hover:text-redish-foreground transition duration-200'
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
+          {totalPages > 1 && (
+            <TableFooter>
+              <TableRow className='border-t-[1px] border-t-primary/10'>
+                <TableCell colSpan={9}>
+                  <PaginationComponent totalPages={totalPages} />
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          )}
         </Table>
       ) : (
-        <p>No Countries Found</p>
+        <NoDataFoundComponent message='No Countries Found' />
       )}
     </>
   );
-};
-
-export default DashboardCountriesPage;
+}

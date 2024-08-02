@@ -1,11 +1,11 @@
-import TournamentGroupMatchForm from "@/components/TournamentGroupMatchForm";
+import GroupMatchForm from "@/components/forms/GroupMatchForm";
 import prisma from "@/lib/db";
 
-const EditTournamentGroupMatchPage = async ({
+export default async function EditGroupMatchPage({
   params: { id },
 }: {
   params: { id: string };
-}) => {
+}) {
   const tournaments = await prisma.tournament.findMany();
   const teams = await prisma.team.findMany();
 
@@ -22,12 +22,6 @@ const EditTournamentGroupMatchPage = async ({
   });
 
   return (
-    <TournamentGroupMatchForm
-      tournaments={tournaments}
-      teams={teams}
-      match={match}
-    />
+    <GroupMatchForm tournaments={tournaments} teams={teams} match={match} />
   );
-};
-
-export default EditTournamentGroupMatchPage;
+}

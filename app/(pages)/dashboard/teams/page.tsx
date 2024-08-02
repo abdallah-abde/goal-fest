@@ -1,35 +1,44 @@
+import Link from "next/link";
+
 import prisma from "@/lib/db";
+
+import { PAGE_RECORDS_COUNT } from "@/lib/constants";
+
+import { SortDirectionValues } from "@/typings/sortValues";
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Pencil, Trash2Icon } from "lucide-react";
-import PaginationComponent from "@/components/paginationComponent";
-import AddNewLink from "@/components/AddNewLink";
-import SearchField from "@/components/SearchField";
-import { PAGE_RECORDS_COUNT } from "@/lib/constants";
-import NoDataFound from "@/components/NoDataFound";
-import SortComponent from "@/components/SortComponent";
-import { SortValues } from "@/typings/sortValues";
 
-const DashboardTeamsPage = async ({
+import { Pencil, Trash2Icon } from "lucide-react";
+
+import AddNewLinkComponent from "@/components/AddNewLinkComponent";
+import SearchFieldComponent from "@/components/SearchFieldComponent";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
+import SortComponent from "@/components/SortComponent";
+import PaginationComponent from "@/components/PaginationComponent";
+
+export default async function DashboardTeamsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; query?: string; sort?: SortValues };
-}) => {
+  searchParams: {
+    page?: string;
+    query?: string;
+    sortDir?: SortDirectionValues;
+    sortField?: String;
+  };
+}) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const sort = searchParams?.sort || SortValues.ASC;
+  const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
+  const sortField = searchParams?.sortField || "name";
 
   const totalTeamsCount = await prisma.team.count({
     where: { name: { contains: query } },
@@ -40,25 +49,21 @@ const DashboardTeamsPage = async ({
     where: { name: { contains: query } },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
-    orderBy: { name: sort },
+    orderBy: { name: sortDir },
   });
 
   return (
     <>
-      <div className='flex items-center gap-2 mt-1'>
-        <SearchField />
-        <AddNewLink href='/dashboard/teams/new' label='Add New Team' />
+      <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
+        <SearchFieldComponent />
+        <AddNewLinkComponent href='/dashboard/teams/new' label='Add New Team' />
       </div>
       {teams.length > 0 ? (
-        <Table
-          className={
-            "mt-4 mb-2 caption-bottom dark:border-primary/10  border-0"
-          }
-        >
+        <Table className='mt-4 mb-2 caption-bottom dark:border-primary/10 border-0 relative'>
           <TableHeader>
             <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
               <TableHead className='text-left flex gap-2 items-center'>
-                <SortComponent />
+                <SortComponent fieldName='name' />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -72,24 +77,26 @@ const DashboardTeamsPage = async ({
                 <TableCell className='text-left font-bold max-w-50%'>
                   {team.name}
                 </TableCell>
-                <TableCell className='flex gap-3 w-fit ml-auto'>
-                  <Button
-                    asChild
-                    size='icon'
-                    variant='outline'
-                    className='border-outline/25 hover:bg-bluish hover:text-bluish-foreground transition duration-200'
-                  >
-                    <Link href={`/dashboard/teams/${team.id}`}>
-                      <Pencil />
-                    </Link>
-                  </Button>
-                  <Button
-                    size='icon'
-                    variant='outline'
-                    className='border-outline/25 hover:bg-redish hover:text-redish-foreground transition duration-200'
-                  >
-                    <Trash2Icon />
-                  </Button>
+                <TableCell>
+                  <div className='flex gap-3 w-fit ml-auto'>
+                    <Button
+                      asChild
+                      size='icon'
+                      variant='outline'
+                      className='border-outline/25 hover:bg-bluish hover:text-bluish-foreground transition duration-200'
+                    >
+                      <Link href={`/dashboard/teams/${team.id}`}>
+                        <Pencil />
+                      </Link>
+                    </Button>
+                    <Button
+                      size='icon'
+                      variant='outline'
+                      className='border-outline/25 hover:bg-redish hover:text-redish-foreground transition duration-200'
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -105,10 +112,8 @@ const DashboardTeamsPage = async ({
           )}
         </Table>
       ) : (
-        <NoDataFound message='No Teams Found' />
+        <NoDataFoundComponent message='No Teams Found' />
       )}
     </>
   );
-};
-
-export default DashboardTeamsPage;
+}

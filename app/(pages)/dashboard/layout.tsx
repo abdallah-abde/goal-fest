@@ -1,12 +1,16 @@
-import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardSidebar from "@/components/menus/DashboardSidebar";
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className='h-screen py-24 flex gap-x-4'>
+    <div className='h-screen flex flex-col md:flex-row gap-4 py-24'>
       <DashboardSidebar />
-      <div className='overflow-auto grow px-2'>{children}</div>
+      <div className='md:overflow-auto grow pl-1 md:pr-2 pb-24 md:pb-0'>
+        {children}
+      </div>
     </div>
   );
-};
-
-export default DashboardLayout;
+}

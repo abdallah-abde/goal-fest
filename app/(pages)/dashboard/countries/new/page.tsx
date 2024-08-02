@@ -1,7 +1,5 @@
-import CountryForm from "@/components/CountryForm";
+import CountryForm from "@/components/forms/CountryForm";
 
-const AddCountryPage = async () => {
+export default async function AddCountryPage() {
   return <CountryForm />;
-};
-
-export default AddCountryPage;
+}

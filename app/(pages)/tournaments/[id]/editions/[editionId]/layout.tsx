@@ -1,13 +1,13 @@
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/menus/Sidebar";
 import prisma from "@/lib/db";
 
-const TournamentLayout = async ({
+export default async function EditionLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
   params: { editionId: string };
-}) => {
+}) {
   const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id: +params.editionId },
     include: { tournament: true },
@@ -27,11 +27,9 @@ const TournamentLayout = async ({
             : "Tournament Logo"
         }
       />
-      <div className='md:overflow-auto grow md:pr-2 pb-24 md:pb-0'>
+      <div className='md:overflow-auto grow pl-1 md:pr-2 pb-24 md:pb-0'>
         {children}
       </div>
     </div>
   );
-};
-
-export default TournamentLayout;
+}

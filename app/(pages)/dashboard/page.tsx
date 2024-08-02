@@ -1,7 +1,3 @@
-import { FC } from "react";
-
-const DashboardPage: FC = async () => {
+export default async function DashboardPage() {
   return <div>Dashboard</div>;
-};
-
-export default DashboardPage;
+}

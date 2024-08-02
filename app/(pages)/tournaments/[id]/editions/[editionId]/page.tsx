@@ -1,16 +1,11 @@
 import prisma from "@/lib/db";
-import TournamentEditionComponent from "@/components/TournamentEditionComponent";
-import TournamentEditionHomeComponent from "@/components/TournamentEditionHomeComponent";
+import EditionHomeComponent from "@/components/lists/EditionHomeComponent";
 
-interface Props {
-  params: { editionId: string };
-}
-
-const TournamentEditionPage = async ({
+export default async function EditionPage({
   params,
 }: {
   params: { editionId: string };
-}) => {
+}) {
   const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: {
       id: +params.editionId,
@@ -19,13 +14,10 @@ const TournamentEditionPage = async ({
       teams: true,
       tournament: true,
       winner: true,
+      titleHolder: true,
       hostingCountries: true,
     },
   });
 
-  return (
-    <TournamentEditionHomeComponent tournamentEdition={tournamentEdition} />
-  );
-};
-
-export default TournamentEditionPage;
+  return <EditionHomeComponent tournamentEdition={tournamentEdition} />;
+}

@@ -1,7 +1,5 @@
-import TeamForm from "@/components/TeamForm";
+import TeamForm from "@/components/forms/TeamForm";
 
-const AddTeamPage = async () => {
+export default async function AddTeamPage() {
   return <TeamForm />;
-};
-
-export default AddTeamPage;
+}

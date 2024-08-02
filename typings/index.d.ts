@@ -1,3 +1,5 @@
+import { Group as PrismaGroup, Team as PrismaTeam } from "@prisma/client";
+
 export interface Tournament {
   id: number;
   name: string;
@@ -97,7 +99,7 @@ export interface TeamStats {
   points: number;
 }
 
-export interface TeamWithStats extends Team {
+export interface TeamWithStats extends PrismaTeam {
   stats: TeamStats;
 }
 
@@ -108,6 +110,6 @@ export interface Player {
   teamId: number;
 }
 
-export interface GroupWithTeams extends Group {
+export interface GroupWithTeams extends PrismaGroup {
   teams: TeamWithStats[];
 }
