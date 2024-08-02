@@ -1,9 +1,5 @@
-import LoadingComponent from "@/components/LoadingComponent";
+import { GroupsSkeleton } from "@/components/LoadingComponents";
 
 export default function Loading() {
-  return (
-    <div className='w-full h-full flex justify-center items-center'>
-      loading edition page groups ...
-    </div>
-  );
+  return <GroupsSkeleton />;
 }

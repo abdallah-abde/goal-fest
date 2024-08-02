@@ -49,8 +49,10 @@ export async function addTournamentEdition(
     data: {
       tournamentId: +data.tournamentId,
       year: +data.year,
+      yearAsString: data.year.toString(),
       logoUrl: data.image.size > 0 ? imagePath : null,
       winnerId: data.winnerId ? +data.winnerId : null,
+      titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
       hostingCountries: {
         connect: hostingCountries,
       },
@@ -124,8 +126,10 @@ export async function updateTournamentEdition(
     data: {
       tournamentId: +data.tournamentId,
       year: +data.year,
+      yearAsString: data.year.toString(),
       logoUrl: imagePath,
       winnerId: data.winnerId ? +data.winnerId : null,
+      titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
       hostingCountries: {
         disconnect: currentTournamentEdition?.hostingCountries,
         connect: hostingCountries,

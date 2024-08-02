@@ -7,7 +7,6 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      console.log("asd");
       const tournaments = await prisma.tournament.findMany();
       res.status(200).json(tournaments);
     } catch (error) {

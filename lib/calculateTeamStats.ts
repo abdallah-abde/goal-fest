@@ -1,6 +1,6 @@
-import prisma from "./db";
+import prisma from "@/lib/db";
 
-export const calculateTeamStats = async (teamId: number, groupId: number) => {
+export async function calculateTeamStats(teamId: number, groupId: number) {
   const homeMatches = await prisma.match.findMany({
     where: { homeTeamId: teamId, groupId: groupId },
   });
@@ -18,30 +18,34 @@ export const calculateTeamStats = async (teamId: number, groupId: number) => {
   let points = 0;
 
   homeMatches.forEach((match) => {
-    goalsFor += match.homeGoals;
-    goalsAgainst += match.awayGoals;
-    if (match.homeGoals > match.awayGoals) {
-      won++;
-      points += 3;
-    } else if (match.homeGoals < match.awayGoals) {
-      lost++;
-    } else {
-      draw++;
-      points += 1;
+    if (match.homeGoals) goalsFor += match.homeGoals;
+    if (match.awayGoals) goalsAgainst += match.awayGoals;
+    if (match.homeGoals && match.awayGoals) {
+      if (match.homeGoals > match.awayGoals) {
+        won++;
+        points += 3;
+      } else if (match.homeGoals < match.awayGoals) {
+        lost++;
+      } else {
+        draw++;
+        points += 1;
+      }
     }
   });
 
   awayMatches.forEach((match) => {
-    goalsFor += match.awayGoals;
-    goalsAgainst += match.homeGoals;
-    if (match.awayGoals > match.homeGoals) {
-      won++;
-      points += 3;
-    } else if (match.awayGoals < match.homeGoals) {
-      lost++;
-    } else {
-      draw++;
-      points += 1;
+    if (match.awayGoals) goalsFor += match.awayGoals;
+    if (match.homeGoals) goalsAgainst += match.homeGoals;
+    if (match.homeGoals && match.awayGoals) {
+      if (match.awayGoals > match.homeGoals) {
+        won++;
+        points += 3;
+      } else if (match.awayGoals < match.homeGoals) {
+        lost++;
+      } else {
+        draw++;
+        points += 1;
+      }
     }
   });
 
@@ -55,4 +59,4 @@ export const calculateTeamStats = async (teamId: number, groupId: number) => {
     goalDifference: goalsFor - goalsAgainst,
     points,
   };
-};
+}

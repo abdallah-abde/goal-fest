@@ -1,17 +1,18 @@
 import prisma from "@/lib/db";
 import { calculateTeamStats } from "@/lib/calculateTeamStats";
 
-import EditionGroupList from "@/components/EditionGroupList";
+import GroupsTable from "@/components/lists/GroupsTables";
 
-const TournamentEditionPage = async ({
+export default async function GroupsPage({
   params,
 }: {
   params: { editionId: string };
-}) => {
+}) {
   const groups = await prisma.group.findMany({
     where: {
       tournamentEditionId: +params.editionId,
     },
+
     select: {
       id: true,
       name: true,
@@ -32,7 +33,5 @@ const TournamentEditionPage = async ({
     }))
   );
 
-  return <EditionGroupList groupsWithTeams={groupsWithTeams} />;
-};
-
-export default TournamentEditionPage;
+  return <GroupsTable groupsWithTeams={groupsWithTeams} />;
+}

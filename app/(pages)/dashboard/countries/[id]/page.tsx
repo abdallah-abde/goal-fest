@@ -1,16 +1,14 @@
-import CountryForm from "@/components/CountryForm";
+import CountryForm from "@/components/forms/CountryForm";
 import prisma from "@/lib/db";
 
-const EditCountryPage = async ({
+export default async function EditCountryPage({
   params: { id },
 }: {
   params: { id: string };
-}) => {
+}) {
   const country = await prisma.country.findUnique({
     where: { id: parseInt(id) },
   });
 
   return <CountryForm country={country} />;
-};
-
-export default EditCountryPage;
+}

@@ -1,11 +1,11 @@
-import TournamentEditionForm from "@/components/TournamentEditionForm";
+import EditionForm from "@/components/forms/EditionForm";
 import prisma from "@/lib/db";
 
-const EditTournamentEditionPage = async ({
+export default async function EditEditionPage({
   params: { id },
 }: {
   params: { id: string };
-}) => {
+}) {
   const tournaments = await prisma.tournament.findMany();
   const teams = await prisma.team.findMany();
   const countries = await prisma.country.findMany();
@@ -20,13 +20,11 @@ const EditTournamentEditionPage = async ({
   });
 
   return (
-    <TournamentEditionForm
+    <EditionForm
       tournaments={tournaments}
       tournamentEdition={tournamentEdition}
       teams={teams}
       countries={countries}
     />
   );
-};
-
-export default EditTournamentEditionPage;
+}

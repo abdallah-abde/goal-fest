@@ -1,8 +1,12 @@
 import prisma from "@/lib/db";
 
-import TournamentEditionList from "@/components/TournamentEditionList";
+import EditionsCards from "@/components/lists/EditionsCards";
 
-const TournamentPage = async ({ params }: { params: { id: string } }) => {
+export default async function EditionsPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const tournamentEditions = await prisma.tournamentEdition.findMany({
     where: {
       tournamentId: +params.id,
@@ -12,7 +16,5 @@ const TournamentPage = async ({ params }: { params: { id: string } }) => {
     },
   });
 
-  return <TournamentEditionList tournamentEditions={tournamentEditions} />;
-};
-
-export default TournamentPage;
+  return <EditionsCards tournamentEditions={tournamentEditions} />;
+}

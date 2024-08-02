@@ -1,11 +1,11 @@
-import TournamentKnockoutMatchForm from "@/components/TournamentKnockoutMatchForm";
+import KnockoutMatchForm from "@/components/forms/KnockoutMatchForm";
 import prisma from "@/lib/db";
 
-const EditTournamentKnockoutMatchPage = async ({
+export default async function EditKnockoutMatchPage({
   params: { id },
 }: {
   params: { id: string };
-}) => {
+}) {
   const tournaments = await prisma.tournament.findMany();
   const teams = await prisma.team.findMany();
 
@@ -19,12 +19,6 @@ const EditTournamentKnockoutMatchPage = async ({
   });
 
   return (
-    <TournamentKnockoutMatchForm
-      tournaments={tournaments}
-      teams={teams}
-      match={match}
-    />
+    <KnockoutMatchForm tournaments={tournaments} teams={teams} match={match} />
   );
-};
-
-export default EditTournamentKnockoutMatchPage;
+}

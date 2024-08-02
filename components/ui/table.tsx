@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className='relative w-full overflow-auto '>
+  React.HTMLAttributes<HTMLTableElement> & { wrapperClassName?: string }
+>(({ className, wrapperClassName, ...props }, ref) => (
+  <div className={cn("relative w-full overflow-auto ", wrapperClassName)}>
     <table
       ref={ref}
       className={cn("w-full caption-top text-sm border", className)}
@@ -92,7 +92,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-4 align-middle text-center [&:has([role=checkbox])]:pr-0",
+      "px-4 py-1 align-middle text-center [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}

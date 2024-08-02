@@ -1,26 +1,26 @@
-export const getFormattedDate = (date: string) => {
+export function getFormattedDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-};
+}
 
-export const getFormattedTime = (date: string) => {
+export function getFormattedTime(date: string) {
   return new Date(date).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
+}
 
-export const getFormattedDateTime = (date: string) => {
+export function getFormattedDateTime(date: string) {
   return `${getFormattedDate(date)}, ${new Date(date).toLocaleTimeString(
     "en-US",
     { hour: "numeric", minute: "numeric" }
   )}`;
-};
+}
 
-export const getUTCDateValueForDateTimeInput = (date: Date) => {
+export function getUTCDateValueForDateTimeInput(date: Date) {
   let [datePart, timePart] = date.toISOString().split("T");
 
   timePart = timePart.split(".")[0];
@@ -28,4 +28,4 @@ export const getUTCDateValueForDateTimeInput = (date: Date) => {
   const mm = timePart.split(":")[1];
 
   return `${datePart}T${hh}:${mm}`;
-};
+}
