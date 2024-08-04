@@ -15,15 +15,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-import { Pencil, Trash2Icon } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 
 import AddNewLinkComponent from "@/components/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/SearchFieldComponent";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/SortComponent";
 import PaginationComponent from "@/components/PaginationComponent";
+import PageHeader from "@/components/PageHeader";
 
 export default async function DashboardCountriesPage({
   searchParams,
@@ -52,8 +58,13 @@ export default async function DashboardCountriesPage({
     orderBy: { name: sortDir },
   });
 
+  // await new Promise((resolve) => {
+  //   setTimeout(() => {}, 300);
+  // });
+
   return (
     <>
+      <PageHeader label='Countries List' />
       <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
         <SearchFieldComponent />
         <AddNewLinkComponent
@@ -80,26 +91,31 @@ export default async function DashboardCountriesPage({
                 <TableCell className='text-left font-bold max-w-50%'>
                   {cou.name}
                 </TableCell>
-                <TableCell>
-                  <div className='flex gap-3 w-fit ml-auto'>
-                    <Button
-                      asChild
-                      size='icon'
-                      variant='outline'
-                      className='border-outline/25 hover:bg-bluish hover:text-bluish-foreground transition duration-200'
-                    >
-                      <Link href={`/dashboard/countries/${cou.id}`}>
-                        <Pencil />
-                      </Link>
-                    </Button>
-                    <Button
-                      size='icon'
-                      variant='outline'
-                      className='border-outline/25 hover:bg-redish hover:text-redish-foreground transition duration-200'
-                    >
-                      <Trash2Icon />
-                    </Button>
-                  </div>
+                <TableCell className='text-right'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <EllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className='min-w-fit cursor-pointer'>
+                      <DropdownMenuItem
+                        asChild
+                        className='items-center justify-center'
+                      >
+                        <Link
+                          href={`/dashboard/countries/${cou.id}`}
+                          className='w-14 cursor-pointer'
+                        >
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        asChild
+                        className='items-center justify-center'
+                      >
+                        <p className='w-14 cursor-pointer'>Delete</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

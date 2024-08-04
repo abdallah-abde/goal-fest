@@ -45,7 +45,7 @@ export default function DashboardSidebar() {
       </div>
       <Sheet>
         <SheetTrigger asChild>
-          <Menu className='block md:hidden size-8 mx-auto mb-4 cursor-pointer' />
+          <Menu className='block md:hidden size-8 mx-auto mb-4 cursor-pointer fixed z-50 bg-primary text-secondary rounded-full p-1' />
         </SheetTrigger>
         <SheetContent side='left'>
           <div className={`space-y-2 overflow-auto mt-4`}>
