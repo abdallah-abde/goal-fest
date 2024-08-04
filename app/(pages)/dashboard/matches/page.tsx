@@ -15,9 +15,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-import { Pencil, Trash2Icon } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 
 import { getFormattedDateTime } from "@/lib/getFormattedDate";
 
@@ -26,6 +31,7 @@ import SearchFieldComponent from "@/components/SearchFieldComponent";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/SortComponent";
 import PaginationComponent from "@/components/PaginationComponent";
+import PageHeader from "@/components/PageHeader";
 
 export default async function DashboardGroupMatchesPage({
   searchParams,
@@ -180,6 +186,7 @@ export default async function DashboardGroupMatchesPage({
 
   return (
     <>
+      <PageHeader label='Matches List' />
       <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
         <SearchFieldComponent />
         <AddNewLinkComponent
@@ -234,26 +241,31 @@ export default async function DashboardGroupMatchesPage({
                 <TableCell className='text-left font-bold'>
                   {mch.tournamentEdition.year.toString()}
                 </TableCell>
-                <TableCell>
-                  <div className='flex gap-3 w-fit ml-auto'>
-                    <Button
-                      asChild
-                      size='xs'
-                      variant='outline'
-                      className='border-outline/25 hover:bg-bluish hover:text-bluish-foreground transition duration-200'
-                    >
-                      <Link href={`/dashboard/matches/${mch.id}`}>
-                        <Pencil />
-                      </Link>
-                    </Button>
-                    <Button
-                      size='xs'
-                      variant='outline'
-                      className='border-outline/25 hover:bg-redish hover:text-redish-foreground transition duration-200'
-                    >
-                      <Trash2Icon className='transition duration-200 hover:text-red-500' />
-                    </Button>
-                  </div>
+                <TableCell className='text-right'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <EllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className='min-w-fit cursor-pointer'>
+                      <DropdownMenuItem
+                        asChild
+                        className='items-center justify-center'
+                      >
+                        <Link
+                          href={`/dashboard/matches/${mch.id}`}
+                          className='w-14 cursor-pointer'
+                        >
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        asChild
+                        className='items-center justify-center'
+                      >
+                        <p className='w-14 cursor-pointer'>Delete</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

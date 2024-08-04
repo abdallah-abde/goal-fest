@@ -10,5 +10,7 @@ export default async function EditTeamPage({
     where: { id: parseInt(id) },
   });
 
+  if (!team) throw new Error("Something went wrong");
+
   return <TeamForm team={team} />;
 }

@@ -33,5 +33,9 @@ export default async function GroupsPage({
     }))
   );
 
+  // await new Promise((resolve) => {
+  //   setTimeout(() => {}, 300);
+  // });
+
   return <GroupsTable groupsWithTeams={groupsWithTeams} />;
 }

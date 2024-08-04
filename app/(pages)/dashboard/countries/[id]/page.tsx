@@ -10,5 +10,7 @@ export default async function EditCountryPage({
     where: { id: parseInt(id) },
   });
 
+  if (!country) throw new Error("Something went wrong");
+
   return <CountryForm country={country} />;
 }
