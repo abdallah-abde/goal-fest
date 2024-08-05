@@ -5,12 +5,7 @@ import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
-
-const fileSchema = z.instanceof(File, { message: "Required" });
-
-const imageSchema = fileSchema.refine(
-  (file) => file.size === 0 || file.type.startsWith("image/")
-);
+import { imageSchema } from "./schema";
 
 const addSchema = z.object({
   name: z.string().min(2),

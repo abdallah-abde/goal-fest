@@ -10,5 +10,7 @@ export default async function EditTournamentPage({
     where: { id: parseInt(id) },
   });
 
+  if (!tournament) throw new Error("Something went wrong");
+
   return <TournamentForm tournament={tournament} />;
 }

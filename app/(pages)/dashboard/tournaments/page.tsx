@@ -73,7 +73,6 @@ export default async function DashboardTournamentsPage({
           <TableHeader>
             <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
               <TableHead className='text-left flex gap-2 items-center'>
-                {" "}
                 <SortComponent fieldName='name' />
               </TableHead>
               <TableHead></TableHead>
