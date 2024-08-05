@@ -3,25 +3,38 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { z } from "zod";
+import { imageSchema } from "./schema";
+
+const addSchema = z.object({
+  name: z.string().min(2),
+  flagUrl: imageSchema.optional(),
+});
 
 export async function addCountry(prevState: unknown, formData: FormData) {
-  const data = Object.fromEntries(formData.entries());
+  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
 
   let imagePath = "";
-  if (data.image !== null && data.image.size > 0) {
-    imagePath = `/countries/${crypto.randomUUID()}-${data.image.name}`;
+  if (data.flagUrl != null && data.flagUrl.size > 0) {
+    imagePath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
       `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
+      Buffer.from(await data.flagUrl.arrayBuffer())
     );
   }
 
   await prisma.country.create({
     data: {
       name: data.name.toString(),
-      flagUrl: data.image.size > 0 ? imagePath : null,
+      flagUrl: imagePath,
     },
   });
 
@@ -34,21 +47,27 @@ export async function updateCountry(
   prevState: unknown,
   formData: FormData
 ) {
-  const data = Object.fromEntries(formData.entries());
+  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
 
   const country = await prisma.country.findUnique({ where: { id } });
 
-  if (country == null) return;
+  if (country == null) return notFound();
 
   let imagePath = country.flagUrl;
-  if (data.image !== null && data.image.size > 0) {
+  if (data.flagUrl != null && data.flagUrl.size > 0) {
     if (country.flagUrl) await fs.unlink(`public${country.flagUrl}`);
 
-    imagePath = `/countries/${crypto.randomUUID()}-${data.image.name}`;
+    imagePath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
       `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
+      Buffer.from(await data.flagUrl.arrayBuffer())
     );
   }
 
