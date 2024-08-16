@@ -16,12 +16,38 @@ export default function LoadingComponents() {
   );
 }
 
+export function LoadingSpinner({
+  className = "",
+}: {
+  className?: string | null;
+}) {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className={cn("animate-spin", className)}
+    >
+      <path d='M21 12a9 9 0 1 1-6.219-8.56' />
+    </svg>
+  );
+}
+
 export function MatchesSkeleton() {
   function _renderFirstAndLastLine() {
     return (
       <div className='flex justify-between'>
         {Array.from({ length: 2 }).map((a, _) => (
-          <Skeleton className='h-[25px] w-[75px] rounded-xl mb-2 bg-primary/25' />
+          <Skeleton
+            key={_}
+            className='h-[25px] w-[75px] rounded-xl mb-2 bg-primary/25'
+          />
         ))}
       </div>
     );
@@ -157,7 +183,10 @@ export function DashboardTableSkeleton() {
           <_BigField bg='bg-transparent' />
           <div className='w-1 flex flex-col gap-1'>
             {Array.from({ length: 3 }).map((a, _) => (
-              <Skeleton className='w-1 h-1 rounded-full bg-transparent' />
+              <Skeleton
+                key={_}
+                className='w-1 h-1 rounded-full bg-transparent'
+              />
             ))}
           </div>
         </div>
@@ -168,7 +197,7 @@ export function DashboardTableSkeleton() {
               <_BigField />
               <div className='w-1 flex flex-col gap-1'>
                 {Array.from({ length: 3 }).map((a, _) => (
-                  <Skeleton className='w-1 h-1 rounded-full' />
+                  <Skeleton key={_} className='w-1 h-1 rounded-full' />
                 ))}
               </div>
             </div>
@@ -177,7 +206,10 @@ export function DashboardTableSkeleton() {
       </div>
       <div className='w-full flex items-center justify-center gap-3'>
         {Array.from({ length: 5 }).map((a, _) => (
-          <Skeleton className='w-[30px] h-[30px] rounded-sm bg-primary/10' />
+          <Skeleton
+            key={_}
+            className='w-[30px] h-[30px] rounded-sm bg-primary/10'
+          />
         ))}
       </div>
     </div>

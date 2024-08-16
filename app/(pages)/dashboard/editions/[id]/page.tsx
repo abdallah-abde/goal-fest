@@ -19,6 +19,8 @@ export default async function EditEditionPage({
     },
   });
 
+  if (!tournamentEdition) throw new Error("Something went wrong");
+
   return (
     <EditionForm
       tournaments={tournaments}

@@ -2,13 +2,26 @@
 
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { z } from "zod";
+
+const schema = z.object({
+  name: z.string().min(2),
+  tournamentEditionId: z.coerce.number().int(),
+  teams: z.string().optional(),
+});
 
 export async function addTournamentGroup(
   prevState: unknown,
   formData: FormData
 ) {
-  const data = Object.fromEntries(formData.entries());
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
 
   const ts = await prisma.team.findMany({
     where: {
@@ -41,7 +54,20 @@ export async function updateTournamentGroup(
   prevState: unknown,
   formData: FormData
 ) {
-  const data = Object.fromEntries(formData.entries());
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentGroup = await prisma.group.findUnique({
+    where: { id },
+    include: { teams: true },
+  });
+
+  if (currentGroup == null) return notFound();
 
   const ts = await prisma.team.findMany({
     where: {
@@ -53,11 +79,6 @@ export async function updateTournamentGroup(
           .map((a) => +a),
       },
     },
-  });
-
-  const currentGroup = await prisma.group.findUnique({
-    where: { id },
-    include: { teams: true },
   });
 
   await prisma.group.update({

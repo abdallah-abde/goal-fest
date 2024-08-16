@@ -62,7 +62,9 @@ export default function TournamentForm({
             </div>
           )}
         </div>
-        <SubmitButton />
+        <div className='col-span-2'>
+          <SubmitButton />
+        </div>
       </form>
     </>
   );

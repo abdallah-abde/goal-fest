@@ -55,7 +55,9 @@ export default function TeamForm({ team }: { team?: Team | null }) {
             </div>
           )}
         </div>
-        <SubmitButton />
+        <div className='col-span-2'>
+          <SubmitButton />
+        </div>
       </form>
     </>
   );

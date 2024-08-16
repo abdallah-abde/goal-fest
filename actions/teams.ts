@@ -5,15 +5,15 @@ import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
-import { imageSchema } from "./schema";
+import { ImageSchema } from "@/schemas";
 
-const addSchema = z.object({
+const schema = z.object({
   name: z.string().min(2),
-  flagUrl: imageSchema.optional(),
+  flagUrl: ImageSchema.optional(),
 });
 
 export async function addTeam(prevState: unknown, formData: FormData) {
-  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -21,12 +21,12 @@ export async function addTeam(prevState: unknown, formData: FormData) {
 
   const data = result.data;
 
-  let imagePath = "";
+  let flagUrlPath = "";
   if (data.flagUrl != null && data.flagUrl.size > 0) {
-    imagePath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
+      `public${flagUrlPath}`,
       Buffer.from(await data.flagUrl.arrayBuffer())
     );
   }
@@ -34,7 +34,7 @@ export async function addTeam(prevState: unknown, formData: FormData) {
   await prisma.team.create({
     data: {
       name: data.name.toString(),
-      flagUrl: imagePath,
+      flagUrl: flagUrlPath,
     },
   });
 
@@ -47,7 +47,7 @@ export async function updateTeam(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -59,14 +59,14 @@ export async function updateTeam(
 
   if (team == null) return notFound();
 
-  let imagePath = team.flagUrl;
+  let flagUrlPath = team.flagUrl;
   if (data.flagUrl != null && data.flagUrl.size > 0) {
     if (team.flagUrl) await fs.unlink(`public${team.flagUrl}`);
 
-    imagePath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
+      `public${flagUrlPath}`,
       Buffer.from(await data.flagUrl.arrayBuffer())
     );
   }
@@ -75,7 +75,7 @@ export async function updateTeam(
     where: { id },
     data: {
       name: data.name.toString(),
-      flagUrl: imagePath,
+      flagUrl: flagUrlPath,
     },
   });
 

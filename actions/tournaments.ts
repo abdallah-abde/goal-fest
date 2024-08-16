@@ -5,15 +5,15 @@ import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
-import { imageSchema } from "./schema";
+import { ImageSchema } from "@/schemas";
 
-const addSchema = z.object({
+const schema = z.object({
   name: z.string().min(2),
-  logoUrl: imageSchema.optional(),
+  logoUrl: ImageSchema.optional(),
 });
 
 export async function addTournament(prevState: unknown, formData: FormData) {
-  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -21,12 +21,12 @@ export async function addTournament(prevState: unknown, formData: FormData) {
 
   const data = result.data;
 
-  let imagePath = "";
+  let logoUrlPath = "";
   if (data.logoUrl != null && data.logoUrl.size > 0) {
-    imagePath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
+      `public${logoUrlPath}`,
       Buffer.from(await data.logoUrl.arrayBuffer())
     );
   }
@@ -34,7 +34,7 @@ export async function addTournament(prevState: unknown, formData: FormData) {
   await prisma.tournament.create({
     data: {
       name: data.name.toString(),
-      logoUrl: imagePath,
+      logoUrl: logoUrlPath,
     },
   });
 
@@ -47,7 +47,7 @@ export async function updateTournament(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -59,14 +59,14 @@ export async function updateTournament(
 
   if (tournament == null) return notFound();
 
-  let imagePath = tournament.logoUrl;
+  let logoUrlPath = tournament.logoUrl;
   if (data.logoUrl != null && data.logoUrl.size > 0) {
     if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
 
-    imagePath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
+      `public${logoUrlPath}`,
       Buffer.from(await data.logoUrl.arrayBuffer())
     );
   }
@@ -75,7 +75,7 @@ export async function updateTournament(
     where: { id },
     data: {
       name: data.name.toString(),
-      logoUrl: imagePath,
+      logoUrl: logoUrlPath,
     },
   });
 

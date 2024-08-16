@@ -3,21 +3,39 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { z } from "zod";
+import { ImageSchema } from "@/schemas";
+
+const schema = z.object({
+  tournamentId: z.coerce.number().int(),
+  year: z.coerce.number().int(),
+  logoUrl: ImageSchema.optional(),
+  winnerId: z.union([z.coerce.number().optional(), z.string()]),
+  titleHolderId: z.union([z.coerce.number().optional(), z.string()]),
+  hostingCountries: z.string().optional(),
+  teams: z.string().optional(),
+});
 
 export async function addTournamentEdition(
   prevState: unknown,
   formData: FormData
 ) {
-  const data = Object.fromEntries(formData.entries());
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
-  let imagePath = "";
-  if (data.image !== null && data.image.size > 0) {
-    imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  let logoUrlPath = "";
+  if (data.logoUrl != null && data.logoUrl.size > 0) {
+    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
+      `public${logoUrlPath}`,
+      Buffer.from(await data.logoUrl.arrayBuffer())
     );
   }
 
@@ -50,7 +68,7 @@ export async function addTournamentEdition(
       tournamentId: +data.tournamentId,
       year: +data.year,
       yearAsString: data.year.toString(),
-      logoUrl: data.image.size > 0 ? imagePath : null,
+      logoUrl: logoUrlPath,
       winnerId: data.winnerId ? +data.winnerId : null,
       titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
       hostingCountries: {
@@ -71,24 +89,31 @@ export async function updateTournamentEdition(
   prevState: unknown,
   formData: FormData
 ) {
-  const data = Object.fromEntries(formData.entries());
+  const result = schema.safeParse(Object.fromEntries(formData.entries()));
 
-  const tournamentEdition = await prisma.tournamentEdition.findUnique({
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id },
+    include: { hostingCountries: true, teams: true },
   });
 
-  if (tournamentEdition == null) return;
+  if (currentTournamentEdition == null) return notFound();
 
-  let imagePath = tournamentEdition.logoUrl;
-  if (data.image !== null && data.image.size > 0) {
-    if (tournamentEdition.logoUrl)
-      await fs.unlink(`public${tournamentEdition.logoUrl}`);
+  let logoUrlPath = currentTournamentEdition.logoUrl;
+  if (data.logoUrl != null && data.logoUrl.size > 0) {
+    if (currentTournamentEdition.logoUrl)
+      await fs.unlink(`public${currentTournamentEdition.logoUrl}`);
 
-    imagePath = `/tournaments/${crypto.randomUUID()}-${data.image.name}`;
+    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
 
     await fs.writeFile(
-      `public${imagePath}`,
-      Buffer.from(await data.image.arrayBuffer())
+      `public${logoUrlPath}`,
+      Buffer.from(await data.logoUrl.arrayBuffer())
     );
   }
 
@@ -116,18 +141,13 @@ export async function updateTournamentEdition(
     },
   });
 
-  const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
-    where: { id },
-    include: { hostingCountries: true, teams: true },
-  });
-
   await prisma.tournamentEdition.update({
     where: { id },
     data: {
       tournamentId: +data.tournamentId,
       year: +data.year,
       yearAsString: data.year.toString(),
-      logoUrl: imagePath,
+      logoUrl: logoUrlPath,
       winnerId: data.winnerId ? +data.winnerId : null,
       titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
       hostingCountries: {

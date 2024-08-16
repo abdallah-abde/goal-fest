@@ -18,6 +18,8 @@ export default async function EditKnockoutMatchPage({
     },
   });
 
+  if (!match) throw new Error("Something went wrong");
+
   return (
     <KnockoutMatchForm tournaments={tournaments} teams={teams} match={match} />
   );

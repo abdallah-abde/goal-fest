@@ -55,7 +55,9 @@ export default function CountryForm({ country }: { country?: Country | null }) {
             </div>
           )}
         </div>
-        <SubmitButton />
+        <div className='col-span-2'>
+          <SubmitButton />
+        </div>
       </form>
     </>
   );

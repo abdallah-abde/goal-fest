@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className='h-full w-full flex flex-col items-center justify-center gap-y-4 text-destructive dark:text-red-600/90'>
+    <div className='h-full w-full flex flex-col items-center justify-center gap-y-4 text-destructive'>
       <CircleX className='font-bold text-2xl size-28' />
       <p className='font-bold text-2xl'>Something went wrong!</p>
       {/* <button

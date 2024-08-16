@@ -21,5 +21,7 @@ export default async function EditGroupPage({
     },
   });
 
+  if (!group) throw new Error("Something went wrong");
+
   return <GroupForm tournaments={tournaments} teams={teams} group={group} />;
 }

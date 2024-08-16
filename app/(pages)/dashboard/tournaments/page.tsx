@@ -60,7 +60,7 @@ export default async function DashboardTournamentsPage({
 
   return (
     <>
-      <PageHeader label='tournaments List' />
+      <PageHeader label='Tournaments List' />
       <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
         <SearchFieldComponent />
         <AddNewLinkComponent
