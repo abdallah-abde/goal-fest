@@ -8,6 +8,7 @@ import { LoginSchema, RegisterSchema } from "@/schemas";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
+import { generateVerificationToken } from "@/lib/tokens";
 
 export async function login(values: z.infer<typeof LoginSchema>) {
   const validatedFields = LoginSchema.safeParse(values);
@@ -17,6 +18,22 @@ export async function login(values: z.infer<typeof LoginSchema>) {
   }
 
   const { email, password } = validatedFields.data;
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!existingUser || !existingUser.email || !existingUser.password) {
+    return { error: "Email does not exist!" };
+  }
+
+  if (!existingUser.emailVerified) {
+    const verificaionToken = await generateVerificationToken(
+      existingUser.email
+    );
+
+    return { success: "Confirmation email sent!" };
+  }
 
   try {
     await signIn("credentials", {
@@ -66,5 +83,7 @@ export async function register(values: z.infer<typeof RegisterSchema>) {
     },
   });
 
-  return { success: "User created!" };
+  const verificaionToken = await generateVerificationToken(email);
+
+  return { success: "Confirmation email sent!" };
 }

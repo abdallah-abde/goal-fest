@@ -28,7 +28,7 @@ export default async function NavigationMenu() {
           </Link>
         </li>
 
-        <li>
+        <li className='h-10 w-10'>
           {session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -38,8 +38,12 @@ export default async function NavigationMenu() {
                   className='m-0 rounded-full dark:hover:bg-muted-foreground/10'
                 >
                   <Avatar>
-                    {/* TODO */}
-                    {/* <AvatarImage src="https://github.com/shadcn.png" /> */}
+                    {session?.user?.image && (
+                      <AvatarImage
+                        src={session?.user?.image}
+                        className='object-cover'
+                      />
+                    )}
                     <AvatarFallback className='text-lg font-normal'>
                       {session?.user?.name?.substring(0, 1).toUpperCase()}
                     </AvatarFallback>

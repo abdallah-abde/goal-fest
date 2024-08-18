@@ -1,7 +1,7 @@
 export const publicRoutes = ["/"];
 export const tournamentsPublicPrefix = "/tournaments";
 
-export const authRoutes = ["/auth/login", "/auth/register"];
+export const authRoutes = ["/auth/login", "/auth/register", "/auth/error"];
 
 export const apiAuthPrefix = "/api/auth";
 

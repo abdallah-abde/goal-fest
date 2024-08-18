@@ -21,8 +21,9 @@ import {
 } from "@/components/ui/form";
 import { login } from "@/actions/authActions";
 import { useTransition, useState } from "react";
-
-import { BadgeCheck, TriangleAlert } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { BadgeCheck, TriangleAlert, Github } from "lucide-react";
+import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | undefined>("");
@@ -52,13 +53,19 @@ export default function LoginForm() {
     });
   }
 
+  function onClick() {
+    signIn("github", {
+      callbackUrl: DEFAULT_LOGIN_REDIRECT,
+    });
+  }
+
   return (
     <div className='flex flex-col w-full sm:w-[75%] md:w[60%] lg:w-[50%] border-[1px] border-primary/20 p-4 rounded-md'>
       <PageHeader label='Welcome back' />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className='space-y-4 grid grid-cols-1 gap-4'
+          className='space-y-4 grid grid-cols-1 gap-4 mb-2'
         >
           <div className='space-y-2'>
             <FormField
@@ -118,6 +125,9 @@ export default function LoginForm() {
           </Button>
         </form>
       </Form>
+      <Button onClick={onClick}>
+        <Github className='mr-2' /> Sign in with Github
+      </Button>
 
       <div className='text-center pt-4'>
         <Link
