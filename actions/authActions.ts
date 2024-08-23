@@ -4,11 +4,30 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import prisma from "@/lib/db";
-import { LoginSchema, RegisterSchema } from "@/schemas";
+import {
+  LoginSchema,
+  RegisterSchema,
+  ResetSchema,
+  NewPasswordSchema,
+} from "@/schemas";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
-import { generateVerificationToken } from "@/lib/tokens";
+import {
+  generateVerificationToken,
+  generatePasswordResetToken,
+  generateTwoFactorToken,
+} from "@/lib/tokens";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendTwoFactorTokenEmail,
+} from "@/lib/mail";
+import { getVerificationTokenByToken } from "@/lib/data/verificationToken";
+import { getPasswordResetTokenByToken } from "@/lib/data/passwordResetToken";
+import bcryptjs from "bcryptjs";
+import { getTwoFactorTokenByEmail } from "@/lib/data/twoFactorToken";
+import { getTwoFactorConfirmationByUserId } from "@/lib/data/twoFactorConfirmation";
 
 export async function login(values: z.infer<typeof LoginSchema>) {
   const validatedFields = LoginSchema.safeParse(values);
@@ -17,7 +36,8 @@ export async function login(values: z.infer<typeof LoginSchema>) {
     return { error: "Invalid fields!" };
   }
 
-  const { email, password } = validatedFields.data;
+  const { email, password, code } = validatedFields.data;
+  console.log("validatedFields.data", validatedFields.data);
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -32,9 +52,56 @@ export async function login(values: z.infer<typeof LoginSchema>) {
       existingUser.email
     );
 
+    await sendVerificationEmail(verificaionToken.email, verificaionToken.token);
+
     return { success: "Confirmation email sent!" };
   }
 
+  if (existingUser.isTwoFactorEnabled && existingUser.email) {
+    if (code) {
+      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
+      console.log("twoFactorTokenBefore", twoFactorToken);
+      if (!twoFactorToken) {
+        return { error: "Invalid Code!" };
+      }
+
+      if (twoFactorToken.token !== code) {
+        return { error: "Invalid Code!" };
+      }
+
+      const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+      if (hasExpired) {
+        return { error: "Code expired!" };
+      }
+
+      await prisma.twoFactorToken.delete({ where: { id: twoFactorToken.id } });
+
+      const existingConfirmation = await getTwoFactorConfirmationByUserId(
+        existingUser.id
+      );
+
+      if (existingConfirmation) {
+        prisma.twoFactorConfirmation.delete({
+          where: { id: existingConfirmation.id },
+        });
+      }
+
+      await prisma.twoFactorConfirmation.create({
+        data: {
+          userId: existingUser.id,
+        },
+      });
+    } else {
+      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+      console.log("twoFactorToken", twoFactorToken);
+
+      await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
+
+      return { twoFactor: true };
+    }
+  }
+  // console.log("here");
   try {
     await signIn("credentials", {
       email,
@@ -84,6 +151,120 @@ export async function register(values: z.infer<typeof RegisterSchema>) {
   });
 
   const verificaionToken = await generateVerificationToken(email);
+  await sendVerificationEmail(verificaionToken.email, verificaionToken.token);
 
   return { success: "Confirmation email sent!" };
+}
+
+export async function newVerification(token: string) {
+  const existingToken = await getVerificationTokenByToken(token);
+
+  if (!existingToken) {
+    return { error: "Token does not exist!" };
+  }
+
+  const hasExpired = new Date(existingToken.expires) < new Date();
+
+  if (hasExpired) {
+    return { error: "Token has expired!" };
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: existingToken.email },
+  });
+
+  if (!existingUser) {
+    return { error: "Email does not exist!" };
+  }
+
+  await prisma.user.update({
+    where: { id: existingUser.id },
+    data: {
+      emailVerified: new Date(),
+      email: existingToken.email,
+    },
+  });
+
+  await prisma.verificationToken.delete({
+    where: { id: existingToken.id },
+  });
+
+  return { success: "Email verified!" };
+}
+
+export async function reset(values: z.infer<typeof ResetSchema>) {
+  const validatedFields = ResetSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return { error: "Invalid email!" };
+  }
+
+  const { email } = validatedFields.data;
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!existingUser) {
+    return { error: "Email not found!" };
+  }
+
+  const passwordResetToken = await generatePasswordResetToken(email);
+
+  await sendPasswordResetEmail(
+    passwordResetToken.email,
+    passwordResetToken.token
+  );
+
+  return { success: "Reset email sent!" };
+}
+
+export async function newPassword(
+  values: z.infer<typeof NewPasswordSchema>,
+  token?: string | null
+) {
+  if (!token) return { error: "Missing token!" };
+
+  const validatedFields = NewPasswordSchema.safeParse(values);
+
+  if (!validatedFields.success) {
+    return { error: "Invalid fields!" };
+  }
+
+  const { password } = validatedFields.data;
+
+  const existingToken = await getPasswordResetTokenByToken(token);
+
+  if (!existingToken) {
+    return { error: "Invalid token!" };
+  }
+
+  const hasExpired = new Date(existingToken.expires) < new Date();
+
+  if (hasExpired) {
+    return { error: "Token has expired!" };
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: existingToken.email },
+  });
+
+  if (!existingUser) {
+    return { error: "Email does not exist!" };
+  }
+
+  const hashedPassword = await bcryptjs.hash(password, 10);
+
+  await prisma.user.update({
+    where: { id: existingUser.id },
+    data: {
+      password: hashedPassword,
+    },
+  });
+
+  await prisma.passwordResetToken.delete({
+    where: { id: existingToken.id },
+  });
+
+  return { success: "Password updated!" };
 }

@@ -16,6 +16,8 @@ import { LogIn, LogOut, CircleUserRound, Settings } from "lucide-react";
 export default async function NavigationMenu() {
   const session = await auth();
 
+  console.log("session", { session });
+
   const linkStyles =
     "font-bold bg-foreground text-background hover:bg-foreground/75 p-2 rounded-sm transition duration-150 focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-outline";
 
@@ -50,10 +52,12 @@ export default async function NavigationMenu() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className='min-w-40 cursor-pointer'>
+              <DropdownMenuContent className='min-w-52 cursor-pointer'>
                 <DropdownMenuLabel className='flex flex-col gap-1'>
                   <span>{session?.user?.name}</span>
-                  <span>Email</span>
+                  <span className='text-xs text-primary/80'>
+                    {session?.user?.email}
+                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className='w-full'>
@@ -75,7 +79,7 @@ export default async function NavigationMenu() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className='w-full'>
+                <DropdownMenuItem asChild>
                   <form
                     action={async () => {
                       "use server";
@@ -86,7 +90,7 @@ export default async function NavigationMenu() {
                     <Button
                       type='submit'
                       variant='ghost'
-                      className='justify-start p-0 px-1'
+                      className='justify-start h-5 px-0 w-full'
                     >
                       <LogOut className='h-4 w-4 mr-2' />
                       Logout

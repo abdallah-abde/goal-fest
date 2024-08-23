@@ -36,6 +36,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
     "react-select": "^5.8.0",
+    "resend": "^4.0.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.1",
