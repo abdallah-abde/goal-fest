@@ -10,7 +10,7 @@ import {
   ResetSchema,
   NewPasswordSchema,
 } from "@/schemas";
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 import {
@@ -122,6 +122,10 @@ export async function login(values: z.infer<typeof LoginSchema>) {
   }
 
   return { success: "Email sent!" };
+}
+
+export async function logout() {
+  await signOut();
 }
 
 export async function register(values: z.infer<typeof RegisterSchema>) {

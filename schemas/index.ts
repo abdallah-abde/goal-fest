@@ -25,3 +25,8 @@ export const ResetSchema = z.object({
 export const NewPasswordSchema = z.object({
   password: z.string().min(6, { message: "Minimum password is 6 chars!" }),
 });
+
+export const CountrySchema = z.object({
+  name: z.string().min(1, { message: "Name is required!" }),
+  flagUrl: ImageSchema.optional(),
+});

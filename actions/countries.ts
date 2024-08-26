@@ -4,16 +4,12 @@ import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { z } from "zod";
-import { ImageSchema } from "@/schemas";
-
-const schema = z.object({
-  name: z.string().min(2),
-  flagUrl: ImageSchema.optional(),
-});
+import { CountrySchema } from "@/schemas";
 
 export async function addCountry(prevState: unknown, formData: FormData) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = CountrySchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -47,7 +43,9 @@ export async function updateCountry(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = CountrySchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;

@@ -44,12 +44,10 @@ export default function LoginForm() {
   function onSubmit(values: z.infer<typeof LoginSchema>) {
     setError("");
     setSuccess("");
-    console.log("values", values);
 
     startTransition(() => {
       login(values)
         .then((data) => {
-          console.log("data", data);
           if (data?.error) {
             // form.reset();
             setError(data.error);
