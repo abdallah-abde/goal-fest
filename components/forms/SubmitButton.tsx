@@ -1,5 +1,6 @@
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/LoadingComponents";
 
 export default function SubmitButton({
   isDisabled = false,
@@ -14,7 +15,13 @@ export default function SubmitButton({
       disabled={pending || (isDisabled ? isDisabled : pending)}
       className='font-bold w-fit'
     >
-      {pending ? "Saving..." : "Save"}
+      {pending ? (
+        <>
+          <LoadingSpinner /> <span className='ml-2'>Saving...</span>
+        </>
+      ) : (
+        "Save"
+      )}
     </Button>
   );
 }

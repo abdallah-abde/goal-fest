@@ -17,6 +17,14 @@ export async function addCountry(prevState: unknown, formData: FormData) {
 
   const data = result.data;
 
+  const country = await prisma.country.findFirst({
+    where: { name: data.name },
+  });
+
+  if (country) return { name: ["Country existed"] };
+
+  // if (country) return { result.error.formErrors.fieldErrors };
+
   let flagUrlPath = "";
   if (data.flagUrl != null && data.flagUrl.size > 0) {
     flagUrlPath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;

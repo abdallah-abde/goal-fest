@@ -5,6 +5,7 @@ import NavigationMenu from "@/components/menus/NavigationMenu";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default async function RootLayout({
               </div>
             </header>
             <main className='mx-auto px-4 md:container'>{children}</main>
+            <Toaster />
             <footer className='fixed z-50 bottom-0 w-full bg-secondary'>
               <div className='border-t-2 border-primary/50'>
                 <ul className='mx-auto px-4 md:container flex justify-between py-6'>

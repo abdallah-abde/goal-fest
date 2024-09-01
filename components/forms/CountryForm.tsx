@@ -32,7 +32,7 @@ export default function CountryForm({ country }: { country?: Country | null }) {
             type='text'
             id='name'
             name='name'
-            required
+            // required
             defaultValue={country?.name || ""}
           />
           {error?.name && <div className='text-destructive'>{error?.name}</div>}
