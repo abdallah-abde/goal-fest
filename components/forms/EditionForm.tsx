@@ -11,16 +11,29 @@ import { useFormState } from "react-dom";
 import {
   addTournamentEdition,
   updateTournamentEdition,
-} from "@/actions/tournamentsEditions";
+} from "@/actions/editions";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/SubmitButton";
+import FormField from "@/components/forms/parts/FormField";
+import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { useRef, useState } from "react";
 
 import MultipleSelector, {
   MultipleSelectorRef,
 } from "@/components/ui/multiple-selector";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectSeparator,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Eraser } from "lucide-react";
 
 interface TournamentEditionProps extends TournamentEdition {
   hostingCountries: Country[];
@@ -51,8 +64,8 @@ export default function EditionForm({
     (tournamentEdition &&
       tournamentEdition.hostingCountries.length > 0 &&
       tournamentEdition.hostingCountries
-        .map((a) => {
-          return a.id.toString();
+        .map(({ id }) => {
+          return id.toString();
         })
         .join(",")) ||
       ""
@@ -63,8 +76,8 @@ export default function EditionForm({
     (tournamentEdition &&
       tournamentEdition.teams.length > 0 &&
       tournamentEdition.teams
-        .map((a) => {
-          return a.id.toString();
+        .map(({ id }) => {
+          return id.toString();
         })
         .join(",")) ||
       ""
@@ -73,11 +86,11 @@ export default function EditionForm({
   const [selectedTeams, setSelectedTeams] = useState(
     (tournamentEdition &&
       tournamentEdition.teams.length > 0 &&
-      tournamentEdition.teams.map((a) => {
+      tournamentEdition.teams.map(({ id, name }) => {
         return {
-          label: a.name,
-          value: a.name,
-          dbValue: a.id.toString(),
+          label: name,
+          value: name,
+          dbValue: id.toString(),
         };
       })) ||
       undefined
@@ -86,15 +99,20 @@ export default function EditionForm({
   const [selectedHostingCountries, setSelectedHostingCountries] = useState(
     (tournamentEdition &&
       tournamentEdition.hostingCountries.length > 0 &&
-      tournamentEdition.hostingCountries.map((a) => {
+      tournamentEdition.hostingCountries.map(({ id, name }) => {
         return {
-          label: a.name,
-          value: a.name,
-          dbValue: a.id.toString(),
+          label: name,
+          value: name,
+          dbValue: id.toString(),
         };
       })) ||
       undefined
   );
+
+  const [value, setValue] = useState<string | undefined>(
+    tournamentEdition?.winnerId?.toString() || undefined
+  );
+  const [key, setKey] = useState(+new Date());
 
   return (
     <>
@@ -105,48 +123,43 @@ export default function EditionForm({
             : "Add Tournament Edition"
         }
       />
-      <form
-        action={action}
-        className='space-y-8 lg:space-y-0 lg:grid grid-cols-2 gap-4'
-      >
-        <div className='space-y-2'>
+      <form action={action} className='form-styles'>
+        <FormField>
           <Label htmlFor='tournamentId'>Tournament Name</Label>
           <div>
             <select
               name='tournamentId'
               id='tournamentId'
-              className='p-2 rounded-md w-full'
+              className='form-select'
               defaultValue={
                 tournamentEdition?.tournamentId.toString() || undefined
               }
             >
-              {tournaments.map((tor) => (
-                <option key={tor.id} value={tor.id}>
-                  {tor.name}
+              {tournaments.map(({ id, name }) => (
+                <option key={id} value={id} className='form-select-option'>
+                  {name}
                 </option>
               ))}
             </select>
-            {error.tournamentId && (
-              <div className='text-destructive'>{error.tournamentId}</div>
-            )}
+            <FormFieldError error={error?.tournamentId} />
           </div>
-        </div>
-        <div className='space-y-2'>
+        </FormField>
+        <FormField>
           <Label htmlFor='year'>Year</Label>
           <Input
             type='number'
             id='year'
             name='year'
-            required
+            // required
             defaultValue={tournamentEdition?.year.toString() || ""}
           />
-          {error?.year && <div className='text-destructive'>{error?.year}</div>}
-        </div>
-        <div className='space-y-2'>
+          <FormFieldError error={error?.year} />
+        </FormField>
+        <FormField>
           <Label htmlFor='logoUrl'>Logo</Label>
           <Input type='file' id='logoUrl' name='logoUrl' />
           {tournamentEdition != null && tournamentEdition?.logoUrl != "" && (
-            <div className='space-y-2 pt-2'>
+            <div className='current-flag-wrapper'>
               <Label>Current Logo</Label>
               <Image
                 src={tournamentEdition?.logoUrl || ""}
@@ -154,55 +167,83 @@ export default function EditionForm({
                 width='100'
                 alt='Tournament Edition Logo'
               />
-              {error.logoUrl && (
-                <div className='text-destructive'>{error.logoUrl}</div>
-              )}
+              <FormFieldError error={error?.logoUrl} />
             </div>
           )}
-        </div>
-        <div className='space-y-2'>
+        </FormField>
+        <FormField>
           <Label htmlFor='winnerId'>Winner Team</Label>
-          <div>
+          <div className='flex items-center gap-2'>
+            <Select
+              name='winnerId'
+              // value={value}
+              key={key}
+              defaultValue={value}
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Winner Team' />
+              </SelectTrigger>
+              <SelectContent>
+                {teams.map(({ id, name }) => (
+                  <SelectItem value={id.toString()}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type='button'
+              className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+              variant='outline'
+              size='icon'
+              onClick={(e) => {
+                e.stopPropagation();
+                setValue(undefined);
+                setKey(+new Date());
+              }}
+            >
+              <Eraser strokeWidth='1.5px' />
+            </Button>
+          </div>
+          {/* <div>
             <select
               name='winnerId'
               id='winnerId'
-              className='p-2 rounded-md w-full'
+              className='form-select'
               defaultValue={tournamentEdition?.winnerId || undefined}
             >
-              <option value='choose team'>Choose Team...</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
+              <option className='form-select-option' value='choose team'>
+                Choose Team...
+              </option>
+              {teams.map(({ id, name }) => (
+                <option key={id} value={id} className='form-select-option'>
+                  {name}
                 </option>
               ))}
             </select>
-            {error.winnerId && (
-              <div className='text-destructive'>{error.winnerId}</div>
-            )}
-          </div>
-        </div>
-        <div className='space-y-2 '>
+            <FormFieldError error={error?.winnerId} />
+          </div> */}
+        </FormField>
+        <FormField>
           <Label htmlFor='titleHolderId'>Title Holder Team</Label>
           <div>
             <select
               name='titleHolderId'
               id='titleHolderId'
-              className='p-2 rounded-md w-full'
+              className='form-select'
               defaultValue={tournamentEdition?.titleHolderId || undefined}
             >
-              <option value='choose team'>Choose Team...</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
+              <option className='form-select-option' value='choose team'>
+                Choose Team...
+              </option>
+              {teams.map(({ id, name }) => (
+                <option key={id} value={id} className='form-select-option'>
+                  {name}
                 </option>
               ))}
             </select>
-            {error.titleHolderId && (
-              <div className='text-destructive'>{error.titleHolderId}</div>
-            )}
+            <FormFieldError error={error?.titleHolderId} />
           </div>
-        </div>
-        <div className='space-y-2 '>
+        </FormField>
+        <FormField>
           <Label htmlFor='hostingCountries'>Hosting Countries</Label>
           <Input
             type='hidden'
@@ -211,13 +252,13 @@ export default function EditionForm({
             value={hiddenHostingCountries}
           />
           <MultipleSelector
-            className='dark:border-1 dark:border-primary'
+            className='form-multiple-selector-styles'
             ref={hostingCountriesRef}
-            defaultOptions={countries.map((t) => {
+            defaultOptions={countries.map(({ id, name }) => {
               return {
-                label: t.name,
-                value: t.name,
-                dbValue: t.id.toString(),
+                label: name,
+                value: name,
+                dbValue: id.toString(),
               };
             })}
             onChange={(options) => {
@@ -231,41 +272,24 @@ export default function EditionForm({
             }}
             placeholder='Select hosting countries for this tournament'
             emptyIndicator={
-              <p className='text-center text-lg leading-10 text-gray-600 dark:text-gray-400'>
-                no countries found.
-              </p>
+              <p className='empty-indicator'>No countries found</p>
             }
             value={selectedHostingCountries}
           />
-          {/* <select name='hostingCountries' id='hostingCountries' multiple={true}>
-          {countries?.map((c) => (
-            <option
-              key={c.id}
-              value={c.id}
-              selected={
-                tournamentEdition?.hostingCountries.filter((a) => c.id === a.id)
-                  .length === 1
-              }
-            >
-              {c.name}
-            </option>
-          ))}
-        </select> */}
-          {error?.hostingCountries && (
-            <div className='text-destructive'>{error?.hostingCountries}</div>
-          )}
-        </div>
-        <div className='space-y-2 '>
+
+          <FormFieldError error={error?.hostingCountries} />
+        </FormField>
+        <FormField>
           <Label htmlFor='teams'>Teams</Label>
           <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
           <MultipleSelector
-            className='dark:border-1 dark:border-primary'
+            className='form-multiple-selector-styles'
             ref={teamsRef}
-            defaultOptions={teams.map((t) => {
+            defaultOptions={teams.map(({ id, name }) => {
               return {
-                label: t.name,
-                value: t.name,
-                dbValue: t.id.toString(),
+                label: name,
+                value: name,
+                dbValue: id.toString(),
               };
             })}
             onChange={(options) => {
@@ -278,20 +302,12 @@ export default function EditionForm({
               );
             }}
             placeholder='Select teams you like to add to the tournament'
-            emptyIndicator={
-              <p className='text-center text-lg leading-10 text-gray-600 dark:text-gray-400'>
-                no teams found.
-              </p>
-            }
+            emptyIndicator={<p className='empty-indicator'>No teams found.</p>}
             value={selectedTeams}
           />
-          {error?.teams && (
-            <div className='text-destructive'>{error?.teams}</div>
-          )}
-        </div>
-        <div className='col-span-2'>
-          <SubmitButton />
-        </div>
+          <FormFieldError error={error?.teams} />
+        </FormField>
+        <SubmitButton />
       </form>
     </>
   );

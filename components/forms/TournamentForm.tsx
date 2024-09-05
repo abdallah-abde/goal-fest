@@ -12,6 +12,8 @@ import { addTournament, updateTournament } from "@/actions/tournaments";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/SubmitButton";
+import FormField from "@/components/forms/parts/FormField";
+import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 export default function TournamentForm({
   tournament,
@@ -28,43 +30,34 @@ export default function TournamentForm({
   return (
     <>
       <PageHeader label={tournament ? "Edit Tournament" : "Add Tournament"} />
-      <form
-        action={action}
-        className='space-y-8 lg:space-y-0 lg:grid grid-cols-2 gap-4'
-      >
-        <div className='space-y-2'>
+      <form action={action} className='form-styles'>
+        <FormField>
           <Label htmlFor='name'>Name</Label>
           <Input
             type='text'
             id='name'
             name='name'
-            required
+            // required
             defaultValue={tournament?.name || ""}
           />
-          {error?.name && <div className='text-destructive'>{error?.name}</div>}
-        </div>
-        <div className='space-y-2'>
+          <FormFieldError error={error?.name} />
+        </FormField>
+        <FormField>
           <Label htmlFor='logoUrl'>Logo</Label>
           <Input type='file' id='logoUrl' name='logoUrl' />
           {tournament != null && tournament?.logoUrl != "" && (
-            <div className='space-y-2 pt-2'>
-              <Label>Current Logo</Label>
+            <div className='current-flag-wrapper'>
               <Image
                 src={tournament?.logoUrl || ""}
                 height='100'
                 width='100'
                 alt='Tournament Logo'
               />
-
-              {error.logoUrl && (
-                <div className='text-destructive'>{error.logoUrl}</div>
-              )}
+              <FormFieldError error={error?.logoUrl} />
             </div>
           )}
-        </div>
-        <div className='col-span-2'>
-          <SubmitButton />
-        </div>
+        </FormField>
+        <SubmitButton />
       </form>
     </>
   );

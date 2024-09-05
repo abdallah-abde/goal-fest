@@ -23,8 +23,6 @@ export async function addCountry(prevState: unknown, formData: FormData) {
 
   if (country) return { name: ["Country existed"] };
 
-  // if (country) return { result.error.formErrors.fieldErrors };
-
   let flagUrlPath = "";
   if (data.flagUrl != null && data.flagUrl.size > 0) {
     flagUrlPath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;
@@ -60,6 +58,12 @@ export async function updateCountry(
   }
 
   const data = result.data;
+
+  const existedCountry = await prisma.country.findFirst({
+    where: { AND: [{ name: data.name }, { id: { not: id } }] },
+  });
+
+  if (existedCountry) return { name: ["Country existed"] };
 
   const country = await prisma.country.findUnique({ where: { id } });
 

@@ -6,21 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Group, Team, Tournament, TournamentEdition } from "@prisma/client";
 
 import { useFormState } from "react-dom";
-import {
-  addTournamentGroup,
-  updateTournamentGroup,
-} from "@/actions/tournamentsGroups";
+import { addTournamentGroup, updateTournamentGroup } from "@/actions/groups";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/SubmitButton";
+import FormField from "@/components/forms/parts/FormField";
+import FormFieldError from "@/components/forms/parts/FormFieldError";
+import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
 import { useEffect, useRef, useState } from "react";
 
 import MultipleSelector, {
   MultipleSelectorRef,
 } from "@/components/ui/multiple-selector";
-
-import { LoadingSpinner } from "@/components/LoadingComponents";
 
 interface GroupProps extends Group {
   tournamentEdition: TournamentEditionProps;
@@ -107,17 +105,14 @@ export default function GroupForm({
   return (
     <>
       <PageHeader label={group ? "Edit Group" : "Add Group"} />
-      <form
-        action={action}
-        className='space-y-8 lg:space-y-0 lg:grid grid-cols-2 gap-4'
-      >
-        <div className='space-y-2'>
+      <form action={action} className='form-styles'>
+        <FormField>
           <Label htmlFor='tournamentId'>Tournament Name</Label>
           <div>
             <select
               name='tournamentId'
               id='tournamentId'
-              className='p-2 rounded-md w-full bg-primary/50 placeholder:text-white text-white'
+              className='form-select'
               onChange={(e) => setTournamentId(e.target.value)}
               defaultValue={
                 group?.tournamentEdition.tournamentId.toString() ||
@@ -125,82 +120,64 @@ export default function GroupForm({
                 undefined
               }
             >
-              {tournaments.map((tor) => (
-                <option
-                  key={tor.id}
-                  value={tor.id}
-                  className='text-primary-foreground'
-                >
-                  {tor.name}
+              {tournaments.map(({ id, name }) => (
+                <option key={id} value={id} className='text-primary-foreground'>
+                  {name}
                 </option>
               ))}
             </select>
           </div>
-        </div>
+        </FormField>
         {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
-          <div className='space-y-2'>
+          <FormField>
             <Label htmlFor='tournamentEditionId'>Tournament Edition Name</Label>
             <div>
               <select
                 name='tournamentEditionId'
                 id='tournamentEditionId'
-                className='p-2 rounded-md w-full bg-primary/50 placeholder:text-white text-white'
+                className='form-select'
                 defaultValue={
                   group?.tournamentEditionId.toString() || undefined
                 }
               >
-                {tournamentsEditions.map((edi) => (
-                  <option
-                    key={edi.id}
-                    value={edi.id}
-                    className='text-primary-foreground'
-                  >
-                    {`${edi.tournament.name} ${edi.year.toString()}`}
+                {tournamentsEditions.map(({ id, tournament, year }) => (
+                  <option key={id} value={id} className='form-select-option'>
+                    {`${tournament.name} ${year.toString()}`}
                   </option>
                 ))}
               </select>
+              <FormFieldError error={error?.tournamentEditionId} />
             </div>
-            {error.tournamentEditionId && (
-              <div className='text-destructive'>
-                {error.tournamentEditionId}
-              </div>
-            )}
-          </div>
+          </FormField>
         ) : (
-          <div className='space-y-2 flex items-center justify-center gap-2'>
-            {isLoading && (
-              <>
-                <p>Loading Editions...</p>
-                <LoadingSpinner />
-              </>
-            )}
-          </div>
+          <FormFieldLoadingState
+            isLoading={isLoading}
+            label='Loading Editions...'
+            notFoundText='There is no editions, add some!'
+          />
         )}
-        <div className='space-y-2'>
+        <FormField>
           <Label htmlFor='name'>Name</Label>
           <Input
             type='text'
             id='name'
             name='name'
-            required
+            // required
             defaultValue={group?.name || ""}
-            className='p-2 px-[10px] rounded-md w-full bg-primary/50 placeholder:text-white text-white focus-visible:ring-0'
           />
-          {error?.name && (
-            <div className='text-destructive font-bold'>{error?.name}</div>
-          )}
-        </div>
-        <div className='space-y-2'>
+          <FormFieldError error={error?.name} />
+        </FormField>
+        <FormField>
           <Label htmlFor='teams'>Teams</Label>
           <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
           <MultipleSelector
-            className='dark:border-1 dark:border-primary focus-visible:ring-0 outline-0'
+            className='form-multiple-selector-styles'
             ref={teamsRef}
-            defaultOptions={teams.map((t) => {
+            defaultOptions={teams.map(({ id, name }) => {
               return {
-                label: t.name,
-                value: t.name,
-                dbValue: t.id.toString(),
+                label: name,
+                value: name,
+                dbValue: id.toString(),
               };
             })}
             onChange={(options) => {
@@ -213,26 +190,16 @@ export default function GroupForm({
               );
             }}
             placeholder='Select teams you like to add to the group'
-            emptyIndicator={
-              <p className='text-center text-lg leading-10 text-gray-600 dark:text-gray-400'>
-                no teams found.
-              </p>
-            }
+            emptyIndicator={<p className='empty-indicator'>no teams found.</p>}
             value={selectedTeams}
           />
-          {error?.teams && (
-            <div className='text-destructive'>{error?.teams}</div>
-          )}
-        </div>
-        <div className='col-span-2'>
-          <SubmitButton
-            isDisabled={
-              isLoading ||
-              !tournamentsEditions ||
-              tournamentsEditions.length < 1
-            }
-          />
-        </div>
+          <FormFieldError error={error?.teams} />
+        </FormField>
+        <SubmitButton
+          isDisabled={
+            isLoading || !tournamentsEditions || tournamentsEditions.length < 1
+          }
+        />
       </form>
     </>
   );

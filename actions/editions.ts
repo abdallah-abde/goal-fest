@@ -4,30 +4,27 @@ import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { z } from "zod";
-import { ImageSchema } from "@/schemas";
-
-const schema = z.object({
-  tournamentId: z.coerce.number().int(),
-  year: z.coerce.number().int(),
-  logoUrl: ImageSchema.optional(),
-  winnerId: z.union([z.coerce.number().optional(), z.string()]),
-  titleHolderId: z.union([z.coerce.number().optional(), z.string()]),
-  hostingCountries: z.string().optional(),
-  teams: z.string().optional(),
-});
+import { EditionSchema } from "@/schemas";
 
 export async function addTournamentEdition(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = EditionSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
   }
 
   const data = result.data;
+
+  const edition = await prisma.tournamentEdition.findFirst({
+    where: { AND: [{ year: data.year }, { tournamentId: data.tournamentId }] },
+  });
+
+  if (edition) return { year: ["Edition existed"] };
 
   let logoUrlPath = "";
   if (data.logoUrl != null && data.logoUrl.size > 0) {
@@ -89,13 +86,27 @@ export async function updateTournamentEdition(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = EditionSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
   }
 
   const data = result.data;
+
+  const existedEdition = await prisma.tournamentEdition.findFirst({
+    where: {
+      AND: [
+        { year: data.year },
+        { tournamentId: data.tournamentId },
+        { id: { not: id } },
+      ],
+    },
+  });
+
+  if (existedEdition) return { year: ["Edition existed"] };
 
   const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
     where: { id },

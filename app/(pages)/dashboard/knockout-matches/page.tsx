@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
@@ -10,19 +8,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import { EllipsisVertical } from "lucide-react";
 
 import { getFormattedDateTime } from "@/lib/getFormattedDate";
 
@@ -30,8 +19,9 @@ import AddNewLinkComponent from "@/components/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/SearchFieldComponent";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/SortComponent";
-import PaginationComponent from "@/components/PaginationComponent";
 import PageHeader from "@/components/PageHeader";
+import DashboardTableFooter from "@/components/tables/DashboardTableFooter";
+import ActionsCellDropDown from "@/components/tables/ActionsCellDropDown";
 
 export default async function DashboardKnockoutMatchesPage({
   searchParams,
@@ -205,7 +195,7 @@ export default async function DashboardKnockoutMatchesPage({
   return (
     <>
       <PageHeader label='Knockout Matches List' />
-      <div className='flex flex-col-reverse md:flex-row items-center gap-2 mt-1'>
+      <div className='dashboard-search-and-add'>
         <SearchFieldComponent />
         <AddNewLinkComponent
           href='/dashboard/knockout-matches/new'
@@ -214,104 +204,93 @@ export default async function DashboardKnockoutMatchesPage({
       </div>
 
       {matches.length > 0 ? (
-        <Table className='mt-4 mb-2 caption-bottom dark:border-primary/10 border-0 relative'>
+        <Table className='dashboard-table'>
           <TableHeader>
-            <TableRow className='bg-primary/10 hover:bg-primary/10 border-0 text-[12px]'>
-              <TableHead className='text-left'>
+            <TableRow className='dashboard-head-table-row text-[12px]'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='homeTeam' label='Home Team' />
               </TableHead>
-              <TableHead className='text-left'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='awayTeam' label='Away Team' />
               </TableHead>
-              <TableHead className='text-left'>Main Time</TableHead>
-              <TableHead className='text-left'>Extra Time</TableHead>
-              <TableHead className='text-left'>Penalties</TableHead>
-              <TableHead className='text-left'>
+              <TableHead className='dashboard-head-table-cell'>
+                Main Time
+              </TableHead>
+              <TableHead className='dashboard-head-table-cell'>
+                Extra Time
+              </TableHead>
+              <TableHead className='dashboard-head-table-cell'>
+                Penalties
+              </TableHead>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='date' label='Date & Time' />
               </TableHead>
-              <TableHead className='text-left'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='round' label='Round' />
               </TableHead>
-              <TableHead className='text-left'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='tournament' label='Tournament' />
               </TableHead>
-              <TableHead className='text-left'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='edition' label='Edition' />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className='text-[12px]'>
-            {matches.map((mch) => (
-              <TableRow
-                key={mch.id}
-                className='border-b-[1px] border-b-primary/10'
-              >
-                <TableCell className='text-left font-bold'>
-                  {mch.homeTeam ? mch.homeTeam.name : mch.homeTeamPlacehlder}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.awayTeam ? mch.awayTeam.name : mch.awayTeamPlacehlder}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.homeGoals} - {mch.awayGoals}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.homeExtraTimeGoals} - {mch.awayExtraTimeGoals}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.homePenaltyGoals} - {mch.awayPenaltyGoals}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.date ? getFormattedDateTime(mch.date.toString()) : ""}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.round}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.tournamentEdition.tournament.name}
-                </TableCell>
-                <TableCell className='text-left font-bold'>
-                  {mch.tournamentEdition.year.toString()}
-                </TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <EllipsisVertical />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className='min-w-fit cursor-pointer'>
-                      <DropdownMenuItem
-                        asChild
-                        className='items-center justify-center'
-                      >
-                        <Link
-                          href={`/dashboard/knockout-matches/${mch.id}`}
-                          className='w-14 cursor-pointer'
-                        >
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        asChild
-                        className='items-center justify-center'
-                      >
-                        <p className='w-14 cursor-pointer'>Delete</p>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            {matches.map(
+              ({
+                id,
+                homeTeam,
+                awayTeam,
+                homeGoals,
+                awayGoals,
+                homeExtraTimeGoals,
+                awayExtraTimeGoals,
+                homeTeamPlacehlder,
+                awayTeamPlacehlder,
+                homePenaltyGoals,
+                awayPenaltyGoals,
+                date,
+                round,
+                tournamentEdition,
+              }) => (
+                <TableRow key={id} className='dashboard-table-row'>
+                  <TableCell className='dashboard-table-cell'>
+                    {homeTeam ? homeTeam.name : homeTeamPlacehlder}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {awayTeam ? awayTeam.name : awayTeamPlacehlder}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {homeGoals} - {awayGoals}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {homeExtraTimeGoals} - {awayExtraTimeGoals}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {homePenaltyGoals} - {awayPenaltyGoals}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {date ? getFormattedDateTime(date.toString()) : ""}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {round}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {tournamentEdition.tournament.name}
+                  </TableCell>
+                  <TableCell className='dashboard-table-cell'>
+                    {tournamentEdition.year.toString()}
+                  </TableCell>
+                  <ActionsCellDropDown
+                    editHref={`/dashboard/knockout-matches/${id}`}
+                  />
+                </TableRow>
+              )
+            )}
           </TableBody>
-          {totalPages > 1 && (
-            <TableFooter>
-              <TableRow className='border-t-[1px] border-t-primary/10'>
-                <TableCell colSpan={9}>
-                  <PaginationComponent totalPages={totalPages} />
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          )}
+          <DashboardTableFooter totalPages={totalPages} colSpan={10} />
         </Table>
       ) : (
         <NoDataFoundComponent message='No Matches Found' />

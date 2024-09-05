@@ -3,24 +3,15 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { z } from "zod";
-
-const schema = z.object({
-  homeTeamId: z.coerce.number().int(),
-  awayTeamId: z.coerce.number().int(),
-  homeGoals: z.coerce.number().optional(),
-  awayGoals: z.coerce.number().optional(),
-  date: z.union([z.coerce.date().optional(), z.string()]),
-  groupId: z.coerce.number().int(),
-  tournamentEditionId: z.coerce.number().int(),
-  round: z.coerce.number().optional(),
-});
+import { GroupMatchSchema } from "@/schemas";
 
 export async function addTournamentGroupMatch(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = GroupMatchSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -50,7 +41,9 @@ export async function updateTournamentGroupMatch(
   prevState: unknown,
   formData: FormData
 ) {
-  const result = schema.safeParse(Object.fromEntries(formData.entries()));
+  const result = GroupMatchSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;

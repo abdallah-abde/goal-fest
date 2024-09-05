@@ -12,6 +12,8 @@ import { addTeam, updateTeam } from "@/actions/teams";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/SubmitButton";
+import FormField from "@/components/forms/parts/FormField";
+import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 export default function TeamForm({ team }: { team?: Team | null }) {
   const [error, action] = useFormState(
@@ -22,26 +24,23 @@ export default function TeamForm({ team }: { team?: Team | null }) {
   return (
     <>
       <PageHeader label={team ? "Edit Team" : "Add Team"} />
-      <form
-        action={action}
-        className='space-y-8 lg:space-y-0 lg:grid grid-cols-2 gap-4'
-      >
-        <div className='space-y-2'>
+      <form action={action} className='form-styles'>
+        <FormField>
           <Label htmlFor='name'>Name</Label>
           <Input
             type='text'
             id='name'
             name='name'
-            required
+            // required
             defaultValue={team?.name || ""}
           />
-          {error?.name && <div className='text-destructive'>{error?.name}</div>}
-        </div>
-        <div className='space-y-2'>
+          <FormFieldError error={error?.name} />
+        </FormField>
+        <FormField>
           <Label htmlFor='flagUrl'>Flag</Label>
           <Input type='file' id='flagUrl' name='flagUrl' />
           {team != null && team?.flagUrl != "" && (
-            <div className='space-y-2 pt-2'>
+            <div className='current-flag-wrapper'>
               <Label>Current Flag</Label>
               <Image
                 src={team?.flagUrl || ""}
@@ -49,15 +48,11 @@ export default function TeamForm({ team }: { team?: Team | null }) {
                 width='100'
                 alt='Team Flag'
               />
-              {error.flagUrl && (
-                <div className='text-destructive'>{error.flagUrl}</div>
-              )}
+              <FormFieldError error={error?.flagUrl} />
             </div>
           )}
-        </div>
-        <div className='col-span-2'>
-          <SubmitButton />
-        </div>
+        </FormField>
+        <SubmitButton />
       </form>
     </>
   );

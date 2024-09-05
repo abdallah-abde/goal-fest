@@ -215,3 +215,29 @@ export function DashboardTableSkeleton() {
     </div>
   );
 }
+
+export function FormSkeleton() {
+  return (
+    <>
+      <Skeleton className='h-[40px] w-full rounded-md bg-primary/20 mb-6 flex items-center justify-center'>
+        <Skeleton className='h-[25px] w-[60px]' />
+      </Skeleton>
+      <div className='space-y-8'>
+        {Array.from({ length: 3 }).map((a, _) => (
+          <div
+            key={_}
+            className='space-y-8 lg:space-y-0 lg:grid grid-cols-2 gap-4'
+          >
+            {Array.from({ length: 2 }).map((a, _) => (
+              <div key={_} className='flex flex-col gap-4'>
+                <Skeleton className='h-[25px] w-[70px] bg-primary/10' />
+                <Skeleton className='h-[40px] w-full rounded-md bg-primary/10 ' />
+              </div>
+            ))}
+          </div>
+        ))}
+        <Skeleton className='h-[40px] w-[80px] rounded-md bg-primary/20' />
+      </div>
+    </>
+  );
+}
