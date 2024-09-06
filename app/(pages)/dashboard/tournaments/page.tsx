@@ -13,13 +13,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import AddNewLinkComponent from "@/components/AddNewLinkComponent";
-import SearchFieldComponent from "@/components/SearchFieldComponent";
+import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
+import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import SortComponent from "@/components/SortComponent";
+import SortComponent from "@/components/table-parts/SortComponent";
 import PageHeader from "@/components/PageHeader";
-import DashboardTableFooter from "@/components/tables/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/tables/ActionsCellDropDown";
+import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
+import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 export default async function DashboardTournamentsPage({
   searchParams,

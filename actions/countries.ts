@@ -25,7 +25,9 @@ export async function addCountry(prevState: unknown, formData: FormData) {
 
   let flagUrlPath = "";
   if (data.flagUrl != null && data.flagUrl.size > 0) {
-    flagUrlPath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/images/countries/${crypto.randomUUID()}-${
+      data.flagUrl.name
+    }`;
 
     await fs.writeFile(
       `public${flagUrlPath}`,
@@ -73,7 +75,9 @@ export async function updateCountry(
   if (data.flagUrl != null && data.flagUrl.size > 0) {
     if (country.flagUrl) await fs.unlink(`public${country.flagUrl}`);
 
-    flagUrlPath = `/countries/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/images/countries/${crypto.randomUUID()}-${
+      data.flagUrl.name
+    }`;
 
     await fs.writeFile(
       `public${flagUrlPath}`,

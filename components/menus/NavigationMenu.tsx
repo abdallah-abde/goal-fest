@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { LogIn, CircleUserRound, Settings, User } from "lucide-react";
-import LogoutButton from "@/components/LogoutButton";
+import LogoutButton from "@/components/forms/auth/LogoutButton";
 import { Icon, Grab } from "lucide-react";
 import { goalNet } from "@lucide/lab";
 

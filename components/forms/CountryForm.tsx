@@ -11,7 +11,7 @@ import { useFormState } from "react-dom";
 import { addCountry, updateCountry } from "@/actions/countries";
 
 import PageHeader from "@/components/PageHeader";
-import SubmitButton from "@/components/forms/SubmitButton";
+import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 

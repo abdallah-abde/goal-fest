@@ -18,7 +18,7 @@ import {
 } from "@/actions/groupMatches";
 
 import PageHeader from "@/components/PageHeader";
-import SubmitButton from "@/components/forms/SubmitButton";
+import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";

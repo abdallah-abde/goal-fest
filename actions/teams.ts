@@ -23,7 +23,7 @@ export async function addTeam(prevState: unknown, formData: FormData) {
 
   let flagUrlPath = "";
   if (data.flagUrl != null && data.flagUrl.size > 0) {
-    flagUrlPath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/images/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
       `public${flagUrlPath}`,
@@ -69,7 +69,7 @@ export async function updateTeam(
   if (data.flagUrl != null && data.flagUrl.size > 0) {
     if (team.flagUrl) await fs.unlink(`public${team.flagUrl}`);
 
-    flagUrlPath = `/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
+    flagUrlPath = `/images/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
 
     await fs.writeFile(
       `public${flagUrlPath}`,

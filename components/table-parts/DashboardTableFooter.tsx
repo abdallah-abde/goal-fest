@@ -1,5 +1,5 @@
 import { TableCell, TableFooter, TableRow } from "@/components/ui/table";
-import PaginationComponent from "@/components/PaginationComponent";
+import PaginationComponent from "@/components/table-parts/PaginationComponent";
 
 export default function DashboardTableFooter({
   totalPages,

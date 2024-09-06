@@ -25,7 +25,9 @@ export async function addTournament(prevState: unknown, formData: FormData) {
 
   let logoUrlPath = "";
   if (data.logoUrl != null && data.logoUrl.size > 0) {
-    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+      data.logoUrl.name
+    }`;
 
     await fs.writeFile(
       `public${logoUrlPath}`,
@@ -73,7 +75,9 @@ export async function updateTournament(
   if (data.logoUrl != null && data.logoUrl.size > 0) {
     if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
 
-    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+      data.logoUrl.name
+    }`;
 
     await fs.writeFile(
       `public${logoUrlPath}`,
