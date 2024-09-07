@@ -33,8 +33,20 @@ export default function CountryForm({ country }: { country?: Country | null }) {
             name='name'
             // required
             defaultValue={country?.name || ""}
+            autoFocus
           />
           <FormFieldError error={error?.name} />
+        </FormField>
+        <FormField>
+          <Label htmlFor='code'>Country Code</Label>
+          <Input
+            type='text'
+            id='code'
+            name='code'
+            // required
+            defaultValue={country?.code || ""}
+          />
+          <FormFieldError error={error?.code} />
         </FormField>
         <FormField>
           <Label htmlFor='flagUrl'>Flag</Label>

@@ -14,6 +14,8 @@ export async function addTournamentEdition(
     Object.fromEntries(formData.entries())
   );
 
+  console.log(result.data);
+
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
   }
@@ -74,6 +76,7 @@ export async function addTournamentEdition(
       teams: {
         connect: ts,
       },
+      currentStage: "Groups Stage",
     },
   });
 

@@ -1,8 +1,9 @@
-import Image from "next/image";
 import { Match, Group, Team } from "@prisma/client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+import Image from "next/image";
 
 import * as _ from "lodash";
 
@@ -31,11 +32,12 @@ export default async function GroupMatchesCards({
     <>
       {results.length > 0 ? (
         <div className='flex flex-col gap-8'>
-          {results.map(([divider, list]) => {
+          {results.map(([divider, list], _) => {
+            const matchDate = getFormattedDate(divider);
             return (
-              <div key={divider}>
+              <div key={_}>
                 <p className='text-[14px] sm:text-[16px] mb-2 border-2 border-primary/10 w-fit p-2 rounded-sm font-semibold'>
-                  {getFormattedDate(divider)}
+                  {matchDate === "Invalid Date" ? "No date info" : matchDate}
                 </p>
                 <div className='flex flex-wrap items-center justify-start gap-2'>
                   {list.map((match) => (
@@ -51,16 +53,28 @@ export default async function GroupMatchesCards({
                                 {match.group.name}
                               </Badge>
                             </div>
-                            {match.round && (
-                              <div>
-                                <Badge variant='outline'>{`Round ${match.round}`}</Badge>
-                              </div>
-                            )}
+                            <div>
+                              <Badge
+                                variant={
+                                  match.round ? "secondary" : "destructive"
+                                }
+                                className='hover:bg-secondary'
+                              >
+                                {match.round
+                                  ? `Round ${match.round}`
+                                  : "No round info"}
+                              </Badge>
+                            </div>
                           </div>
                           <div className='flex items-center justify-between gap-4'>
                             <div className='flex flex-col md:flex-row gap-2 items-center'>
-                              <p className='text-[14px] sm:text-[18px] font-bold'>
+                              <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
                                 {match.homeTeam.name}
+                              </p>
+                              <p className='hidden max-xs:block text-[16px] font-bold'>
+                                {match.homeTeam.code
+                                  ? match.homeTeam.code
+                                  : match.homeTeam.name}
                               </p>
                               {match.homeTeam && match.homeTeam.flagUrl && (
                                 <Image
@@ -72,13 +86,13 @@ export default async function GroupMatchesCards({
                               )}
                             </div>
                             {match.homeGoals !== null && (
-                              <span className='text-[16px] sm:text-[22px] font-bold ml-8'>
+                              <span className='text-[18px] xs:text-[22px] font-bold ml-8'>
                                 {match.homeGoals}
                               </span>
                             )}{" "}
                             -{" "}
                             {match.awayGoals !== null && (
-                              <span className='text-[16px] sm:text-[22px] font-bold mr-8'>
+                              <span className='text-[18px] xs:text-[22px] font-bold mr-8'>
                                 {match.awayGoals}
                               </span>
                             )}
@@ -91,27 +105,38 @@ export default async function GroupMatchesCards({
                                   alt={`${match.awayTeam?.name} Flag`}
                                 />
                               )}
-                              <p className='text-[14px] sm:text-[18px] font-bold'>
+                              <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
                                 {match.awayTeam.name}
+                              </p>
+                              <p className='hidden max-xs:block text-[16px] font-bold'>
+                                {match.awayTeam.code
+                                  ? match.awayTeam.code
+                                  : match.awayTeam.name}
                               </p>
                             </div>
                           </div>
                         </CardTitle>
                       </CardHeader>
-                      {match.date && (
-                        <CardContent className='flex justify-between'>
-                          <Badge variant='default' className='hover:bg-primary'>
-                            {match.date
-                              ? getFormattedDate(match.date.toString())
-                              : ""}
-                          </Badge>
-                          <Badge variant='outline'>
-                            {match.date
-                              ? getFormattedTime(match.date.toString())
-                              : ""}
-                          </Badge>
-                        </CardContent>
-                      )}
+                      {/* {match.date && ( */}
+                      <CardContent className='flex justify-between'>
+                        <Badge
+                          variant={match.date ? "default" : "destructive"}
+                          className='hover:bg-primary'
+                        >
+                          {match.date
+                            ? getFormattedDate(match.date.toString())
+                            : "No date info"}
+                        </Badge>
+                        <Badge
+                          variant={match.date ? "default" : "destructive"}
+                          className='hover:bg-primary'
+                        >
+                          {match.date
+                            ? getFormattedTime(match.date.toString())
+                            : "No time info"}
+                        </Badge>
+                      </CardContent>
+                      {/* )} */}
                     </Card>
                   ))}
                 </div>

@@ -29,6 +29,7 @@ export const NewPasswordSchema = z.object({
 export const CountrySchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
+  code: z.string().optional(),
 });
 
 export const TournamentSchema = z.object({
@@ -39,16 +40,21 @@ export const TournamentSchema = z.object({
 export const TeamSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
+  code: z.string().optional(),
 });
 
 export const EditionSchema = z.object({
-  tournamentId: z.coerce.number().int(),
+  tournamentId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data < 0, { message: "Tournament is required" }),
   year: z.coerce.number().int(),
   logoUrl: ImageSchema.optional(),
   winnerId: z.union([z.coerce.number().optional(), z.string()]),
   titleHolderId: z.union([z.coerce.number().optional(), z.string()]),
   hostingCountries: z.string().optional(),
   teams: z.string().optional(),
+  // currentStage: z.string().optional(),
 });
 
 export const GroupMatchSchema = z.object({
@@ -79,7 +85,7 @@ export const knockoutMatchSchema = z.object({
   awayPenaltyGoals: z.coerce.number().optional(),
   date: z.union([z.coerce.date().optional(), z.string()]),
   tournamentEditionId: z.coerce.number().int(),
-  round: z.coerce.number().optional(),
+  round: z.string().optional(),
   homeTeamPlacehlder: z.string().min(2),
   awayTeamPlacehlder: z.string().min(2),
 });

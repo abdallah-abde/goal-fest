@@ -127,7 +127,7 @@
   }
 
   .dashboard-table-cell {
-    @apply text-left font-bold !important;
+    @apply text-left font-bold py-4 !important;
   }
 
   .dashboard-head-table-cell {

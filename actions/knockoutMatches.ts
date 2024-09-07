@@ -35,7 +35,7 @@ export async function addTournamentKnockoutMatch(
       awayPenaltyGoals: data.awayPenaltyGoals ? +data.awayPenaltyGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       tournamentEditionId: +data.tournamentEditionId,
-      round: data.round ? data.round.toString() : null,
+      round: data.round || null,
       homeTeamPlacehlder: data.homeTeamPlacehlder
         ? data.homeTeamPlacehlder.toString()
         : null,
@@ -87,7 +87,7 @@ export async function updateTournamentKnockoutMatch(
       awayPenaltyGoals: data.awayPenaltyGoals ? +data.awayPenaltyGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       tournamentEditionId: +data.tournamentEditionId,
-      round: data.round ? data.round.toString() : null,
+      round: data.round || null,
       homeTeamPlacehlder: data.homeTeamPlacehlder
         ? data.homeTeamPlacehlder.toString()
         : null,

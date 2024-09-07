@@ -34,19 +34,34 @@ export default async function DashboardTeamsPage({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
-  // const sortField = searchParams?.sortField || "name";
+  const sortField = searchParams?.sortField || "name";
 
   const totalTeamsCount = await prisma.team.count({
     where: { name: { contains: query } },
   });
   const totalPages = Math.ceil(totalTeamsCount / PAGE_RECORDS_COUNT);
 
-  const teams = await prisma.team.findMany({
-    where: { name: { contains: query } },
-    skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-    take: PAGE_RECORDS_COUNT,
-    orderBy: { name: sortDir },
-  });
+  let teams;
+
+  if (sortField === "name") {
+    teams = await prisma.team.findMany({
+      where: {
+        OR: [{ name: { contains: query } }, { code: { contains: query } }],
+      },
+      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+      take: PAGE_RECORDS_COUNT,
+      orderBy: { name: sortDir },
+    });
+  } else {
+    teams = await prisma.team.findMany({
+      where: {
+        OR: [{ name: { contains: query } }, { code: { contains: query } }],
+      },
+      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+      take: PAGE_RECORDS_COUNT,
+      orderBy: { code: sortDir },
+    });
+  }
 
   return (
     <>
@@ -62,18 +77,22 @@ export default async function DashboardTeamsPage({
               <TableHead className='dashboard-head-table-cell'>
                 <SortComponent fieldName='name' />
               </TableHead>
+              <TableHead className='dashboard-head-table-cell'>
+                <SortComponent label='Team Code' fieldName='code' />
+              </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {teams.map(({ id, name }) => (
+            {teams.map(({ id, name, code }) => (
               <TableRow key={id} className='dashboard-table-row'>
                 <TableCell className='dashboard-table-cell'>{name}</TableCell>
+                <TableCell className='dashboard-table-cell'>{code}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/teams/${id}`} />
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={2} />
+          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
         <NoDataFoundComponent message='No Teams Found' />

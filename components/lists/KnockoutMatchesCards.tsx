@@ -49,14 +49,17 @@ const KnockoutMatchesCards = ({
             </Button>
           </div>
           <div className='flex flex-col gap-8'>
-            {results.map(([divider, list]) => {
+            {results.map(([divider, list], _) => {
               return (
-                <div key={divider + new Date().toString()}>
+                // <div key={divider + new Date().toString()}>
+                <div key={_}>
                   <p className='text-[14px] sm:text-[16px] mb-2 border-2 border-primary/10 w-fit p-2 rounded-sm font-semibold'>
                     {groupBy === "date"
                       ? divider === "null"
-                        ? "Matches Without Date"
+                        ? "Matches without date"
                         : getFormattedDate(divider)
+                      : divider === "null"
+                      ? "Matches without round"
                       : divider}
                   </p>
                   <div className='flex flex-wrap items-center justify-start gap-2'>
@@ -65,21 +68,28 @@ const KnockoutMatchesCards = ({
                         <CardHeader>
                           <CardTitle className='flex flex-col items-center justify-center gap-4'>
                             <div className='mr-auto'>
-                              {match.round && (
-                                <Badge
-                                  variant='secondary'
-                                  className='hover:bg-secondary'
-                                >
-                                  {match.round}
-                                </Badge>
-                              )}
+                              <Badge
+                                variant={
+                                  match.round ? "secondary" : "destructive"
+                                }
+                                className='hover:bg-secondary'
+                              >
+                                {match.round || "No round info"}
+                              </Badge>
                             </div>
                             <div className='flex items-center justify-center gap-4'>
                               <div className='flex flex-col md:flex-row gap-2 items-center'>
-                                <p className='text-[14px] sm:text-[18px] font-bold'>
+                                <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
                                   {match.homeTeam
                                     ? match.homeTeam?.name
                                     : match.homeTeamPlacehlder}
+                                </p>
+                                <p className='hidden max-xs:block text-[16px] font-bold'>
+                                  {!match.homeTeam
+                                    ? match.homeTeamPlacehlder
+                                    : match.homeTeam.code
+                                    ? match.homeTeam.code
+                                    : match.homeTeam.name}
                                 </p>
                                 {match.homeTeam && match.homeTeam.flagUrl && (
                                   <Image
@@ -91,13 +101,13 @@ const KnockoutMatchesCards = ({
                                 )}
                               </div>
                               {match.homeGoals !== null && (
-                                <span className='text-[16px] sm:text-[22px] font-bold ml-8'>
+                                <span className='text-[18px] xs:text-[22px] font-bold ml-8'>
                                   {match.homeGoals}
                                 </span>
                               )}{" "}
                               -{" "}
                               {match.awayGoals !== null && (
-                                <span className='text-[16px] sm:text-[22px] font-bold mr-8'>
+                                <span className='text-[18px] xs:text-[22px] font-bold mr-8'>
                                   {match.awayGoals}
                                 </span>
                               )}
@@ -110,32 +120,41 @@ const KnockoutMatchesCards = ({
                                     alt={`${match.awayTeam?.name} Flag`}
                                   />
                                 )}
-                                <p className='text-[14px] sm:text-[18px]  font-bold'>
+                                <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
                                   {match.awayTeam
                                     ? match.awayTeam?.name
                                     : match.awayTeamPlacehlder}
+                                </p>
+                                <p className='hidden max-xs:block text-[16px] font-bold'>
+                                  {!match.awayTeam
+                                    ? match.awayTeamPlacehlder
+                                    : match.awayTeam.code
+                                    ? match.awayTeam.code
+                                    : match.awayTeam.name}
                                 </p>
                               </div>
                             </div>
                           </CardTitle>
                         </CardHeader>
-                        {match.date && (
-                          <CardContent className='flex justify-between'>
-                            <Badge
-                              variant='default'
-                              className='hover:bg-primary'
-                            >
-                              {match.date
-                                ? getFormattedDate(match.date.toString())
-                                : ""}
-                            </Badge>
-                            <Badge variant='outline'>
-                              {match.date
-                                ? getFormattedTime(match.date.toString())
-                                : ""}
-                            </Badge>
-                          </CardContent>
-                        )}
+                        {/* {match.date && ( */}
+                        <CardContent className='flex justify-between'>
+                          <Badge
+                            variant={match.date ? "default" : "destructive"}
+                            className='hover:bg-primary'
+                          >
+                            {match.date
+                              ? getFormattedDate(match.date.toString())
+                              : "No date info"}
+                          </Badge>
+                          <Badge
+                            variant={match.date ? "default" : "destructive"}
+                          >
+                            {match.date
+                              ? getFormattedTime(match.date.toString())
+                              : "No time info"}
+                          </Badge>
+                        </CardContent>
+                        {/* )} */}
                       </Card>
                     ))}
                   </div>

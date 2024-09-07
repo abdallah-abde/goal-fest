@@ -119,6 +119,7 @@ export default function GroupForm({
                 tournamentId ||
                 undefined
               }
+              autoFocus
             >
               {tournaments.map(({ id, name }) => (
                 <option key={id} value={id} className='text-primary-foreground'>

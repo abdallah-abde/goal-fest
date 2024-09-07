@@ -14,6 +14,7 @@ const config = {
     screens: {
       "2xs": "344px",
       xs: "515px",
+      "2md": "912px",
       ...defaultTheme.screens,
     },
     container: {

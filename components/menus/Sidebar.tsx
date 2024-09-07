@@ -21,7 +21,7 @@ export default function Sidebar({
   logoUrl,
   name,
 }: {
-  logoUrl: string;
+  logoUrl?: string | null;
   name: string;
 }) {
   const params = useParams();
@@ -30,16 +30,18 @@ export default function Sidebar({
   const routes = getSidebarRoutes(params);
 
   return (
-    <div className='flex flex-col md:border-r-2 border-primary/10 md:pr-4 w-full md:min-w-52 md:max-w-52'>
-      <div className='mx-auto h-[140px] w-[140px] mb-2 relative'>
-        <Image
-          fill
-          src={logoUrl}
-          alt={name + " Logo"}
-          className='mx-auto object-contain'
-        />
-      </div>
-      <div className={`space-y-2 pb-2 overflow-auto hidden md:block`}>
+    <div className='flex flex-col 2md:border-r-2 border-primary/10 2md:pr-4 w-full 2md:min-w-52 2md:max-w-52'>
+      {logoUrl && (
+        <div className='mx-auto h-[140px] w-[140px] mb-2 relative'>
+          <Image
+            fill
+            src={logoUrl}
+            alt={name + " Logo"}
+            className='mx-auto object-contain'
+          />
+        </div>
+      )}
+      <div className={`space-y-2 pb-2 overflow-auto hidden 2md:block`}>
         {routes.map(({ id, href, label, Icon }) => (
           <Link
             key={id}
@@ -59,7 +61,7 @@ export default function Sidebar({
       </div>
       <Sheet>
         <SheetTrigger asChild>
-          <Menu className='block md:hidden size-8 mx-auto mb-4 cursor-pointer' />
+          <Menu className='block 2md:hidden size-8 mx-auto mb-4 cursor-pointer' />
         </SheetTrigger>
         <SheetContent side='left'>
           <div className={`space-y-2 overflow-auto mt-4`}>

@@ -26,10 +26,10 @@ export default function GroupsTables({
       {groupsWithTeams.length > 0 ? (
         groupsWithTeams.map((group) => (
           <div key={group.id} className='mb-8 last:mb-0'>
-            <Table className='dark:border-primary/10 border-0'>
+            <Table className='dark:border-primary/10 border'>
               <TableCaption
                 className={cn(
-                  "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10"
+                  "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10 py-4"
                 )}
               >
                 {group.name}
@@ -75,7 +75,7 @@ export default function GroupsTables({
                         key={team.id}
                         className='border-b-[1px] border-b-primary/10'
                       >
-                        <TableCell className='text-left flex gap-3 items-center font-bold '>
+                        <TableCell className='text-left flex gap-3 items-center font-bold py-4'>
                           {team.flagUrl && (
                             <>
                               <Image
@@ -95,28 +95,34 @@ export default function GroupsTables({
                             </>
                           )}
                           <span className='hidden max-2xs:block'>
-                            {team.name.substring(0, 3)}
+                            {team.code ? team.code : team.name}
                           </span>
                           <span className='hidden 2xs:block'>{team.name}</span>
                         </TableCell>
-                        <TableCell>{team.stats.played}</TableCell>
-                        <TableCell className='hidden sm:table-cell'>
+                        <TableCell className='py-4'>
+                          {team.stats.played}
+                        </TableCell>
+                        <TableCell className='hidden sm:table-cell py-4'>
                           {team.stats.won}
                         </TableCell>
-                        <TableCell className='hidden sm:table-cell'>
+                        <TableCell className='hidden sm:table-cell py-4'>
                           {team.stats.lost}
                         </TableCell>
-                        <TableCell className='hidden sm:table-cell'>
+                        <TableCell className='hidden sm:table-cell py-4'>
                           {team.stats.draw}
                         </TableCell>
-                        <TableCell className='hidden sm:table-cell'>
+                        <TableCell className='hidden sm:table-cell py-4'>
                           {team.stats.goalsFor}
                         </TableCell>
-                        <TableCell className='hidden sm:table-cell'>
+                        <TableCell className='hidden sm:table-cell py-4'>
                           {team.stats.goalsAgainst}
                         </TableCell>
-                        <TableCell>{team.stats.goalDifference}</TableCell>
-                        <TableCell>{team.stats.points}</TableCell>
+                        <TableCell className='py-4'>
+                          {team.stats.goalDifference}
+                        </TableCell>
+                        <TableCell className='py-4'>
+                          {team.stats.points}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

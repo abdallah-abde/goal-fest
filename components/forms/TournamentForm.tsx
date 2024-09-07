@@ -39,6 +39,7 @@ export default function TournamentForm({
             name='name'
             // required
             defaultValue={tournament?.name || ""}
+            autoFocus
           />
           <FormFieldError error={error?.name} />
         </FormField>

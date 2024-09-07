@@ -33,8 +33,20 @@ export default function TeamForm({ team }: { team?: Team | null }) {
             name='name'
             // required
             defaultValue={team?.name || ""}
+            autoFocus
           />
           <FormFieldError error={error?.name} />
+        </FormField>
+        <FormField>
+          <Label htmlFor='code'>Team Code</Label>
+          <Input
+            type='text'
+            id='code'
+            name='code'
+            // required
+            defaultValue={team?.code || ""}
+          />
+          <FormFieldError error={error?.code} />
         </FormField>
         <FormField>
           <Label htmlFor='flagUrl'>Flag</Label>

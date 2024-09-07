@@ -109,10 +109,15 @@ export default function EditionForm({
       undefined
   );
 
-  const [value, setValue] = useState<string | undefined>(
-    tournamentEdition?.winnerId?.toString() || undefined
+  const [winnerValue, setWinnerValue] = useState<number | undefined>(
+    tournamentEdition?.winnerId || undefined
   );
-  const [key, setKey] = useState(+new Date());
+  const [winnerKey, setWinnerKey] = useState(+new Date());
+
+  // const [tournamentValue, setTournamentValue] = useState<number | undefined>(
+  //   tournamentEdition?.tournamentId || undefined
+  // );
+  // const [tournamentKey, setTournamentKey] = useState(+new Date());
 
   return (
     <>
@@ -127,13 +132,38 @@ export default function EditionForm({
         <FormField>
           <Label htmlFor='tournamentId'>Tournament Name</Label>
           <div>
+            <div className='flex items-center gap-2'>
+              <Select
+                name='tournamentId'
+                // value={tournamentValue}
+                // key={tournamentKey}
+                defaultValue={
+                  (tournamentEdition?.tournamentId &&
+                    tournamentEdition?.tournamentId.toString()) ||
+                  tournaments[0].id.toString()
+                }
+              >
+                <SelectTrigger className='flex-1'>
+                  <SelectValue placeholder='Choose Tournament' />
+                </SelectTrigger>
+                <SelectContent>
+                  {tournaments.map(({ id, name }) => (
+                    <SelectItem value={id.toString()} key={id}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <FormFieldError error={error?.tournamentId} />
+          </div>
+          {/* <div>
             <select
               name='tournamentId'
               id='tournamentId'
               className='form-select'
-              defaultValue={
-                tournamentEdition?.tournamentId.toString() || undefined
-              }
+              defaultValue={tournamentEdition?.tournamentId || undefined}
+              autoFocus
             >
               {tournaments.map(({ id, name }) => (
                 <option key={id} value={id} className='form-select-option'>
@@ -142,17 +172,18 @@ export default function EditionForm({
               ))}
             </select>
             <FormFieldError error={error?.tournamentId} />
-          </div>
+          </div> */}
         </FormField>
         <FormField>
           <Label htmlFor='year'>Year</Label>
           <Input
-            type='number'
+            // type='number'
             id='year'
             name='year'
             // required
-            defaultValue={tournamentEdition?.year.toString() || ""}
+            defaultValue={tournamentEdition?.year || undefined}
           />
+
           <FormFieldError error={error?.year} />
         </FormField>
         <FormField>
@@ -177,15 +208,19 @@ export default function EditionForm({
             <Select
               name='winnerId'
               // value={value}
-              key={key}
-              defaultValue={value}
+              key={winnerKey}
+              defaultValue={
+                (winnerValue && winnerValue.toString()) || undefined
+              }
             >
               <SelectTrigger className='flex-1'>
                 <SelectValue placeholder='Choose Winner Team' />
               </SelectTrigger>
               <SelectContent>
                 {teams.map(({ id, name }) => (
-                  <SelectItem value={id.toString()}>{name}</SelectItem>
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -196,8 +231,8 @@ export default function EditionForm({
               size='icon'
               onClick={(e) => {
                 e.stopPropagation();
-                setValue(undefined);
-                setKey(+new Date());
+                setWinnerValue(undefined);
+                setWinnerKey(+new Date());
               }}
             >
               <Eraser strokeWidth='1.5px' />

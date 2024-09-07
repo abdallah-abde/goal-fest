@@ -107,19 +107,21 @@ function InfoCards({
           </Badge>
         </CardContent>
       </Card>
-      <Card className={cardStyles}>
-        <CardHeader>
-          <CardTitle className={cardTitlestyles}>Current Stage</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Badge
-            variant='green'
-            className={badgeStyles + " justify-center py-1"}
-          >
-            <span>Groups</span>
-          </Badge>
-        </CardContent>
-      </Card>
+      {tournamentEdition && tournamentEdition?.currentStage && (
+        <Card className={cardStyles}>
+          <CardHeader>
+            <CardTitle className={cardTitlestyles}>Current Stage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Badge
+              variant='green'
+              className={badgeStyles + " justify-center py-1"}
+            >
+              <span>{tournamentEdition.currentStage}</span>
+            </Badge>
+          </CardContent>
+        </Card>
+      )}
       {tournamentEdition && tournamentEdition?.titleHolder && (
         <Card className={cardStyles}>
           <CardHeader>

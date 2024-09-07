@@ -96,6 +96,7 @@ export default function KnockoutMatchForm({
                 tournamentId ||
                 undefined
               }
+              autoFocus
             >
               {tournaments.map(({ id, name }) => (
                 <option key={id} value={id} className='form-select-option'>

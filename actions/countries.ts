@@ -38,6 +38,7 @@ export async function addCountry(prevState: unknown, formData: FormData) {
   await prisma.country.create({
     data: {
       name: data.name.toString(),
+      code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
     },
   });
@@ -89,6 +90,7 @@ export async function updateCountry(
     where: { id },
     data: {
       name: data.name.toString(),
+      code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
     },
   });

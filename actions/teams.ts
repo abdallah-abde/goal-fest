@@ -34,6 +34,7 @@ export async function addTeam(prevState: unknown, formData: FormData) {
   await prisma.team.create({
     data: {
       name: data.name.toString(),
+      code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
     },
   });
@@ -81,6 +82,7 @@ export async function updateTeam(
     where: { id },
     data: {
       name: data.name.toString(),
+      code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
     },
   });
