@@ -4,6 +4,16 @@ import Image from "next/image";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
+import { Eraser } from "lucide-react";
 
 import { TournamentEdition, Tournament, Team, Country } from "@prisma/client";
 
@@ -17,23 +27,13 @@ import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
+import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
 import { useRef, useState } from "react";
 
 import MultipleSelector, {
   MultipleSelectorRef,
 } from "@/components/ui/multiple-selector";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectSeparator,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Eraser } from "lucide-react";
 
 interface TournamentEditionProps extends TournamentEdition {
   hostingCountries: Country[];
@@ -114,10 +114,10 @@ export default function EditionForm({
   );
   const [winnerKey, setWinnerKey] = useState(+new Date());
 
-  // const [tournamentValue, setTournamentValue] = useState<number | undefined>(
-  //   tournamentEdition?.tournamentId || undefined
-  // );
-  // const [tournamentKey, setTournamentKey] = useState(+new Date());
+  const [titleHolderValue, setTitleHolderValue] = useState<number | undefined>(
+    tournamentEdition?.titleHolderId || undefined
+  );
+  const [titleHolderKey, setTitleHolderKey] = useState(+new Date());
 
   return (
     <>
@@ -129,61 +129,45 @@ export default function EditionForm({
         }
       />
       <form action={action} className='form-styles'>
-        <FormField>
-          <Label htmlFor='tournamentId'>Tournament Name</Label>
-          <div>
-            <div className='flex items-center gap-2'>
-              <Select
-                name='tournamentId'
-                // value={tournamentValue}
-                // key={tournamentKey}
-                defaultValue={
-                  (tournamentEdition?.tournamentId &&
-                    tournamentEdition?.tournamentId.toString()) ||
-                  tournaments[0].id.toString()
-                }
-              >
-                <SelectTrigger className='flex-1'>
-                  <SelectValue placeholder='Choose Tournament' />
-                </SelectTrigger>
-                <SelectContent>
-                  {tournaments.map(({ id, name }) => (
-                    <SelectItem value={id.toString()} key={id}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <FormFieldError error={error?.tournamentId} />
-          </div>
-          {/* <div>
-            <select
+        {tournaments && tournaments.length > 0 ? (
+          <FormField>
+            <Label htmlFor='tournamentId'>Tournament Name</Label>
+            <Select
               name='tournamentId'
-              id='tournamentId'
-              className='form-select'
-              defaultValue={tournamentEdition?.tournamentId || undefined}
-              autoFocus
+              defaultValue={
+                (tournamentEdition?.tournamentId &&
+                  tournamentEdition?.tournamentId.toString()) ||
+                tournaments[0].id.toString() ||
+                undefined
+              }
             >
-              {tournaments.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament' />
+              </SelectTrigger>
+              <SelectContent>
+                {tournaments.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormFieldError error={error?.tournamentId} />
-          </div> */}
-        </FormField>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no tournaments, add some!'
+          />
+        )}
         <FormField>
           <Label htmlFor='year'>Year</Label>
           <Input
-            // type='number'
             id='year'
             name='year'
-            // required
             defaultValue={tournamentEdition?.year || undefined}
           />
-
           <FormFieldError error={error?.year} />
         </FormField>
         <FormField>
@@ -202,82 +186,101 @@ export default function EditionForm({
             </div>
           )}
         </FormField>
-        <FormField>
-          <Label htmlFor='winnerId'>Winner Team</Label>
-          <div className='flex items-center gap-2'>
-            <Select
-              name='winnerId'
-              // value={value}
-              key={winnerKey}
-              defaultValue={
-                (winnerValue && winnerValue.toString()) || undefined
-              }
-            >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Winner Team' />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              type='button'
-              className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
-              variant='outline'
-              size='icon'
-              onClick={(e) => {
-                e.stopPropagation();
-                setWinnerValue(undefined);
-                setWinnerKey(+new Date());
-              }}
-            >
-              <Eraser strokeWidth='1.5px' />
-            </Button>
-          </div>
-          {/* <div>
-            <select
-              name='winnerId'
-              id='winnerId'
-              className='form-select'
-              defaultValue={tournamentEdition?.winnerId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <FormFieldError error={error?.winnerId} />
-          </div> */}
-        </FormField>
-        <FormField>
-          <Label htmlFor='titleHolderId'>Title Holder Team</Label>
-          <div>
-            <select
-              name='titleHolderId'
-              id='titleHolderId'
-              className='form-select'
-              defaultValue={tournamentEdition?.titleHolderId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <FormFieldError error={error?.titleHolderId} />
-          </div>
-        </FormField>
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='winnerId'>Winner Team</Label>
+            <div>
+              <div className='flex items-center gap-2'>
+                <Select
+                  name='winnerId'
+                  key={winnerKey}
+                  defaultValue={
+                    (winnerValue && winnerValue.toString()) || undefined
+                  }
+                >
+                  <SelectTrigger className='flex-1'>
+                    <SelectValue placeholder='Choose Winner Team' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map(({ id, name }) => (
+                      <SelectItem value={id.toString()} key={id}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type='button'
+                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                  variant='outline'
+                  size='icon'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setWinnerValue(undefined);
+                    setWinnerKey(+new Date());
+                  }}
+                >
+                  <Eraser strokeWidth='1.5px' />
+                </Button>
+              </div>
+              <FormFieldError error={error?.winnerId} />
+            </div>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='titleHolderId'>Title Holder Team</Label>
+            <div>
+              <div className='flex items-center gap-2'>
+                <Select
+                  name='titleHolderId'
+                  key={titleHolderKey}
+                  defaultValue={
+                    (titleHolderValue && titleHolderValue.toString()) ||
+                    undefined
+                  }
+                >
+                  <SelectTrigger className='flex-1'>
+                    <SelectValue placeholder='Choose Title Holder Team' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map(({ id, name }) => (
+                      <SelectItem value={id.toString()} key={id}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type='button'
+                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                  variant='outline'
+                  size='icon'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTitleHolderValue(undefined);
+                    setTitleHolderKey(+new Date());
+                  }}
+                >
+                  <Eraser strokeWidth='1.5px' />
+                </Button>
+              </div>
+              <FormFieldError error={error?.titleHolderId} />
+            </div>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
         <FormField>
           <Label htmlFor='hostingCountries'>Hosting Countries</Label>
           <Input
@@ -342,7 +345,14 @@ export default function EditionForm({
           />
           <FormFieldError error={error?.teams} />
         </FormField>
-        <SubmitButton />
+        <SubmitButton
+          isDisabled={
+            !tournaments ||
+            tournaments.length <= 0 ||
+            !teams ||
+            teams.length <= 0
+          }
+        />
       </form>
     </>
   );

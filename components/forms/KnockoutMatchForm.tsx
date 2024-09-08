@@ -2,6 +2,16 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
+import { Eraser } from "lucide-react";
 
 import {
   KnockoutMatch,
@@ -77,55 +87,77 @@ export default function KnockoutMatchForm({
     getEditions();
   }, [tournamentId]);
 
+  const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
+    match?.homeTeamId || undefined
+  );
+  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
+
+  const [awayTeamValue, setAwayTeamValue] = useState<number | undefined>(
+    match?.awayTeamId || undefined
+  );
+  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
+
   return (
     <>
       <PageHeader
         label={match ? "Edit Knockout Match" : "Add Knockout Match"}
       />
       <form action={action} className='form-styles'>
-        <FormField>
-          <Label htmlFor='tournamentId'>Tournament Name</Label>
-          <div>
-            <select
+        {tournaments && tournaments.length > 0 ? (
+          <FormField>
+            <Label htmlFor='tournamentId'>Tournament</Label>
+            <Select
               name='tournamentId'
-              id='tournamentId'
-              className='form-select'
-              onChange={(e) => setTournamentId(e.target.value)}
               defaultValue={
                 match?.tournamentEdition.tournamentId.toString() ||
                 tournamentId ||
+                tournaments[0].id.toString() ||
                 undefined
               }
-              autoFocus
+              onValueChange={(value) => setTournamentId(value)}
             >
-              {tournaments.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </FormField>
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament' />
+              </SelectTrigger>
+              <SelectContent>
+                {tournaments.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no tournaments, add some!'
+          />
+        )}
         {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
           <FormField>
-            <Label htmlFor='tournamentEditionId'>Tournament Edition Name</Label>
-            <div>
-              <select
-                name='tournamentEditionId'
-                id='tournamentEditionId'
-                className='form-select'
-                defaultValue={
-                  match?.tournamentEditionId.toString() || undefined
-                }
-              >
+            <Label htmlFor='tournamentEditionId'>Tournament Edition</Label>
+            <Select
+              name='tournamentEditionId'
+              defaultValue={
+                match?.tournamentEditionId.toString() ||
+                tournamentsEditions[0].id.toString() ||
+                undefined
+              }
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament Edition' />
+              </SelectTrigger>
+              <SelectContent>
                 {tournamentsEditions.map(({ id, tournament, year }) => (
-                  <option key={id} value={id} className='form-select-option'>
+                  <SelectItem value={id.toString()} key={id}>
                     {`${tournament.name} ${year.toString()}`}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <FormFieldError error={error?.tournamentEditionId} />
-            </div>
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.tournamentEditionId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -134,55 +166,114 @@ export default function KnockoutMatchForm({
             notFoundText='There is no editions, add some!'
           />
         )}
-        <FormField>
-          <Label htmlFor='homeTeamId'>Home Team</Label>
-          <div>
-            <select
-              name='homeTeamId'
-              id='homeTeamId'
-              className='form-select'
-              defaultValue={match?.homeTeamId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <FormFieldError error={error?.homeTeamId} />
-          </div>
-        </FormField>
-        <FormField>
-          <Label htmlFor='awayTeamId'>Away Team</Label>
-          <div>
-            <select
-              name='awayTeamId'
-              id='awayTeamId'
-              className='form-select'
-              defaultValue={match?.awayTeamId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <FormFieldError error={error?.awayTeamId} />
-        </FormField>
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='homeTeamId'>Home Team</Label>
+            <div>
+              <div className='flex items-center gap-2'>
+                <Select
+                  name='homeTeamId'
+                  key={homeTeamKey}
+                  defaultValue={
+                    (homeTeamValue && homeTeamValue.toString()) || undefined
+                  }
+                  // defaultValue={
+                  //   (match?.homeTeamId && match?.homeTeamId.toString()) ||
+                  //   teams[0].id.toString() ||
+                  //   undefined
+                  // }
+                >
+                  <SelectTrigger className='flex-1'>
+                    <SelectValue placeholder='Choose Home Team' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map(({ id, name }) => (
+                      <SelectItem value={id.toString()} key={id}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type='button'
+                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                  variant='outline'
+                  size='icon'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHomeTeamValue(undefined);
+                    setHomeTeamKey(+new Date());
+                  }}
+                >
+                  <Eraser strokeWidth='1.5px' />
+                </Button>
+              </div>
+              <FormFieldError error={error?.homeTeamId} />
+            </div>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='awayTeamId'>Away Team</Label>
+            <div>
+              <div className='flex items-center gap-2'>
+                <Select
+                  name='awayTeamId'
+                  key={awayTeamKey}
+                  defaultValue={
+                    (awayTeamValue && awayTeamValue.toString()) || undefined
+                  }
+                >
+                  <SelectTrigger className='flex-1'>
+                    <SelectValue placeholder='Choose Away Team' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map(({ id, name }) => (
+                      <SelectItem value={id.toString()} key={id}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type='button'
+                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                  variant='outline'
+                  size='icon'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAwayTeamValue(undefined);
+                    setAwayTeamKey(+new Date());
+                  }}
+                >
+                  <Eraser strokeWidth='1.5px' />
+                </Button>
+              </div>
+              <FormFieldError error={error?.awayTeamId} />
+            </div>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
         <FormField>
           <Label htmlFor='homeGoals'>Home Main Time Goals</Label>
           <Input
             type='text'
             id='homeGoals'
             name='homeGoals'
-            defaultValue={match?.homeGoals || ""}
+            defaultValue={
+              match?.homeGoals !== null ? match?.homeGoals.toString() : ""
+            }
           />
           <FormFieldError error={error?.homeGoals} />
         </FormField>
@@ -192,7 +283,9 @@ export default function KnockoutMatchForm({
             type='text'
             id='awayGoals'
             name='awayGoals'
-            defaultValue={match?.awayGoals || ""}
+            defaultValue={
+              match?.awayGoals !== null ? match?.awayGoals.toString() : ""
+            }
           />
           <FormFieldError error={error?.awayGoals} />
         </FormField>
@@ -202,7 +295,11 @@ export default function KnockoutMatchForm({
             type='text'
             id='homeExtraTimeGoals'
             name='homeExtraTimeGoals'
-            defaultValue={match?.homeExtraTimeGoals || ""}
+            defaultValue={
+              match?.homeExtraTimeGoals !== null
+                ? match?.homeExtraTimeGoals.toString()
+                : ""
+            }
           />
           <FormFieldError error={error?.homeExtraTimeGoals} />
         </FormField>
@@ -212,7 +309,11 @@ export default function KnockoutMatchForm({
             type='text'
             id='awayExtraTimeGoals'
             name='awayExtraTimeGoals'
-            defaultValue={match?.awayExtraTimeGoals || ""}
+            defaultValue={
+              match?.awayExtraTimeGoals !== null
+                ? match?.awayExtraTimeGoals.toString()
+                : ""
+            }
           />
           <FormFieldError error={error?.awayExtraTimeGoals} />
         </FormField>
@@ -222,7 +323,11 @@ export default function KnockoutMatchForm({
             type='text'
             id='homePenaltyGoals'
             name='homePenaltyGoals'
-            defaultValue={match?.homePenaltyGoals || ""}
+            defaultValue={
+              match?.homePenaltyGoals !== null
+                ? match?.homePenaltyGoals.toString()
+                : ""
+            }
           />
           <FormFieldError error={error?.homePenaltyGoals} />
         </FormField>
@@ -232,7 +337,11 @@ export default function KnockoutMatchForm({
             type='text'
             id='awayPenaltyGoals'
             name='awayPenaltyGoals'
-            defaultValue={match?.awayPenaltyGoals || ""}
+            defaultValue={
+              match?.awayPenaltyGoals !== null
+                ? match?.awayPenaltyGoals.toString()
+                : ""
+            }
           />
           <FormFieldError error={error?.awayPenaltyGoals} />
         </FormField>

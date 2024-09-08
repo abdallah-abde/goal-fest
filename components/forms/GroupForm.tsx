@@ -2,6 +2,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Group, Team, Tournament, TournamentEdition } from "@prisma/client";
 
@@ -106,49 +113,61 @@ export default function GroupForm({
     <>
       <PageHeader label={group ? "Edit Group" : "Add Group"} />
       <form action={action} className='form-styles'>
-        <FormField>
-          <Label htmlFor='tournamentId'>Tournament Name</Label>
-          <div>
-            <select
+        {tournaments && tournaments.length > 0 ? (
+          <FormField>
+            <Label htmlFor='tournamentId'>Tournament Name</Label>
+            <Select
               name='tournamentId'
-              id='tournamentId'
-              className='form-select'
-              onChange={(e) => setTournamentId(e.target.value)}
               defaultValue={
                 group?.tournamentEdition.tournamentId.toString() ||
                 tournamentId ||
+                tournaments[0].id.toString() ||
                 undefined
               }
-              autoFocus
+              onValueChange={(value) => setTournamentId(value)}
             >
-              {tournaments.map(({ id, name }) => (
-                <option key={id} value={id} className='text-primary-foreground'>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </FormField>
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament' />
+              </SelectTrigger>
+              <SelectContent>
+                {tournaments.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no tournaments, add some!'
+          />
+        )}
         {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
           <FormField>
             <Label htmlFor='tournamentEditionId'>Tournament Edition Name</Label>
-            <div>
-              <select
-                name='tournamentEditionId'
-                id='tournamentEditionId'
-                className='form-select'
-                defaultValue={
-                  group?.tournamentEditionId.toString() || undefined
-                }
-              >
+            <Select
+              name='tournamentEditionId'
+              defaultValue={
+                tournamentsEditions[0].id.toString() ||
+                group?.tournamentEditionId.toString() ||
+                undefined
+              }
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament Edition' />
+              </SelectTrigger>
+              <SelectContent>
                 {tournamentsEditions.map(({ id, tournament, year }) => (
-                  <option key={id} value={id} className='form-select-option'>
+                  <SelectItem value={id.toString()} key={id}>
                     {`${tournament.name} ${year.toString()}`}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <FormFieldError error={error?.tournamentEditionId} />
-            </div>
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.tournamentEditionId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -163,7 +182,6 @@ export default function GroupForm({
             type='text'
             id='name'
             name='name'
-            // required
             defaultValue={group?.name || ""}
           />
           <FormFieldError error={error?.name} />
@@ -198,7 +216,11 @@ export default function GroupForm({
         </FormField>
         <SubmitButton
           isDisabled={
-            isLoading || !tournamentsEditions || tournamentsEditions.length < 1
+            !tournaments ||
+            tournaments.length <= 0 ||
+            isLoading ||
+            !tournamentsEditions ||
+            tournamentsEditions.length < 1
           }
         />
       </form>

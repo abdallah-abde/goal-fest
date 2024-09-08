@@ -2,6 +2,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Match,
@@ -110,54 +117,65 @@ export default function GroupMatchForm({
     <>
       <PageHeader label={match ? "Edit Group Match" : "Add Group Match"} />
       <form action={action} className='form-styles'>
-        <FormField>
-          <Label htmlFor='tournamentId'>Tournament Name</Label>
-          <div>
-            <select
+        {tournaments && tournaments.length > 0 ? (
+          <FormField>
+            <Label htmlFor='tournamentId'>Tournament</Label>
+            <Select
               name='tournamentId'
-              id='tournamentId'
-              className='form-select'
-              onChange={(e) => setTournamentId(e.target.value)}
               defaultValue={
                 match?.tournamentEdition.tournamentId.toString() ||
                 tournamentId ||
+                tournaments[0].id.toString() ||
                 undefined
               }
-              autoFocus
+              onValueChange={(value) => setTournamentId(value)}
             >
-              {tournaments.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </FormField>
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament' />
+              </SelectTrigger>
+              <SelectContent>
+                {tournaments.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no tournaments, add some!'
+          />
+        )}
         {tournamentsEditions &&
         tournamentsEditions.length > 0 &&
         !isEditionsLoading ? (
           <FormField>
-            <Label htmlFor='tournamentEditionId'>Tournament Edition Name</Label>
-            <div>
-              <select
-                name='tournamentEditionId'
-                id='tournamentEditionId'
-                className='form-select'
-                onChange={(e) => setTournamentEditionId(e.target.value)}
-                defaultValue={
-                  match?.tournamentEditionId.toString() ||
-                  tournamentEditionId ||
-                  undefined
-                }
-              >
+            <Label htmlFor='tournamentEditionId'>Tournament Edition</Label>
+            <Select
+              name='tournamentEditionId'
+              defaultValue={
+                tournamentEditionId ||
+                match?.tournamentEditionId.toString() ||
+                tournamentsEditions[0].id.toString() ||
+                undefined
+              }
+              onValueChange={(value) => setTournamentEditionId(value)}
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Tournament Edition' />
+              </SelectTrigger>
+              <SelectContent>
                 {tournamentsEditions.map(({ id, tournament, year }) => (
-                  <option key={id} value={id} className='form-select-option'>
+                  <SelectItem value={id.toString()} key={id}>
                     {`${tournament.name} ${year.toString()}`}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <FormFieldError error={error?.tournamentEditionId} />
-            </div>
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.tournamentEditionId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -169,21 +187,26 @@ export default function GroupMatchForm({
         {groups && groups.length > 0 && !isGroupsLoading ? (
           <FormField>
             <Label htmlFor='groupId'>Group</Label>
-            <div>
-              <select
-                name='groupId'
-                id='groupId'
-                className='form-select'
-                defaultValue={match?.groupId.toString() || undefined}
-              >
+            <Select
+              name='groupId'
+              defaultValue={
+                groups[0].id.toString() ||
+                match?.groupId.toString() ||
+                undefined
+              }
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Group' />
+              </SelectTrigger>
+              <SelectContent>
                 {groups.map(({ id, name }) => (
-                  <option key={id} value={id} className='form-select-option'>
+                  <SelectItem value={id.toString()} key={id}>
                     {name}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <FormFieldError error={error?.groupId} />
-            </div>
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.groupId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -192,68 +215,6 @@ export default function GroupMatchForm({
             notFoundText='There is no groups, add some!'
           />
         )}
-        <FormField>
-          <Label htmlFor='homeTeamId'>Home Team</Label>
-          <div>
-            <select
-              name='homeTeamId'
-              id='homeTeamId'
-              className='form-select'
-              defaultValue={match?.homeTeamId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <FormFieldError error={error?.homeTeamId} />
-          </div>
-        </FormField>
-        <FormField>
-          <Label htmlFor='awayTeamId'>Away Team</Label>
-          <div>
-            <select
-              name='awayTeamId'
-              id='awayTeamId'
-              className='form-select'
-              defaultValue={match?.awayTeamId || undefined}
-            >
-              <option className='form-select-option' value='choose team'>
-                Choose Team...
-              </option>
-              {teams.map(({ id, name }) => (
-                <option key={id} value={id} className='form-select-option'>
-                  {name}
-                </option>
-              ))}
-            </select>
-            <FormFieldError error={error?.awayTeamId} />
-          </div>
-        </FormField>
-        <FormField>
-          <Label htmlFor='homeGoals'>Home Goals</Label>
-          <Input
-            type='text'
-            id='homeGoals'
-            name='homeGoals'
-            defaultValue={match?.homeGoals || ""}
-          />
-          <FormFieldError error={error?.homeGoals} />
-        </FormField>
-        <FormField>
-          <Label htmlFor='awayGoals'>Away Goals</Label>
-          <Input
-            type='text'
-            id='awayGoals'
-            name='awayGoals'
-            defaultValue={match?.awayGoals || ""}
-          />
-          <FormFieldError error={error?.awayGoals} />
-        </FormField>
         <FormField>
           <Label htmlFor='date'>Date</Label>
           <Input
@@ -268,6 +229,93 @@ export default function GroupMatchForm({
           />
           <FormFieldError error={error?.date} />
         </FormField>
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='homeTeamId'>Home Team</Label>
+            <Select
+              name='homeTeamId'
+              defaultValue={
+                (match?.homeTeamId && match?.homeTeamId.toString()) ||
+                teams[0].id.toString() ||
+                undefined
+              }
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Home Team' />
+              </SelectTrigger>
+              <SelectContent>
+                {teams.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.homeTeamId} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
+        {teams && teams.length > 0 ? (
+          <FormField>
+            <Label htmlFor='awayTeamId'>Away Team</Label>
+            <Select
+              name='awayTeamId'
+              defaultValue={
+                (match?.awayTeamId && match?.awayTeamId.toString()) ||
+                teams[0].id.toString() ||
+                undefined
+              }
+            >
+              <SelectTrigger className='flex-1'>
+                <SelectValue placeholder='Choose Away Team' />
+              </SelectTrigger>
+              <SelectContent>
+                {teams.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.awayTeamId} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={false}
+            label=''
+            notFoundText='There is no teams, add some!'
+          />
+        )}
+        <FormField>
+          <Label htmlFor='homeGoals'>Home Goals</Label>
+          <Input
+            type='text'
+            id='homeGoals'
+            name='homeGoals'
+            defaultValue={
+              match?.homeGoals !== null ? match?.homeGoals.toString() : ""
+            }
+          />
+          <FormFieldError error={error?.homeGoals} />
+        </FormField>
+        <FormField>
+          <Label htmlFor='awayGoals'>Away Goals</Label>
+          <Input
+            type='text'
+            id='awayGoals'
+            name='awayGoals'
+            defaultValue={
+              match?.awayGoals !== null ? match?.awayGoals.toString() : ""
+            }
+          />
+          <FormFieldError error={error?.awayGoals} />
+        </FormField>
+
         <FormField>
           <Label htmlFor='round'>Round</Label>
           <Input
@@ -281,12 +329,16 @@ export default function GroupMatchForm({
 
         <SubmitButton
           isDisabled={
+            !tournaments ||
+            tournaments.length <= 0 ||
             isEditionsLoading ||
             !tournamentsEditions ||
             tournamentsEditions.length < 1 ||
             isGroupsLoading ||
             !groups ||
-            groups.length < 1
+            groups.length < 1 ||
+            !teams ||
+            teams.length < 1
           }
         />
       </form>

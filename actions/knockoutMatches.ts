@@ -19,20 +19,23 @@ export async function addTournamentKnockoutMatch(
 
   const data = result.data;
 
+  const homeGoals = formData.get("homeGoals");
+  const awayGoals = formData.get("awayGoals");
+  const homeExtraTimeGoals = formData.get("homeExtraTimeGoals");
+  const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
+  const homePenaltyGoals = formData.get("homePenaltyGoals");
+  const awayPenaltyGoals = formData.get("awayPenaltyGoals");
+
   await prisma.knockoutMatch.create({
     data: {
       homeTeamId: data.homeTeamId ? +data.homeTeamId : null,
       awayTeamId: data.awayTeamId ? +data.awayTeamId : null,
-      homeGoals: data.homeGoals ? +data.homeGoals : null,
-      awayGoals: data.awayGoals ? +data.awayGoals : null,
-      homeExtraTimeGoals: data.homeExtraTimeGoals
-        ? +data.homeExtraTimeGoals
-        : null,
-      awayExtraTimeGoals: data.awayExtraTimeGoals
-        ? +data.awayExtraTimeGoals
-        : null,
-      homePenaltyGoals: data.homePenaltyGoals ? +data.homePenaltyGoals : null,
-      awayPenaltyGoals: data.awayPenaltyGoals ? +data.awayPenaltyGoals : null,
+      homeGoals: homeGoals ? +homeGoals : null,
+      awayGoals: awayGoals ? +awayGoals : null,
+      homeExtraTimeGoals: homeExtraTimeGoals ? +homeExtraTimeGoals : null,
+      awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
+      homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
+      awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       tournamentEditionId: +data.tournamentEditionId,
       round: data.round || null,
@@ -70,21 +73,24 @@ export async function updateTournamentKnockoutMatch(
 
   if (currentMatch == null) return notFound();
 
+  const homeGoals = formData.get("homeGoals");
+  const awayGoals = formData.get("awayGoals");
+  const homeExtraTimeGoals = formData.get("homeExtraTimeGoals");
+  const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
+  const homePenaltyGoals = formData.get("homePenaltyGoals");
+  const awayPenaltyGoals = formData.get("awayPenaltyGoals");
+
   await prisma.knockoutMatch.update({
     where: { id },
     data: {
       homeTeamId: data.homeTeamId ? +data.homeTeamId : null,
       awayTeamId: data.awayTeamId ? +data.awayTeamId : null,
-      homeGoals: data.homeGoals ? +data.homeGoals : null,
-      awayGoals: data.awayGoals ? +data.awayGoals : null,
-      homeExtraTimeGoals: data.homeExtraTimeGoals
-        ? +data.homeExtraTimeGoals
-        : null,
-      awayExtraTimeGoals: data.awayExtraTimeGoals
-        ? +data.awayExtraTimeGoals
-        : null,
-      homePenaltyGoals: data.homePenaltyGoals ? +data.homePenaltyGoals : null,
-      awayPenaltyGoals: data.awayPenaltyGoals ? +data.awayPenaltyGoals : null,
+      homeGoals: homeGoals ? +homeGoals : null,
+      awayGoals: awayGoals ? +awayGoals : null,
+      homeExtraTimeGoals: homeExtraTimeGoals ? +homeExtraTimeGoals : null,
+      awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
+      homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
+      awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       tournamentEditionId: +data.tournamentEditionId,
       round: data.round || null,

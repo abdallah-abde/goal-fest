@@ -19,12 +19,15 @@ export async function addTournamentGroupMatch(
 
   const data = result.data;
 
+  const homeGoals = formData.get("homeGoals");
+  const awayGoals = formData.get("awayGoals");
+
   await prisma.match.create({
     data: {
       homeTeamId: +data.homeTeamId,
       awayTeamId: +data.awayTeamId,
-      homeGoals: data.homeGoals ? +data.homeGoals : null,
-      awayGoals: data.awayGoals ? +data.awayGoals : null,
+      homeGoals: homeGoals ? +homeGoals : null,
+      awayGoals: awayGoals ? +awayGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       groupId: +data.groupId,
       tournamentEditionId: +data.tournamentEditionId,
@@ -57,13 +60,16 @@ export async function updateTournamentGroupMatch(
 
   if (currentMatch == null) return notFound();
 
+  const homeGoals = formData.get("homeGoals");
+  const awayGoals = formData.get("awayGoals");
+
   await prisma.match.update({
     where: { id },
     data: {
       homeTeamId: +data.homeTeamId,
       awayTeamId: +data.awayTeamId,
-      homeGoals: data.homeGoals ? +data.homeGoals : null,
-      awayGoals: data.awayGoals ? +data.awayGoals : null,
+      homeGoals: homeGoals ? +homeGoals : null,
+      awayGoals: awayGoals ? +awayGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
       groupId: +data.groupId,
       tournamentEditionId: +data.tournamentEditionId,

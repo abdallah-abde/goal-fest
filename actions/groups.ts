@@ -18,7 +18,7 @@ export async function addTournamentGroup(
   const data = result.data;
 
   const group = await prisma.group.findFirst({
-    where: { name: data.name },
+    where: { name: data.name, tournamentEditionId: +data.tournamentEditionId },
   });
 
   if (group) return { name: ["Group existed"] };
@@ -63,7 +63,12 @@ export async function updateTournamentGroup(
   const data = result.data;
 
   const group = await prisma.group.findFirst({
-    where: { AND: [{ name: data.name }, { id: { not: id } }] },
+    where: {
+      AND: [
+        { name: data.name, tournamentEditionId: +data.tournamentEditionId },
+        { id: { not: id } },
+      ],
+    },
   });
 
   if (group) return { name: ["Group existed"] };
