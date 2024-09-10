@@ -17,21 +17,21 @@ export function getSidebarRoutes(params: Params) {
     },
     {
       id: 3,
-      label: "Groups Matches",
-      href: `/tournaments/${params.id}/editions/${params.editionId}/matches`,
+      label: "Matches",
+      href: `/tournaments/${params.id}/editions/${params.editionId}/all-matches`,
       Icon: LandPlotIcon,
     },
+    // {
+    //   id: 4,
+    //   label: "Knockout Matches",
+    //   href: `/tournaments/${params.id}/editions/${params.editionId}/knockout-matches`,
+    //   Icon: LandPlotIcon,
+    // },
     {
       id: 4,
       label: "Knockout Brackets",
       href: `/tournaments/${params.id}/editions/${params.editionId}/knockout-brackets`,
       Icon: BracesIcon,
-    },
-    {
-      id: 5,
-      label: "Knockout Matches",
-      href: `/tournaments/${params.id}/editions/${params.editionId}/knockout-matches`,
-      Icon: LandPlotIcon,
     },
   ];
 }

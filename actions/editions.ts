@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { EditionSchema } from "@/schemas";
+import { EditionSchema, CurrentStageSchema } from "@/schemas";
 
 export async function addTournamentEdition(
   prevState: unknown,
@@ -28,7 +28,9 @@ export async function addTournamentEdition(
 
   let logoUrlPath = "";
   if (data.logoUrl != null && data.logoUrl.size > 0) {
-    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+      data.logoUrl.name
+    }`;
 
     await fs.writeFile(
       `public${logoUrlPath}`,
@@ -121,7 +123,9 @@ export async function updateTournamentEdition(
     if (currentTournamentEdition.logoUrl)
       await fs.unlink(`public${currentTournamentEdition.logoUrl}`);
 
-    logoUrlPath = `/tournaments/${crypto.randomUUID()}-${data.logoUrl.name}`;
+    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+      data.logoUrl.name
+    }`;
 
     await fs.writeFile(
       `public${logoUrlPath}`,
@@ -170,6 +174,39 @@ export async function updateTournamentEdition(
         disconnect: currentTournamentEdition?.teams,
         connect: ts,
       },
+    },
+  });
+
+  revalidatePath("/dashboard/editions");
+  redirect("/dashboard/editions");
+}
+
+export async function updateTournamentEditionCurrentStage(
+  id: number,
+  prevState: unknown,
+  formData: FormData
+) {
+  const result = CurrentStageSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentTournamentEdition = await prisma.tournamentEdition.findUnique({
+    where: { id },
+    include: { hostingCountries: true, teams: true },
+  });
+
+  if (currentTournamentEdition == null) return notFound();
+
+  await prisma.tournamentEdition.update({
+    where: { id },
+    data: {
+      currentStage: data.currentStage,
     },
   });
 

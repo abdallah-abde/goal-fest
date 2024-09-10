@@ -2,11 +2,21 @@ import prisma from "@/lib/db";
 
 export async function calculateTeamStats(teamId: number, groupId: number) {
   const homeMatches = await prisma.match.findMany({
-    where: { homeTeamId: teamId, groupId: groupId },
+    where: {
+      homeTeamId: teamId,
+      groupId: groupId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
   });
 
   const awayMatches = await prisma.match.findMany({
-    where: { awayTeamId: teamId, groupId: groupId },
+    where: {
+      awayTeamId: teamId,
+      groupId: groupId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
   });
 
   let played = homeMatches.length + awayMatches.length;
@@ -20,7 +30,7 @@ export async function calculateTeamStats(teamId: number, groupId: number) {
   homeMatches.forEach((match) => {
     if (match.homeGoals) goalsFor += match.homeGoals;
     if (match.awayGoals) goalsAgainst += match.awayGoals;
-    if (match.homeGoals && match.awayGoals) {
+    if (match.homeGoals != null && match.awayGoals != null) {
       if (match.homeGoals > match.awayGoals) {
         won++;
         points += 3;
@@ -36,7 +46,7 @@ export async function calculateTeamStats(teamId: number, groupId: number) {
   awayMatches.forEach((match) => {
     if (match.awayGoals) goalsFor += match.awayGoals;
     if (match.homeGoals) goalsAgainst += match.homeGoals;
-    if (match.homeGoals && match.awayGoals) {
+    if (match.homeGoals != null && match.awayGoals != null) {
       if (match.awayGoals > match.homeGoals) {
         won++;
         points += 3;

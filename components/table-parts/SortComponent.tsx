@@ -9,10 +9,12 @@ import { SortDirectionValues } from "@/typings/sortValues";
 
 export default function SortComponent({
   label = "Name",
+  labelForSmallerDevices,
   fieldName,
   direction = SortDirectionValues.ASC,
 }: {
   label?: string;
+  labelForSmallerDevices?: string | null;
   fieldName: string;
   direction?: SortDirectionValues | null;
 }) {
@@ -37,7 +39,12 @@ export default function SortComponent({
 
   return (
     <div className='flex gap-2 items-center w-full'>
-      <span>{label}</span>
+      {labelForSmallerDevices && (
+        <span className='hidden max-sm:block'>{labelForSmallerDevices}</span>
+      )}
+      <span className={`${labelForSmallerDevices ? "hidden sm:block" : ""}`}>
+        {label}
+      </span>
       {sortDirection === SortDirectionValues.ASC && (
         <ArrowDownZA
           size='24'

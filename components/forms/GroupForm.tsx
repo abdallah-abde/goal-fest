@@ -38,11 +38,11 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function GroupForm({
   group,
-  teams,
+  // teams,
   tournaments,
 }: {
   group?: GroupProps | null;
-  teams: Team[];
+  // teams: Team[];
   tournaments: Tournament[];
 }) {
   const [error, action] = useFormState(
@@ -58,15 +58,27 @@ export default function GroupForm({
       null
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isEditionsLoading, setIsEditionsLoading] = useState(false);
 
   const [tournamentsEditions, setTournamentsEditions] = useState<
     TournamentEditionProps[] | null
   >(null);
 
+  const [tournamentEditionId, setTournamentEditionId] = useState<string | null>(
+    group?.tournamentEditionId.toString() ||
+      (tournamentsEditions &&
+        tournamentsEditions.length > 0 &&
+        tournamentsEditions[0].id.toString()) ||
+      null
+  );
+
+  const [editionTeams, setEditionTeams] = useState<Team[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
   useEffect(() => {
     async function getEditions() {
-      setIsLoading(true);
+      setIsEditionsLoading(true);
 
       // await new Promise((resolve) => {
       //   setTimeout(() => {}, 3000);
@@ -74,15 +86,32 @@ export default function GroupForm({
 
       if (tournamentId) {
         const res = await fetch("/api/tournaments-editions/" + tournamentId);
-        const data = await res.json();
+        const data: TournamentEditionProps[] = await res.json();
 
         setTournamentsEditions(data);
+        if (data.length > 0) setTournamentEditionId(data[0].id.toString());
       }
-      setIsLoading(false);
+      setIsEditionsLoading(false);
     }
 
     getEditions();
   }, [tournamentId]);
+
+  useEffect(() => {
+    async function getTeams() {
+      setIsTeamsLoading(true);
+
+      if (tournamentEditionId) {
+        const res = await fetch("/api/editions-teams/" + tournamentEditionId);
+        const data = await res.json();
+
+        setEditionTeams(data[0].teams);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getTeams();
+  }, [tournamentEditionId]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
   const [hiddenTeams, setHiddenTeams] = useState<string>(
@@ -115,7 +144,7 @@ export default function GroupForm({
       <form action={action} className='form-styles'>
         {tournaments && tournaments.length > 0 ? (
           <FormField>
-            <Label htmlFor='tournamentId'>Tournament Name</Label>
+            <Label htmlFor='tournamentId'>Tournament</Label>
             <Select
               name='tournamentId'
               defaultValue={
@@ -145,9 +174,11 @@ export default function GroupForm({
             notFoundText='There is no tournaments, add some!'
           />
         )}
-        {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
+        {tournamentsEditions &&
+        tournamentsEditions.length > 0 &&
+        !isEditionsLoading ? (
           <FormField>
-            <Label htmlFor='tournamentEditionId'>Tournament Edition Name</Label>
+            <Label htmlFor='tournamentEditionId'>Tournament Edition</Label>
             <Select
               name='tournamentEditionId'
               defaultValue={
@@ -155,6 +186,7 @@ export default function GroupForm({
                 group?.tournamentEditionId.toString() ||
                 undefined
               }
+              onValueChange={(value) => setTournamentEditionId(value)}
             >
               <SelectTrigger className='flex-1'>
                 <SelectValue placeholder='Choose Tournament Edition' />
@@ -171,7 +203,7 @@ export default function GroupForm({
           </FormField>
         ) : (
           <FormFieldLoadingState
-            isLoading={isLoading}
+            isLoading={isEditionsLoading}
             label='Loading Editions...'
             notFoundText='There is no editions, add some!'
           />
@@ -186,39 +218,50 @@ export default function GroupForm({
           />
           <FormFieldError error={error?.name} />
         </FormField>
-        <FormField>
-          <Label htmlFor='teams'>Teams</Label>
-          <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
-          <MultipleSelector
-            className='form-multiple-selector-styles'
-            ref={teamsRef}
-            defaultOptions={teams.map(({ id, name }) => {
-              return {
-                label: name,
-                value: name,
-                dbValue: id.toString(),
-              };
-            })}
-            onChange={(options) => {
-              setHiddenTeams(
-                options
-                  .map((a) => {
-                    return a.dbValue;
-                  })
-                  .join(",")
-              );
-            }}
-            placeholder='Select teams you like to add to the group'
-            emptyIndicator={<p className='empty-indicator'>no teams found.</p>}
-            value={selectedTeams}
+        {editionTeams && editionTeams.length > 0 && !isTeamsLoading ? (
+          <FormField>
+            <Label htmlFor='teams'>Teams</Label>
+            <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
+            <MultipleSelector
+              className='form-multiple-selector-styles'
+              ref={teamsRef}
+              defaultOptions={editionTeams.map(({ id, name }) => {
+                return {
+                  label: name,
+                  value: name,
+                  dbValue: id.toString(),
+                };
+              })}
+              onChange={(options) => {
+                setHiddenTeams(
+                  options
+                    .map((a) => {
+                      return a.dbValue;
+                    })
+                    .join(",")
+                );
+              }}
+              placeholder='Select teams you like to add to the group'
+              emptyIndicator={
+                <p className='empty-indicator'>no teams found.</p>
+              }
+              value={selectedTeams}
+            />
+            <FormFieldError error={error?.teams} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={isTeamsLoading}
+            label='Loading Teams...'
+            notFoundText='There is no teams, add some!'
           />
-          <FormFieldError error={error?.teams} />
-        </FormField>
+        )}
+
         <SubmitButton
           isDisabled={
             !tournaments ||
             tournaments.length <= 0 ||
-            isLoading ||
+            isEditionsLoading ||
             !tournamentsEditions ||
             tournamentsEditions.length < 1
           }

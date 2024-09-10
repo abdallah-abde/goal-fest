@@ -189,25 +189,45 @@ export default async function DashboardGroupMatchesPage({
           <TableHeader>
             <TableRow className='dashboard-head-table-row text-[12px]'>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='homeTeam' label='Home Team' />
+                <SortComponent
+                  fieldName='homeTeam'
+                  label='Home Team'
+                  labelForSmallerDevices='HT'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='awayTeam' label='Away Team' />
+                <SortComponent
+                  fieldName='awayTeam'
+                  label='Away Team'
+                  labelForSmallerDevices='AT'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>Score</TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='date' label='Date & Time' />
+                <SortComponent
+                  fieldName='date'
+                  label='Date & Time'
+                  labelForSmallerDevices='D&T'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='tournament' label='Tournament' />
+                <SortComponent
+                  fieldName='tournament'
+                  label='Tournament'
+                  labelForSmallerDevices='Tour'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='edition' label='Edition' />
+                <SortComponent
+                  fieldName='edition'
+                  label='Edition'
+                  labelForSmallerDevices='Edi'
+                />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className='text-[12px]'>
+          <TableBody className='text-[11px] sm:text-[12px]'>
             {matches.map(
               ({
                 id,
@@ -220,16 +240,23 @@ export default async function DashboardGroupMatchesPage({
               }) => (
                 <TableRow key={id} className='dashboard-table-row'>
                   <TableCell className='dashboard-table-cell'>
-                    {homeTeam.name}
+                    <span className='hidden max-sm:block'>{homeTeam.code}</span>
+                    <span className='hidden sm:block'>{homeTeam.name}</span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
-                    {awayTeam.name}
+                    <span className='hidden max-sm:block'>{awayTeam.code}</span>
+                    <span className='hidden sm:block'>{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
                     {homeGoals} - {awayGoals}
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
-                    {date ? getFormattedDateTime(date.toString()) : ""}
+                    <span className='hidden max-sm:block'>
+                      {date ? getFormattedDateTime(date.toString(), true) : ""}
+                    </span>
+                    <span className='hidden sm:block'>
+                      {date ? getFormattedDateTime(date.toString()) : ""}
+                    </span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
                     {tournamentEdition.tournament.name}

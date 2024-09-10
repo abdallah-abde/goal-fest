@@ -208,36 +208,63 @@ export default async function DashboardKnockoutMatchesPage({
           <TableHeader>
             <TableRow className='dashboard-head-table-row text-[12px]'>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='homeTeam' label='Home Team' />
+                <SortComponent
+                  fieldName='homeTeam'
+                  label='Home Team'
+                  labelForSmallerDevices='HT'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='awayTeam' label='Away Team' />
+                <SortComponent
+                  fieldName='awayTeam'
+                  label='Away Team'
+                  labelForSmallerDevices='AT'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                Main Time
+                <span className='hidden max-sm:block'>MT</span>
+                <span className='hidden sm:block'>Main Time</span>
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                Extra Time
+                <span className='hidden max-sm:block'>ET</span>
+                <span className='hidden sm:block'>Extra Time</span>
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                Penalties
+                <span className='hidden max-sm:block'>Pen</span>
+                <span className='hidden sm:block'>Penalties</span>
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='date' label='Date & Time' />
+                <SortComponent
+                  fieldName='date'
+                  label='Date & Time'
+                  labelForSmallerDevices='D&T'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='round' label='Round' />
+                <SortComponent
+                  fieldName='round'
+                  label='Round'
+                  labelForSmallerDevices='Rnd'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='tournament' label='Tournament' />
+                <SortComponent
+                  fieldName='tournament'
+                  label='Tournament'
+                  labelForSmallerDevices='Tour'
+                />
               </TableHead>
               <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='edition' label='Edition' />
+                <SortComponent
+                  fieldName='edition'
+                  label='Edition'
+                  labelForSmallerDevices='Edi'
+                />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className='text-[12px]'>
+          <TableBody className='text-[11px] sm:text-[12px]'>
             {matches.map(
               ({
                 id,
@@ -257,10 +284,20 @@ export default async function DashboardKnockoutMatchesPage({
               }) => (
                 <TableRow key={id} className='dashboard-table-row'>
                   <TableCell className='dashboard-table-cell'>
-                    {homeTeam ? homeTeam.name : homeTeamPlacehlder}
+                    <span className='hidden max-sm:block'>
+                      {homeTeam ? homeTeam.code : homeTeamPlacehlder}
+                    </span>
+                    <span className='hidden sm:block'>
+                      {homeTeam ? homeTeam.name : homeTeamPlacehlder}
+                    </span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
-                    {awayTeam ? awayTeam.name : awayTeamPlacehlder}
+                    <span className='hidden max-sm:block'>
+                      {awayTeam ? awayTeam.code : awayTeamPlacehlder}
+                    </span>
+                    <span className='hidden sm:block'>
+                      {awayTeam ? awayTeam.name : awayTeamPlacehlder}
+                    </span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
                     {homeGoals} - {awayGoals}
@@ -272,7 +309,12 @@ export default async function DashboardKnockoutMatchesPage({
                     {homePenaltyGoals} - {awayPenaltyGoals}
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
-                    {date ? getFormattedDateTime(date.toString()) : ""}
+                    <span className='hidden max-sm:block'>
+                      {date ? getFormattedDateTime(date.toString(), true) : ""}
+                    </span>
+                    <span className='hidden sm:block'>
+                      {date ? getFormattedDateTime(date.toString()) : ""}
+                    </span>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
                     {round}

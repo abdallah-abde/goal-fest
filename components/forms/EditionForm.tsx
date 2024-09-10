@@ -186,101 +186,84 @@ export default function EditionForm({
             </div>
           )}
         </FormField>
-        {teams && teams.length > 0 ? (
-          <FormField>
-            <Label htmlFor='winnerId'>Winner Team</Label>
-            <div>
-              <div className='flex items-center gap-2'>
-                <Select
-                  name='winnerId'
-                  key={winnerKey}
-                  defaultValue={
-                    (winnerValue && winnerValue.toString()) || undefined
-                  }
-                >
-                  <SelectTrigger className='flex-1'>
-                    <SelectValue placeholder='Choose Winner Team' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map(({ id, name }) => (
-                      <SelectItem value={id.toString()} key={id}>
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  type='button'
-                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
-                  variant='outline'
-                  size='icon'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setWinnerValue(undefined);
-                    setWinnerKey(+new Date());
-                  }}
-                >
-                  <Eraser strokeWidth='1.5px' />
-                </Button>
-              </div>
-              <FormFieldError error={error?.winnerId} />
+        <FormField>
+          <Label htmlFor='winnerId'>Winner Team</Label>
+          <div>
+            <div className='flex items-center gap-2'>
+              <Select
+                name='winnerId'
+                key={winnerKey}
+                defaultValue={
+                  (winnerValue && winnerValue.toString()) || undefined
+                }
+              >
+                <SelectTrigger className='flex-1'>
+                  <SelectValue placeholder='Choose Winner Team' />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map(({ id, name }) => (
+                    <SelectItem value={id.toString()} key={id}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type='button'
+                className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                variant='outline'
+                size='icon'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setWinnerValue(undefined);
+                  setWinnerKey(+new Date());
+                }}
+              >
+                <Eraser strokeWidth='1.5px' />
+              </Button>
             </div>
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=''
-            notFoundText='There is no teams, add some!'
-          />
-        )}
-        {teams && teams.length > 0 ? (
-          <FormField>
-            <Label htmlFor='titleHolderId'>Title Holder Team</Label>
-            <div>
-              <div className='flex items-center gap-2'>
-                <Select
-                  name='titleHolderId'
-                  key={titleHolderKey}
-                  defaultValue={
-                    (titleHolderValue && titleHolderValue.toString()) ||
-                    undefined
-                  }
-                >
-                  <SelectTrigger className='flex-1'>
-                    <SelectValue placeholder='Choose Title Holder Team' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map(({ id, name }) => (
-                      <SelectItem value={id.toString()} key={id}>
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  type='button'
-                  className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
-                  variant='outline'
-                  size='icon'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTitleHolderValue(undefined);
-                    setTitleHolderKey(+new Date());
-                  }}
-                >
-                  <Eraser strokeWidth='1.5px' />
-                </Button>
-              </div>
-              <FormFieldError error={error?.titleHolderId} />
+            <FormFieldError error={error?.winnerId} />
+          </div>
+        </FormField>
+        <FormField>
+          <Label htmlFor='titleHolderId'>Title Holder Team</Label>
+          <div>
+            <div className='flex items-center gap-2'>
+              <Select
+                name='titleHolderId'
+                key={titleHolderKey}
+                defaultValue={
+                  (titleHolderValue && titleHolderValue.toString()) || undefined
+                }
+              >
+                <SelectTrigger className='flex-1'>
+                  <SelectValue placeholder='Choose Title Holder Team' />
+                </SelectTrigger>
+                <SelectContent>
+                  {teams.map(({ id, name }) => (
+                    <SelectItem value={id.toString()} key={id}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type='button'
+                className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
+                variant='outline'
+                size='icon'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTitleHolderValue(undefined);
+                  setTitleHolderKey(+new Date());
+                }}
+              >
+                <Eraser strokeWidth='1.5px' />
+              </Button>
             </div>
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=''
-            notFoundText='There is no teams, add some!'
-          />
-        )}
+            <FormFieldError error={error?.titleHolderId} />
+          </div>
+        </FormField>
         <FormField>
           <Label htmlFor='hostingCountries'>Hosting Countries</Label>
           <Input
@@ -314,7 +297,6 @@ export default function EditionForm({
             }
             value={selectedHostingCountries}
           />
-
           <FormFieldError error={error?.hostingCountries} />
         </FormField>
         <FormField>
@@ -345,14 +327,7 @@ export default function EditionForm({
           />
           <FormFieldError error={error?.teams} />
         </FormField>
-        <SubmitButton
-          isDisabled={
-            !tournaments ||
-            tournaments.length <= 0 ||
-            !teams ||
-            teams.length <= 0
-          }
-        />
+        <SubmitButton isDisabled={!tournaments || tournaments.length <= 0} />
       </form>
     </>
   );

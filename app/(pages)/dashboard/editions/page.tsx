@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import Link from "next/link";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
@@ -12,6 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
@@ -113,7 +118,20 @@ export default async function DashboardEditionsPage({
                 <TableCell className='dashboard-table-cell'>
                   {year.toString()}
                 </TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/editions/${id}`} />
+                <ActionsCellDropDown editHref={`/dashboard/editions/${id}`}>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    asChild
+                    className='items-center justify-center'
+                  >
+                    <Link
+                      href={`/dashboard/editions/${id}/update-current-stage`}
+                      className='w-full cursor-pointer'
+                    >
+                      Update Current Stage
+                    </Link>
+                  </DropdownMenuItem>
+                </ActionsCellDropDown>
               </TableRow>
             ))}
           </TableBody>

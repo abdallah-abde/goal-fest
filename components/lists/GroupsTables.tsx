@@ -37,8 +37,8 @@ export default function GroupsTables({
               {group.teams.length > 0 ? (
                 <>
                   <TableHeader>
-                    <TableRow className='bg-primary/10 hover:bg-primary/10 border-0'>
-                      <TableHead className='min-w-[150px] max-2xs:min-w-[100px] text-left'>
+                    <TableRow className='dashboard-head-table-row'>
+                      <TableHead className='dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]'>
                         Team
                       </TableHead>
                       <TableHead className='w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center'>
@@ -71,11 +71,8 @@ export default function GroupsTables({
                   </TableHeader>
                   <TableBody>
                     {group.teams.sort(sortGroupTeams).map((team) => (
-                      <TableRow
-                        key={team.id}
-                        className='border-b-[1px] border-b-primary/10'
-                      >
-                        <TableCell className='text-left flex gap-3 items-center font-bold py-4'>
+                      <TableRow key={team.id} className='dashboard-table-row'>
+                        <TableCell className='dashboard-table-cell text-left flex gap-3 items-center'>
                           {team.flagUrl && (
                             <>
                               <Image
@@ -128,7 +125,7 @@ export default function GroupsTables({
                   </TableBody>
                 </>
               ) : (
-                <p className='text-primary font-bold py-2 text-center'>
+                <p className='text-destructive font-bold py-2 text-center'>
                   There is no Teams in {group.name}
                 </p>
               )}

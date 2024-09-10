@@ -54,7 +54,11 @@ export default function DashboardSidebar() {
                 <Link
                   className={cn(
                     `m-1 px-2 flex items-center gap-x-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center`,
-                    pathname === href && "bg-primary/10"
+                    pathname === href
+                      ? "bg-primary/10"
+                      : pathname.includes(href) && href !== "/dashboard"
+                      ? "bg-primary/10"
+                      : ""
                   )}
                   href={href}
                 >

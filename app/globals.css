@@ -115,7 +115,7 @@
   }
 
   .dashboard-table {
-    @apply mt-4 mb-2 caption-bottom dark:border-primary/10 border-0 relative !important;
+    @apply mt-4 mb-2 caption-bottom dark:border-primary/10  relative !important;
   }
 
   .dashboard-table-row {

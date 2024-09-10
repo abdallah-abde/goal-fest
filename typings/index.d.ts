@@ -1,4 +1,10 @@
-import { Group as PrismaGroup, Team as PrismaTeam } from "@prisma/client";
+import {
+  Group as PrismaGroup,
+  Team as PrismaTeam,
+  TournamentEdition as PrismaTournamentEdition,
+  Match as PrismaMatch,
+  KnockoutMatch as PrismaKnockoutMatch,
+} from "@prisma/client";
 
 export interface Tournament {
   id: number;
@@ -112,4 +118,25 @@ export interface Player {
 
 export interface GroupWithTeams extends PrismaGroup {
   teams: TeamWithStats[];
+}
+
+export interface NeutralMatch {
+  dbId: number;
+  id: string;
+  type: "GROUP" | "KNOCKOUT";
+  tournamentEdition: PrismaTournamentEdition;
+  homeTeam?: PrismaTeam | null; // Not null in matches just in knockout
+  awayTeam?: PrismaTeam | null; // Not null in matches just in knockout
+  homeGoals?: number | null;
+  awayGoals?: number | null;
+  homeExtraTimeGoals?: number | null; // Not existed in matches just in knockout
+  awayExtraTimeGoals?: number | null; // Not existed in matches just in knockout
+  homePenaltyGoals?: number | null; // Not existed in matches just in knockout
+  awayPenaltyGoals?: number | null; // Not existed in matches just in knockout
+  date?: Date | null;
+  group?: PrismaGroup | null; // Not existed in knockout just in matches
+  round?: string | null;
+  homeTeamPlacehlder?: string | null; // Not existed in matches just in knockout
+  awayTeamPlacehlder?: string | null; // Not existed in matches just in knockout
+  stage: string; // Not existed in matches or knockout
 }

@@ -36,6 +36,11 @@ import { getUTCDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface MatchProps extends Match {
   tournamentEdition: TournamentEditionProps;
+  group: GroupProps;
+}
+
+interface GroupProps extends Group {
+  tournamentEdition: TournamentEditionProps;
 }
 
 interface TournamentEditionProps extends TournamentEdition {
@@ -44,11 +49,11 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function GroupMatchForm({
   match,
-  teams,
+  // teams,
   tournaments,
 }: {
   match?: MatchProps | null;
-  teams: Team[];
+  // teams: Team[];
   tournaments: Tournament[];
 }) {
   const [error, action] = useFormState(
@@ -82,15 +87,26 @@ export default function GroupMatchForm({
 
   const [isGroupsLoading, setIsGroupsLoading] = useState(false);
 
+  const [groupId, setGroupId] = useState<string | null>(
+    match?.groupId.toString() ||
+      (groups && groups.length > 0 && groups[0].id.toString()) ||
+      null
+  );
+
+  const [groupTeams, setGroupTeams] = useState<Team[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
   useEffect(() => {
     async function getEditions() {
       setIsEditionsLoading(true);
+
       if (tournamentId) {
         const res = await fetch("/api/tournaments-editions/" + tournamentId);
         const data: TournamentEditionProps[] = await res.json();
 
         setTournamentsEditions(data);
-        if (data.length > 0) setTournamentEditionId(data[0].id.toString());
+        // if (data.length > 0) setTournamentEditionId(data[0].id.toString());
       }
       setIsEditionsLoading(false);
     }
@@ -101,17 +117,35 @@ export default function GroupMatchForm({
   useEffect(() => {
     async function getGroups() {
       setIsGroupsLoading(true);
+
       if (tournamentEditionId) {
         const res = await fetch("/api/groups/" + tournamentEditionId);
-        const data = await res.json();
+        const data: GroupProps[] = await res.json();
 
         setGroups(data);
+        // if (data.length > 0) setGroupId(data[0].id.toString());
       }
       setIsGroupsLoading(false);
     }
 
     getGroups();
   }, [tournamentEditionId]);
+
+  useEffect(() => {
+    async function getTeams() {
+      setIsTeamsLoading(true);
+
+      if (groupId) {
+        const res = await fetch("/api/groups-teams/" + groupId);
+        const data = await res.json();
+
+        setGroupTeams(data[0].teams);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getTeams();
+  }, [groupId]);
 
   return (
     <>
@@ -157,8 +191,8 @@ export default function GroupMatchForm({
             <Select
               name='tournamentEditionId'
               defaultValue={
-                tournamentEditionId ||
                 match?.tournamentEditionId.toString() ||
+                tournamentEditionId ||
                 tournamentsEditions[0].id.toString() ||
                 undefined
               }
@@ -190,10 +224,12 @@ export default function GroupMatchForm({
             <Select
               name='groupId'
               defaultValue={
-                groups[0].id.toString() ||
                 match?.groupId.toString() ||
+                groupId ||
+                groups[0].id.toString() ||
                 undefined
               }
+              onValueChange={(value) => setGroupId(value)}
             >
               <SelectTrigger className='flex-1'>
                 <SelectValue placeholder='Choose Group' />
@@ -229,14 +265,14 @@ export default function GroupMatchForm({
           />
           <FormFieldError error={error?.date} />
         </FormField>
-        {teams && teams.length > 0 ? (
+        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor='homeTeamId'>Home Team</Label>
             <Select
               name='homeTeamId'
               defaultValue={
-                (match?.homeTeamId && match?.homeTeamId.toString()) ||
-                teams[0].id.toString() ||
+                (match && match?.homeTeamId.toString()) ||
+                (groupTeams && groupTeams[0].id.toString()) ||
                 undefined
               }
             >
@@ -244,7 +280,7 @@ export default function GroupMatchForm({
                 <SelectValue placeholder='Choose Home Team' />
               </SelectTrigger>
               <SelectContent>
-                {teams.map(({ id, name }) => (
+                {groupTeams.map(({ id, name }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {name}
                   </SelectItem>
@@ -255,19 +291,19 @@ export default function GroupMatchForm({
           </FormField>
         ) : (
           <FormFieldLoadingState
-            isLoading={false}
-            label=''
+            isLoading={isTeamsLoading}
+            label='Loading Teams...'
             notFoundText='There is no teams, add some!'
           />
         )}
-        {teams && teams.length > 0 ? (
+        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor='awayTeamId'>Away Team</Label>
             <Select
               name='awayTeamId'
               defaultValue={
-                (match?.awayTeamId && match?.awayTeamId.toString()) ||
-                teams[0].id.toString() ||
+                match?.awayTeamId.toString() ||
+                groupTeams[0].id.toString() ||
                 undefined
               }
             >
@@ -275,7 +311,7 @@ export default function GroupMatchForm({
                 <SelectValue placeholder='Choose Away Team' />
               </SelectTrigger>
               <SelectContent>
-                {teams.map(({ id, name }) => (
+                {groupTeams.map(({ id, name }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {name}
                   </SelectItem>
@@ -286,8 +322,8 @@ export default function GroupMatchForm({
           </FormField>
         ) : (
           <FormFieldLoadingState
-            isLoading={false}
-            label=''
+            isLoading={isTeamsLoading}
+            label='Loading Teams...'
             notFoundText='There is no teams, add some!'
           />
         )}
@@ -315,7 +351,6 @@ export default function GroupMatchForm({
           />
           <FormFieldError error={error?.awayGoals} />
         </FormField>
-
         <FormField>
           <Label htmlFor='round'>Round</Label>
           <Input
@@ -337,8 +372,8 @@ export default function GroupMatchForm({
             isGroupsLoading ||
             !groups ||
             groups.length < 1 ||
-            !teams ||
-            teams.length < 1
+            !groupTeams ||
+            groupTeams.length < 1
           }
         />
       </form>

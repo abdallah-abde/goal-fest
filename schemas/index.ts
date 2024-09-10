@@ -68,6 +68,10 @@ export const EditionSchema = z.object({
   // currentStage: z.string().optional(),
 });
 
+export const CurrentStageSchema = z.object({
+  currentStage: z.string().optional(),
+});
+
 export const GroupSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   tournamentEditionId: z.coerce
@@ -101,7 +105,7 @@ export const GroupMatchSchema = z.object({
     .number()
     .int()
     .refine((data) => data > 0, { message: "Tournament Edition is required" }),
-  round: z.coerce.number().optional(),
+  round: z.string().optional(),
 });
 
 export const knockoutMatchSchema = z.object({
