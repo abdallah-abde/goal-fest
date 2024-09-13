@@ -4,7 +4,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const data = await prisma.tournamentEdition.findMany({
+  const data = await prisma.tournamentEdition.findUnique({
     where: { id: +params.id },
     select: { teams: true },
   });

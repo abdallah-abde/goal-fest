@@ -7,7 +7,6 @@ export default async function EditKnockoutMatchPage({
   params: { id: string };
 }) {
   const tournaments = await prisma.tournament.findMany();
-  const teams = await prisma.team.findMany();
 
   const match = await prisma.knockoutMatch.findUnique({
     where: { id: +id },
@@ -20,7 +19,5 @@ export default async function EditKnockoutMatchPage({
 
   if (!match) throw new Error("Something went wrong");
 
-  return (
-    <KnockoutMatchForm tournaments={tournaments} teams={teams} match={match} />
-  );
+  return <KnockoutMatchForm tournaments={tournaments} match={match} />;
 }

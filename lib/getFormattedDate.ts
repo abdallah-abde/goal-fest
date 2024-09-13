@@ -14,13 +14,7 @@ export function getFormattedTime(date: string, short: boolean = false) {
 }
 
 export function getFormattedDateTime(date: string, short: boolean = false) {
-  return `${getFormattedDate(date, short)}, ${
-    getFormattedTime(date, short)
-    // new Date(date).toLocaleTimeString(
-    // short ? "it-IT" : "en-EN",
-    // { hour: "2-digit", minute: "2-digit" }
-    // )
-  }`;
+  return `${getFormattedDate(date, short)}; ${getFormattedTime(date, short)}`;
 }
 
 export function getUTCDateValueForDateTimeInput(date: Date) {

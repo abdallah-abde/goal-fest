@@ -134,6 +134,7 @@ export interface NeutralMatch {
   homePenaltyGoals?: number | null; // Not existed in matches just in knockout
   awayPenaltyGoals?: number | null; // Not existed in matches just in knockout
   date?: Date | null;
+  onlyDate?: string | null;
   group?: PrismaGroup | null; // Not existed in knockout just in matches
   round?: string | null;
   homeTeamPlacehlder?: string | null; // Not existed in matches just in knockout

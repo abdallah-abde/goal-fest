@@ -29,7 +29,7 @@ export function getSidebarRoutes(params: Params) {
     // },
     {
       id: 4,
-      label: "Knockout Brackets",
+      label: "Brackets",
       href: `/tournaments/${params.id}/editions/${params.editionId}/knockout-brackets`,
       Icon: BracesIcon,
     },

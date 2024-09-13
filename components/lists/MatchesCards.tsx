@@ -67,6 +67,7 @@ export default async function MatchesCards({
       homePenaltyGoals: null,
       awayPenaltyGoals: null,
       date: match.date,
+      onlyDate: match.date ? match.date.toLocaleDateString() : "",
       group: match.group,
       round: match.round,
       homeTeamPlacehlder: null,
@@ -91,6 +92,7 @@ export default async function MatchesCards({
       homePenaltyGoals: match.homePenaltyGoals,
       awayPenaltyGoals: match.awayPenaltyGoals,
       date: match.date,
+      onlyDate: match.date ? match.date.toLocaleDateString() : "",
       group: null,
       round: match.round,
       homeTeamPlacehlder: match.homeTeamPlacehlder,
@@ -106,7 +108,7 @@ export default async function MatchesCards({
   //   )
   // );
 
-  const [groupBy, setGroupBy] = useState("date");
+  const [groupBy, setGroupBy] = useState("onlyDate");
   const results = Object.entries(_.groupBy(allMatches, groupBy));
 
   return (
@@ -117,7 +119,7 @@ export default async function MatchesCards({
             <Button
               variant='outline'
               onClick={() => {
-                setGroupBy(groupBy === "stage" ? "date" : "stage");
+                setGroupBy(groupBy === "stage" ? "onlyDate" : "stage");
               }}
               className='flex gap-2 border-2 border-secondary hover:border-primary/10'
             >
@@ -127,131 +129,188 @@ export default async function MatchesCards({
           </div>
           <div className='flex flex-col gap-8'>
             {results.map(([divider, list], _) => {
-              // const matchDate = getFormattedDate(divider);
               return (
-                <div key={_}>
+                <div key={_} className='w-full'>
                   <p className='text-[14px] sm:text-[16px] mb-2 border-2 border-primary/10 w-fit p-2 rounded-sm font-semibold'>
                     {/* {matchDate === "Invalid Date" ? "No date info" : matchDate} */}
-                    {groupBy === "date"
-                      ? divider === "null"
+                    {groupBy === "onlyDate"
+                      ? divider === ""
                         ? "Matches without date"
                         : getFormattedDate(divider, !isSmall)
                       : divider === "null"
                       ? "Matches without round"
                       : divider}
                   </p>
-                  <div className='flex flex-wrap items-center justify-start gap-2'>
+                  <div className='w-full space-y-2'>
                     {list.map((match) => (
-                      <Card key={match.id} className='w-full bg-primary/10'>
-                        <CardHeader>
-                          <CardTitle className='flex flex-col items-center justify-center gap-4'>
-                            <div className='flex w-full justify-between'>
-                              {match.group && (
-                                <div>
-                                  <Badge
-                                    variant='secondary'
-                                    className='hover:bg-secondary'
-                                  >
-                                    {match.group.name}
-                                  </Badge>
+                      <Card key={match.id} className='rounded-lg bg-primary/10'>
+                        <CardContent className='grid grid-cols-5 grid-rows-3 gap-2 pt-6'>
+                          {/* <CardHeader> */}
+                          {/* <CardTitle className='flex flex-col items-center justify-center gap-4'> */}
+                          {/* <div> */}
+                          {match.group && (
+                            <div className='row-start-1 col-start-1 col-end-3 self-center'>
+                              <Badge
+                                variant='secondary'
+                                className='hover:bg-secondary'
+                              >
+                                {match.group.name}
+                              </Badge>
+                            </div>
+                          )}
+                          <div
+                            className={`row-start-1 col-start-${
+                              match.group ? "4" : "1"
+                            } col-end-${
+                              match.group ? "6" : "3"
+                            } self-center place-self-${
+                              match.group ? "end" : "start"
+                            }`}
+                          >
+                            <Badge
+                              variant={
+                                match.round ? "secondary" : "destructive"
+                              }
+                              className='hover:bg-secondary'
+                            >
+                              {match.round ? `${match.round}` : "No round info"}
+                            </Badge>
+                          </div>
+                          {/* </div> */}
+                          {/* <div className='w-full flex items-center gap-4'> */}
+                          <div className='row-start-2 col-start-1 col-end-3 place-self-end self-center flex flex-col md:flex-row items-center gap-3  max-xs:gap-2'>
+                            <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
+                              {match.homeTeam
+                                ? match.homeTeam?.name
+                                : match.homeTeamPlacehlder}
+                            </p>
+                            <p className='hidden max-xs:block text-[16px] font-bold'>
+                              {!match.homeTeam
+                                ? match.homeTeamPlacehlder
+                                : match.homeTeam.code
+                                ? match.homeTeam.code
+                                : match.homeTeam.name}
+                            </p>
+                            {match.homeTeam && match.homeTeam.flagUrl && (
+                              <Image
+                                src={match.homeTeam?.flagUrl}
+                                width={25}
+                                height={25}
+                                alt={`${match.homeTeam?.name} Flag`}
+                              />
+                            )}
+                          </div>
+                          <div className='row-start-1 row-end-4 col-start-3 col-end-4 place-self-center flex flex-col items-center justify-center gap-2'>
+                            {match.homeGoals !== null &&
+                              match.awayGoals !== null && (
+                                <div className='text-[18px] xs:text-[22px] font-bold flex gap-2'>
+                                  {match.homeGoals !== null && (
+                                    <span className='ml-auto'>
+                                      {match.homeGoals}
+                                    </span>
+                                  )}
+                                  <span className='text-center'>-</span>
+                                  {match.awayGoals !== null && (
+                                    <span className='mr-auto'>
+                                      {match.awayGoals}
+                                    </span>
+                                  )}
                                 </div>
                               )}
-                              <div>
-                                <Badge
-                                  variant={
-                                    match.round ? "secondary" : "destructive"
-                                  }
-                                  className='hover:bg-secondary'
-                                >
-                                  {match.round
-                                    ? `${match.round}`
-                                    : "No round info"}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className='flex items-center justify-between gap-4'>
-                              <div className='flex flex-col md:flex-row gap-2 items-center'>
-                                <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
-                                  {match.homeTeam
-                                    ? match.homeTeam?.name
-                                    : match.homeTeamPlacehlder}
-                                </p>
-                                <p className='hidden max-xs:block text-[16px] font-bold'>
-                                  {!match.homeTeam
-                                    ? match.homeTeamPlacehlder
-                                    : match.homeTeam.code
-                                    ? match.homeTeam.code
-                                    : match.homeTeam.name}
-                                </p>
-                                {match.homeTeam && match.homeTeam.flagUrl && (
-                                  <Image
-                                    src={match.homeTeam?.flagUrl}
-                                    width={25}
-                                    height={25}
-                                    alt={`${match.homeTeam?.name} Flag`}
-                                  />
-                                )}
-                              </div>
-                              {match.homeGoals !== null && (
-                                <span className='text-[18px] xs:text-[22px] font-bold ml-8'>
-                                  {match.homeGoals}
-                                </span>
-                              )}{" "}
-                              -{" "}
-                              {match.awayGoals !== null && (
-                                <span className='text-[18px] xs:text-[22px] font-bold mr-8'>
-                                  {match.awayGoals}
-                                </span>
+                            {match.homeExtraTimeGoals !== null &&
+                              match.awayExtraTimeGoals !== null && (
+                                <div className='text-[10px] xs:text-[14px] font-bold flex flex-col items-center justify-center'>
+                                  <span>Extra time:</span>
+                                  <div className='flex gap-2'>
+                                    {match.homeExtraTimeGoals !== null && (
+                                      <span className='ml-auto'>
+                                        {match.homeExtraTimeGoals}
+                                      </span>
+                                    )}
+                                    <span className='text-center'>-</span>
+                                    {match.awayExtraTimeGoals !== null && (
+                                      <span className='mr-auto'>
+                                        {match.awayExtraTimeGoals}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                               )}
-                              <div className='flex flex-col-reverse md:flex-row gap-2 items-center'>
-                                {match.awayTeam && match.awayTeam.flagUrl && (
-                                  <Image
-                                    src={match.awayTeam?.flagUrl}
-                                    width={25}
-                                    height={25}
-                                    alt={`${match.awayTeam?.name} Flag`}
-                                  />
-                                )}
-                                <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
-                                  {match.awayTeam
-                                    ? match.awayTeam?.name
-                                    : match.awayTeamPlacehlder}
-                                </p>
-                                <p className='hidden max-xs:block text-[16px] font-bold'>
-                                  {!match.awayTeam
-                                    ? match.awayTeamPlacehlder
-                                    : match.awayTeam.code
-                                    ? match.awayTeam.code
-                                    : match.awayTeam.name}
-                                </p>
-                              </div>
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        {/* {match.date && ( */}
-                        <CardContent className='flex justify-between'>
-                          <Badge
-                            variant={match.date ? "default" : "destructive"}
-                            className='hover:bg-primary'
-                          >
-                            {match.date
-                              ? getFormattedDate(
-                                  match.date.toString(),
-                                  !isSmall
-                                )
-                              : "No date info"}
-                          </Badge>
-                          <Badge
-                            variant={match.date ? "default" : "destructive"}
-                            className='hover:bg-primary'
-                          >
-                            {match.date
-                              ? getFormattedTime(
-                                  match.date.toString(),
-                                  !isSmall
-                                )
-                              : "No time info"}
-                          </Badge>
+                            {match.homePenaltyGoals !== null &&
+                              match.awayPenaltyGoals !== null && (
+                                <div className='text-[10px] xs:text-[14px] font-bold flex flex-col items-center justify-center'>
+                                  <span>Penalties:</span>
+                                  <div className='flex gap-2'>
+                                    {match.homePenaltyGoals !== null && (
+                                      <span className='ml-auto'>
+                                        {match.homePenaltyGoals}
+                                      </span>
+                                    )}
+                                    <span className='text-center'>-</span>
+                                    {match.awayPenaltyGoals !== null && (
+                                      <span className='mr-auto'>
+                                        {match.awayPenaltyGoals}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                          </div>
+                          <div className='row-start-2 col-start-4 col-end-6 place-self-start self-center flex flex-col-reverse md:flex-row items-center gap-3 max-xs:gap-2'>
+                            {/* flex-1 flex flex-col-reverse md:flex-row gap-3  max-xs:gap-2 items-center */}
+                            {match.awayTeam && match.awayTeam.flagUrl && (
+                              <Image
+                                src={match.awayTeam?.flagUrl}
+                                width={25}
+                                height={25}
+                                alt={`${match.awayTeam?.name} Flag`}
+                              />
+                            )}
+                            <p className='hidden xs:block text-[16px] xs:text-[18px] font-bold'>
+                              {match.awayTeam
+                                ? match.awayTeam?.name
+                                : match.awayTeamPlacehlder}
+                            </p>
+                            <p className='hidden max-xs:block text-[16px] font-bold'>
+                              {!match.awayTeam
+                                ? match.awayTeamPlacehlder
+                                : match.awayTeam.code
+                                ? match.awayTeam.code
+                                : match.awayTeam.name}
+                            </p>
+                          </div>
+                          {/* </div> */}
+                          {/* </CardTitle> */}
+                          {/* </CardHeader> */}
+                          {/* {match.date && ( */}
+                          {/* <div> */}
+                          <div className='row-start-3 col-start-1 col-end-3 self-center'>
+                            <Badge
+                              variant={match.date ? "default" : "destructive"}
+                              className='hover:bg-primary'
+                            >
+                              {match.date
+                                ? getFormattedDate(
+                                    match.date.toString(),
+                                    !isSmall
+                                  )
+                                : "No date info"}
+                            </Badge>
+                          </div>
+                          <div className='row-start-3 col-start-4 col-end-6 self-center place-self-end'>
+                            <Badge
+                              variant={match.date ? "default" : "destructive"}
+                              className='hover:bg-primary'
+                            >
+                              {match.date
+                                ? getFormattedTime(
+                                    match.date.toString(),
+                                    !isSmall
+                                  )
+                                : "No time info"}
+                            </Badge>
+                          </div>
+                          {/* </div> */}
                         </CardContent>
                         {/* )} */}
                       </Card>

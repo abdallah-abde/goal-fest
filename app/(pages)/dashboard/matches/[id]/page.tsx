@@ -7,7 +7,6 @@ export default async function EditGroupMatchPage({
   params: { id: string };
 }) {
   const tournaments = await prisma.tournament.findMany();
-  const teams = await prisma.team.findMany();
 
   const match = await prisma.match.findUnique({
     where: { id: +id },
@@ -23,7 +22,5 @@ export default async function EditGroupMatchPage({
 
   if (!match) throw new Error("Something went wrong");
 
-  return (
-    <GroupMatchForm tournaments={tournaments} teams={teams} match={match} />
-  );
+  return <GroupMatchForm tournaments={tournaments} match={match} />;
 }

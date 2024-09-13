@@ -46,11 +46,11 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function KnockoutMatchForm({
   match,
-  teams,
+  // teams,
   tournaments,
 }: {
   match?: MatchProps | null;
-  teams: Team[];
+  // teams: Team[];
   tournaments: Tournament[];
 }) {
   const [error, action] = useFormState(
@@ -72,20 +72,52 @@ export default function KnockoutMatchForm({
     TournamentEditionProps[] | null
   >(null);
 
+  const [tournamentEditionId, setTournamentEditionId] = useState<string | null>(
+    match?.tournamentEditionId.toString() ||
+      (tournamentsEditions &&
+        tournamentsEditions.length > 0 &&
+        tournamentsEditions[0].id.toString()) ||
+      null
+  );
+
+  const [groupTeams, setGroupTeams] = useState<Team[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
   useEffect(() => {
     async function getEditions() {
       setIsLoading(true);
+
       if (tournamentId) {
         const res = await fetch("/api/tournaments-editions/" + tournamentId);
         const data = await res.json();
 
         setTournamentsEditions(data);
+
+        if (data.length > 0 && !match)
+          setTournamentEditionId(data[0].id.toString());
       }
       setIsLoading(false);
     }
 
     getEditions();
   }, [tournamentId]);
+
+  useEffect(() => {
+    async function getTeams() {
+      setIsTeamsLoading(true);
+
+      if (tournamentEditionId) {
+        const res = await fetch("/api/editions-teams/" + tournamentEditionId);
+        const data = await res.json();
+
+        setGroupTeams(data.teams);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getTeams();
+  }, [tournamentEditionId]);
 
   const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
     match?.homeTeamId || undefined
@@ -142,6 +174,7 @@ export default function KnockoutMatchForm({
               name='tournamentEditionId'
               defaultValue={
                 match?.tournamentEditionId.toString() ||
+                tournamentEditionId ||
                 tournamentsEditions[0].id.toString() ||
                 undefined
               }
@@ -166,7 +199,7 @@ export default function KnockoutMatchForm({
             notFoundText='There is no editions, add some!'
           />
         )}
-        {teams && teams.length > 0 ? (
+        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor='homeTeamId'>Home Team</Label>
             <div>
@@ -187,7 +220,7 @@ export default function KnockoutMatchForm({
                     <SelectValue placeholder='Choose Home Team' />
                   </SelectTrigger>
                   <SelectContent>
-                    {teams.map(({ id, name }) => (
+                    {groupTeams.map(({ id, name }) => (
                       <SelectItem value={id.toString()} key={id}>
                         {name}
                       </SelectItem>
@@ -218,7 +251,7 @@ export default function KnockoutMatchForm({
             notFoundText='There is no teams, add some!'
           />
         )}
-        {teams && teams.length > 0 ? (
+        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor='awayTeamId'>Away Team</Label>
             <div>
@@ -234,7 +267,7 @@ export default function KnockoutMatchForm({
                     <SelectValue placeholder='Choose Away Team' />
                   </SelectTrigger>
                   <SelectContent>
-                    {teams.map(({ id, name }) => (
+                    {groupTeams.map(({ id, name }) => (
                       <SelectItem value={id.toString()} key={id}>
                         {name}
                       </SelectItem>

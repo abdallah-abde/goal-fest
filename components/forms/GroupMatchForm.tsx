@@ -37,10 +37,12 @@ import { getUTCDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 interface MatchProps extends Match {
   tournamentEdition: TournamentEditionProps;
   group: GroupProps;
+  homeTeam: Team;
+  awayTeam: Team;
 }
 
 interface GroupProps extends Group {
-  tournamentEdition: TournamentEditionProps;
+  // tournamentEdition: TournamentEditionProps;
 }
 
 interface TournamentEditionProps extends TournamentEdition {
@@ -106,7 +108,8 @@ export default function GroupMatchForm({
         const data: TournamentEditionProps[] = await res.json();
 
         setTournamentsEditions(data);
-        // if (data.length > 0) setTournamentEditionId(data[0].id.toString());
+        if (data.length > 0 && !match)
+          setTournamentEditionId(data[0].id.toString());
       }
       setIsEditionsLoading(false);
     }
@@ -123,7 +126,7 @@ export default function GroupMatchForm({
         const data: GroupProps[] = await res.json();
 
         setGroups(data);
-        // if (data.length > 0) setGroupId(data[0].id.toString());
+        if (data.length > 0 && !match) setGroupId(data[0].id.toString());
       }
       setIsGroupsLoading(false);
     }

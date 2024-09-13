@@ -105,7 +105,7 @@ export default function GroupForm({
         const res = await fetch("/api/editions-teams/" + tournamentEditionId);
         const data = await res.json();
 
-        setEditionTeams(data[0].teams);
+        setEditionTeams(data.teams);
       }
       setIsTeamsLoading(false);
     }
