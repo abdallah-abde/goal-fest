@@ -1,22 +1,40 @@
 import prisma from "@/lib/db";
-import GroupMatchesCards from "@/components/lists/GroupMatchesCards";
+import MatchesCards from "@/components/lists/MatchesCards";
 
-export default async function GroupMatchesPage({
+export default async function MatchesPage({
   params,
 }: {
-  params: { editionId: string };
+  params: { editionId: string; id: string };
 }) {
-  const matches = await prisma.match.findMany({
-    where: {
-      tournamentEditionId: +params.editionId,
-    },
-    include: {
-      homeTeam: true,
-      awayTeam: true,
-      tournamentEdition: true,
-      group: true,
-    },
-  });
+  const [matches, knockoutMatches] = await Promise.all([
+    prisma.match.findMany({
+      where: {
+        tournamentEditionId: +params.editionId,
+        tournamentEdition: {
+          tournamentId: +params.id,
+        },
+      },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournamentEdition: true,
+        group: true,
+      },
+    }),
+    prisma.knockoutMatch.findMany({
+      where: {
+        tournamentEditionId: +params.editionId,
+        tournamentEdition: {
+          tournamentId: +params.id,
+        },
+      },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        tournamentEdition: true,
+      },
+    }),
+  ]);
 
-  return <GroupMatchesCards matches={matches} />;
+  return <MatchesCards matches={matches} knockoutMatches={knockoutMatches} />;
 }

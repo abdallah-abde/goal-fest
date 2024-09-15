@@ -16,9 +16,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className='h-full w-full flex flex-col items-center justify-center gap-y-4 text-destructive'>
+    <div className='h-screen w-full flex flex-col items-center justify-center gap-y-4 text-destructive'>
       <CircleX className='font-bold text-2xl size-28' />
-      <p className='font-bold text-2xl'>Something went wrong!</p>
+      <p className='font-bold text-2xl'>Something went wrong!!</p>
       {/* <button
         onClick={
           // Attempt to recover by trying to re-render the segment

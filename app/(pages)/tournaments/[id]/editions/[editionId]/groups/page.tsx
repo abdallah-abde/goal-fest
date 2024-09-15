@@ -6,11 +6,14 @@ import GroupsTable from "@/components/lists/GroupsTables";
 export default async function GroupsPage({
   params,
 }: {
-  params: { editionId: string };
+  params: { editionId: string; id: string };
 }) {
   const groups = await prisma.group.findMany({
     where: {
       tournamentEditionId: +params.editionId,
+      tournamentEdition: {
+        tournamentId: +params.id,
+      },
     },
 
     select: {

@@ -4,11 +4,12 @@ import EditionHomeComponent from "@/components/lists/EditionHomeComponent";
 export default async function EditionPage({
   params,
 }: {
-  params: { editionId: string };
+  params: { editionId: string; id: string };
 }) {
   const tournamentEdition = await prisma.tournamentEdition.findUnique({
     where: {
       id: +params.editionId,
+      tournamentId: +params.id,
     },
     include: {
       teams: true,

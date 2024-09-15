@@ -21,7 +21,7 @@ export default function EditionsCards({
       {tournamentEditions.length > 0 ? (
         tournamentEditions.map(({ id, year, logoUrl, tournament }) => (
           <div key={id} className='md:overflow-auto last:pb-24'>
-            <Link href={`/tournaments/${tournament.id}/editions/${id}/`}>
+            <Link href={`/tournaments/${tournament.id}/editions/${id}/info`}>
               <Card className='bg-primary/5 text-secondary-foreground hover:shadow-lg transition duration-200 p-4 pt-0'>
                 <CardHeader>
                   <CardTitle className='mx-auto text-xl'>

@@ -7,6 +7,13 @@ import { TournamentEdition, Team, Tournament, Country } from "@prisma/client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 
 interface TournamentEditionProps extends TournamentEdition {
   teams: Team[];
@@ -22,18 +29,24 @@ export default function EditionHomeComponent({
   tournamentEdition: TournamentEditionProps | null;
 }) {
   return (
-    <div className='space-y-8'>
-      <InfoCards tournamentEdition={tournamentEdition} />
-      {tournamentEdition?.hostingCountries &&
-        tournamentEdition?.hostingCountries.length > 0 && (
-          <HostingCountriesComponent
-            hostingCountries={tournamentEdition?.hostingCountries}
-          />
-        )}
-      {tournamentEdition?.teams && tournamentEdition?.teams.length > 0 && (
-        <TeamsComponent teams={tournamentEdition.teams} />
+    <>
+      {tournamentEdition ? (
+        <div className='space-y-8'>
+          <InfoCards tournamentEdition={tournamentEdition} />
+          {tournamentEdition?.hostingCountries &&
+            tournamentEdition?.hostingCountries.length > 0 && (
+              <HostingCountriesComponent
+                hostingCountries={tournamentEdition?.hostingCountries}
+              />
+            )}
+          {tournamentEdition?.teams && tournamentEdition?.teams.length > 0 && (
+            <TeamsComponent teams={tournamentEdition.teams} />
+          )}
+        </div>
+      ) : (
+        <NoDataFoundComponent message='Sorry, No Info Found' />
       )}
-    </div>
+    </>
   );
 }
 
@@ -46,17 +59,20 @@ function HostingCountriesComponent({
     <div className=''>
       <h2 className='font-bold mb-2'>Hosting Countries</h2>
       <div className='flex flex-wrap gap-2 justify-between'>
-        {hostingCountries.map((country) => (
-          <Card className='2xs:min-w-56 bg-primary/10 text-primary flex flex-col justify-between'>
+        {hostingCountries.map(({ id, name, flagUrl }) => (
+          <Card
+            key={id}
+            className='2xs:min-w-56 bg-primary/10 text-primary flex flex-col justify-between'
+          >
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle className='w-full text-xl flex items-center justify-center'>
-                {country.name}
-                {country.flagUrl && (
+                {name}
+                {flagUrl && (
                   <Image
                     width={30}
                     height={30}
-                    src={country.flagUrl}
-                    alt={country.name + " Flag"}
+                    src={flagUrl}
+                    alt={name + " Flag"}
                     className='ml-4'
                   />
                 )}
@@ -65,13 +81,14 @@ function HostingCountriesComponent({
             <CardContent className='text-sm flex justify-between'>
               <div className='flex flex-col items-center gap-1'>
                 <Badge className='flex items-center border-primary font-bold hover:bg-primary'>
-                  5
+                  5{/* TODO: Bring Cities */}
                 </Badge>
                 <span className='font-semibold'>Cities</span>
               </div>
               <div className='flex flex-col items-center gap-1'>
                 <Badge className='flex items-center border-primary font-bold hover:bg-primary'>
                   10
+                  {/* TODO: Bring Stadiums */}
                 </Badge>
                 <span className='font-semibold'>Stadiums</span>
               </div>
@@ -97,16 +114,20 @@ function InfoCards({
 
   return (
     <div className='flex flex-wrap gap-2 justify-between'>
-      <Card className={cardStyles}>
-        <CardHeader>
-          <CardTitle className={cardTitlestyles}>Number of Teams</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Badge className='text-xl hover:bg-primary'>
-            {tournamentEdition?.teams.length}
-          </Badge>
-        </CardContent>
-      </Card>
+      {tournamentEdition &&
+        tournamentEdition.teams &&
+        tournamentEdition.teams.length > 0 && (
+          <Card className={cardStyles}>
+            <CardHeader>
+              <CardTitle className={cardTitlestyles}>Number of Teams</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Badge className='text-xl hover:bg-primary'>
+                {tournamentEdition?.teams.length}
+              </Badge>
+            </CardContent>
+          </Card>
+        )}
       {tournamentEdition && tournamentEdition?.currentStage && (
         <Card className={cardStyles}>
           <CardHeader>
@@ -178,18 +199,32 @@ function TeamsComponent({ teams }: { teams: Team[] }) {
     <div className=''>
       <h2 className='font-bold mb-2'>Teams</h2>
       <div className='flex flex-wrap gap-2 justify-between'>
-        {teams.map((team) => (
-          <Card className='flex-1 min-w-40 bg-primary/10 text-primary flex flex-col-reverse justify-between items-center'>
-            <CardHeader className='flex flex-row items-center justify-between'>
-              <CardTitle className='text-lg font-bold'>{team.name}</CardTitle>
+        {teams.map(({ id, name, flagUrl }) => (
+          <Card
+            key={id}
+            className='flex-1 min-w-40 bg-primary/10 text-primary flex flex-col-reverse justify-between items-center'
+          >
+            <CardHeader className='flex flex-row items-center justify-center'>
+              <CardTitle className=''>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <p className='text-lg font-bold text-center truncate w-[10ch]'>
+                        {name}
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent>{name}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
             </CardHeader>
             <CardContent className='pt-6 pb-0'>
-              {team.flagUrl && (
+              {flagUrl && (
                 <Image
                   width={40}
                   height={40}
-                  src={team.flagUrl}
-                  alt={team.name + " Flag"}
+                  src={flagUrl}
+                  alt={name + " Flag"}
                 />
               )}
             </CardContent>
