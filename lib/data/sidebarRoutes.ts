@@ -1,4 +1,11 @@
-import { BracesIcon, Table2Icon, LandPlotIcon, HomeIcon } from "lucide-react";
+import {
+  BracesIcon,
+  Table2Icon,
+  LandPlotIcon,
+  HomeIcon,
+  TrophyIcon,
+  SquareStackIcon,
+} from "lucide-react";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 
 export function getSidebarRoutes(params: Params) {
@@ -22,17 +29,23 @@ export function getSidebarRoutes(params: Params) {
       href: `/tournaments/${id}/editions/${editionId}/matches`,
       Icon: LandPlotIcon,
     },
-    // {
-    //   id: 4,
-    //   label: "Knockout Matches",
-    //   href: `/tournaments/${id}/editions/${editionId}/knockout-matches`,
-    //   Icon: LandPlotIcon,
-    // },
     {
       id: 4,
       label: "Brackets",
       href: `/tournaments/${id}/editions/${editionId}/knockout-brackets`,
       Icon: BracesIcon,
+    },
+    {
+      id: 5,
+      label: "History",
+      href: `/tournaments/${id}/editions/${editionId}/history`,
+      Icon: SquareStackIcon,
+    },
+    {
+      id: 6,
+      label: "Title Holders",
+      href: `/tournaments/${id}/editions/${editionId}/title-holders`,
+      Icon: TrophyIcon,
     },
   ];
 }

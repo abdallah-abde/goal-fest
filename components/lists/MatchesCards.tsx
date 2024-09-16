@@ -22,7 +22,6 @@ import ListTitle from "@/components/lists/ListTitle";
 
 import { NeutralMatch } from "@/typings";
 
-import { useMediaQuery } from "react-responsive";
 import {
   switchGroupMatchesToNeutralMatches,
   switchKnockoutMatchesToNeutralMatches,
@@ -48,8 +47,6 @@ export default async function MatchesCards({
   matches: MatchProps[];
   knockoutMatches: KnockoutMatchProps[];
 }) {
-  const isSmall = useMediaQuery({ query: "(min-width: 515px)" });
-
   const allMatches: NeutralMatch[] = switchGroupMatchesToNeutralMatches(
     matches
   ).concat(switchKnockoutMatchesToNeutralMatches(knockoutMatches));
@@ -77,14 +74,10 @@ export default async function MatchesCards({
             {results.map(([divider, list], index) => {
               return (
                 <div key={index} className='w-full'>
-                  <ListTitle
-                    groupBy={groupBy}
-                    divider={divider}
-                    isSmall={isSmall}
-                  />
+                  <ListTitle groupBy={groupBy} divider={divider} />
                   <div className='w-full space-y-2'>
                     {list.map((match: NeutralMatch) => (
-                      <MatchCard match={match} isSmall={isSmall} />
+                      <MatchCard key={match.dbId} match={match} />
                     ))}
                   </div>
                 </div>

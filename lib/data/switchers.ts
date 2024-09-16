@@ -48,8 +48,8 @@ export function switchGroupMatchToNeutralMatch(match: MatchProps) {
     onlyDate: match.date ? match.date.toLocaleDateString() : "",
     group: match.group,
     round: match.round,
-    homeTeamPlacehlder: null,
-    awayTeamPlacehlder: null,
+    homeTeamPlaceholder: null,
+    awayTeamPlaceholder: null,
     stage: "Groups Stage",
   };
 
@@ -86,8 +86,8 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
     onlyDate: match.date ? match.date.toLocaleDateString() : "",
     group: null,
     round: match.round,
-    homeTeamPlacehlder: match.homeTeamPlacehlder,
-    awayTeamPlacehlder: match.awayTeamPlacehlder,
+    homeTeamPlaceholder: match.homeTeamPlacehlder,
+    awayTeamPlaceholder: match.awayTeamPlacehlder,
     stage: match.round || "",
   };
 

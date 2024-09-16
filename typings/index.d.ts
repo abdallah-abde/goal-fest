@@ -137,7 +137,7 @@ export interface NeutralMatch {
   onlyDate?: string | null;
   group?: PrismaGroup | null; // Not existed in knockout just in matches
   round?: string | null;
-  homeTeamPlacehlder?: string | null; // Not existed in matches just in knockout
-  awayTeamPlacehlder?: string | null; // Not existed in matches just in knockout
+  homeTeamPlaceholder?: string | null; // Not existed in matches just in knockout
+  awayTeamPlaceholder?: string | null; // Not existed in matches just in knockout
   stage: string; // Not existed in matches or knockout
 }
