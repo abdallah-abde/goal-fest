@@ -17,10 +17,10 @@ import * as _ from "lodash";
 import { Filter } from "lucide-react";
 
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import MatchCard from "@/components/lists/MatchCard";
+import MatchCard from "@/components/lists/cards/MatchCard";
 import ListTitle from "@/components/lists/ListTitle";
 
-import { NeutralMatch } from "@/typings";
+import { NeutralMatch } from "@/types";
 
 import {
   switchGroupMatchesToNeutralMatches,

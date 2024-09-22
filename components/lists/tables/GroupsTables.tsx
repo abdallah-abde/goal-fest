@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-import { GroupWithTeams } from "@/typings";
+import { GroupWithTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";

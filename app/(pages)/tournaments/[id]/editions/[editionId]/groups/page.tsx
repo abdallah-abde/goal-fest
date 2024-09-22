@@ -1,7 +1,7 @@
 import prisma from "@/lib/db";
 import { calculateTeamStats } from "@/lib/calculateTeamStats";
 
-import GroupsTable from "@/components/lists/GroupsTables";
+import GroupsTable from "@/components/lists/tables/GroupsTables";
 
 export default async function GroupsPage({
   params,

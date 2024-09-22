@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionValues } from "@/typings/sortValues";
+import { SortDirectionValues } from "@/types/sortValues";
 
 import {
   Table,

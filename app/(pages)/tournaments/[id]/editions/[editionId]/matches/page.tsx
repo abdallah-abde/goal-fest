@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import MatchesCards from "@/components/lists/MatchesCards";
+import MatchesCards from "@/components/lists/cards/MatchesCards";
 
 export default async function MatchesPage({
   params,

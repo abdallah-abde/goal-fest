@@ -1,6 +1,7 @@
 import PageHeader from "@/components/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/db";
+import { KnockoutMatch, Match } from "@prisma/client";
 import Image from "next/image";
 
 export default async function HistoryPage({
@@ -8,96 +9,174 @@ export default async function HistoryPage({
 }: {
   params: { editionId: string; id: string };
 }) {
-  const tournament = await prisma.tournament.findUnique({
-    where: { id: +params.id },
-    include: {
-      tournamentEditions: {
-        where: { currentStage: "Finished" },
-        include: {
-          hostingCountries: true,
-          winner: true,
+  const [tournamentEdition, matches] = await Promise.all([
+    prisma.tournamentEdition.findUnique({
+      where: { id: +params.editionId },
+      include: { tournament: true },
+    }),
+    prisma.knockoutMatch.findMany({
+      where: {
+        round: "Final",
+        tournamentEdition: {
+          tournamentId: +params.id,
+          currentStage: "Finished",
         },
-        orderBy: {
+      },
+      select: {
+        id: true,
+        homeTeamId: true,
+        awayTeamId: true,
+        tournamentEditionId: true,
+        homeTeam: true,
+        awayTeam: true,
+        homeGoals: true,
+        awayGoals: true,
+        homeExtraTimeGoals: true,
+        awayExtraTimeGoals: true,
+        homePenaltyGoals: true,
+        awayPenaltyGoals: true,
+        tournamentEdition: {
+          select: {
+            logoUrl: true,
+            year: true,
+            hostingCountries: true,
+            winner: true,
+            tournament: true,
+          },
+        },
+      },
+      orderBy: {
+        tournamentEdition: {
           year: "desc",
         },
       },
-    },
-  });
+    }),
+  ]);
+
+  function getScore(match: any) {
+    const homeExtraGoals = match.homeExtraTimeGoals || 0;
+    const awayExtraGoals = match.awayExtraTimeGoals || 0;
+    const homePenalty = match.homePenaltyGoals || 0;
+    const awayPenalty = match.awayPenaltyGoals || 0;
+
+    const homeScore = match.homeGoals + homeExtraGoals + homePenalty;
+    const awayScore = match.awayGoals + awayExtraGoals + awayPenalty;
+
+    if (match.tournamentEdition.winner.id === match.homeTeam.id) {
+      if (match.homeGoals === match.awayGoals) {
+        if (homeExtraGoals === awayExtraGoals) {
+          return `${match.awayTeam.name} [ ${
+            match.homeGoals + homeExtraGoals
+          } - ${
+            match.awayGoals + awayExtraGoals
+          } ] (After Penalties: ${homePenalty} - ${awayPenalty})`;
+        } else {
+          return `${match.awayTeam.name} [ ${homeScore} - ${awayScore} ] (After Extra Time)`;
+        }
+      }
+
+      return `${match.awayTeam.name} [ ${homeScore} - ${awayScore} ]`;
+    } else {
+      if (match.homeGoals === match.awayGoals) {
+        if (homeExtraGoals === awayExtraGoals) {
+          return `${match.homeTeam.name} [ ${
+            match.awayGoals + awayExtraGoals
+          } - ${
+            match.homeGoals + homeExtraGoals
+          } ] (After Penalties: ${awayPenalty} - ${homePenalty})`;
+        } else {
+          return `${match.homeTeam.name} [ ${awayScore} - ${homeScore} ] (After Extra Time)`;
+        }
+      }
+
+      return `${match.homeTeam.name} [ ${awayScore} - ${homeScore} ]`;
+    }
+  }
+
+  if (!tournamentEdition) throw new Error("Something went wrong");
 
   return (
     <>
-      {tournament && (
-        <div>
-          <PageHeader label={`${tournament.name} History`} />
-          <div>
-            {tournament?.tournamentEditions &&
-              tournament?.tournamentEditions.length > 0 &&
-              tournament?.tournamentEditions.map((edition) => (
-                <div
-                  key={edition.id}
-                  className='flex py-4 gap-4 border-b border-primary/10 last:border-0'
-                >
-                  {edition.logoUrl && (
-                    <Image
-                      width={100}
-                      height={80}
-                      src={edition.logoUrl}
-                      alt=''
-                    />
-                  )}
-                  <div className='flex flex-col gap-2'>
-                    <Badge variant='outline' className='text-[16px] max-w-fit'>
-                      {edition.year}
-                    </Badge>
-                    <div className='grid gap-2 grid-cols-[80px_1fr] grid-row-2'>
-                      <span className='text-sm col-start-1 row-start-1 self-center'>
-                        Hosted by
-                      </span>
-                      <div className='col-start-2 row-start-1 flex flex-wrap gap-2'>
-                        {edition.hostingCountries.map((country) => (
-                          <Badge
-                            key={country.id}
-                            variant='secondary'
-                            className='flex gap-2 items-center '
-                          >
-                            {country.flagUrl && (
-                              <Image
-                                width={25}
-                                height={25}
-                                src={country.flagUrl}
-                                alt=''
-                              />
-                            )}
-                            <span>{country.name}</span>
-                          </Badge>
-                        ))}
-                      </div>
-                      <span className='text-sm col-start-1 row-start-2  self-center'>
-                        Winner
-                      </span>
-                      {edition.winner && (
-                        <Badge
-                          variant='green'
-                          className='flex gap-2 items-center col-start-2 row-start-2 max-w-fit'
-                        >
-                          {edition.winner.flagUrl && (
-                            <Image
-                              width={25}
-                              height={25}
-                              src={edition.winner.flagUrl}
-                              alt=''
-                            />
-                          )}
-                          <span>{edition.winner.name}</span>
-                        </Badge>
-                      )}
+      <PageHeader label={`${tournamentEdition.tournament.name} History`} />
+      {matches.length > 0 &&
+        matches.map((match) => (
+          <div
+            key={match.id}
+            className='flex items-end py-4 gap-4 border-b border-primary/10 last:border-0'
+          >
+            {match.tournamentEdition.logoUrl && (
+              <Image
+                width={125}
+                height={125}
+                src={match.tournamentEdition.logoUrl}
+                alt={`${match.tournamentEdition.tournament.name} ${match.tournamentEdition.year} Logo`}
+                className='hidden sm:block'
+              />
+            )}
+            <div className='flex flex-col gap-2 flex-1'>
+              <Badge variant='outline' className='text-[16px] sm:text-lg w-fit'>
+                {match.tournamentEdition.year}
+              </Badge>
+              <div className='grid grid-cols-[100px_1fr] grid-rows-2 gap-2 items-center'>
+                <span className='col-start-1 row-start-1 text-sm sm:text-[16px]'>
+                  Hosted by
+                </span>
+                <div className='col-start-2 row-start-1 flex flex-wrap gap-2'>
+                  {match.tournamentEdition.hostingCountries.map((country) => (
+                    <div className='flex items-center gap-2'>
+                      <Badge
+                        key={country.id}
+                        variant='secondary'
+                        className='flex gap-2 items-center text-[16px] sm:text-lg'
+                      >
+                        {country.flagUrl && (
+                          <Image
+                            width={30}
+                            height={30}
+                            src={country.flagUrl}
+                            alt={country.name + " Flag"}
+                            className='w-6 sm:w-8 h-6 sm:h-8'
+                          />
+                        )}
+                        {country.name}
+                      </Badge>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+                <span className='col-start-1 row-start-2 text-sm sm:text-[16px]'>
+                  Winner
+                </span>
+                <div className='col-start-2 row-start-2 flex gap-2 items-center justify-start'>
+                  {match.tournamentEdition.winner && (
+                    <div className='flex flex-col xs:flex-row gap-2'>
+                      <Badge
+                        variant='green'
+                        className='flex gap-2 items-center text-[16px] sm:text-lg'
+                      >
+                        {match.tournamentEdition.winner.flagUrl && (
+                          <Image
+                            width={30}
+                            height={30}
+                            src={match.tournamentEdition.winner.flagUrl}
+                            alt={match.tournamentEdition.winner.name + " Flag"}
+                            className='w-6 sm:w-8 h-6 sm:h-8'
+                          />
+                        )}
+                        {match.tournamentEdition.winner.name}
+                      </Badge>
+                      <Badge
+                        variant='outline'
+                        className='border-0 text-[12px] sm:text-sm text-ring'
+                      >
+                        {getScore(match)}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        ))}
     </>
   );
 }

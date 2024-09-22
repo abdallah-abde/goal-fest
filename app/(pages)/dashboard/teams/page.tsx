@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionValues } from "@/typings/sortValues";
+import { SortDirectionValues } from "@/types/sortValues";
 
 import {
   Table,

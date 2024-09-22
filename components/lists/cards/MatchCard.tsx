@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-import { NeutralMatch } from "@/typings";
+import { NeutralMatch } from "@/types";
 
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { Team } from "@prisma/client";

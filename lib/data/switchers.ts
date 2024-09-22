@@ -1,4 +1,4 @@
-import { NeutralMatch } from "@/typings";
+import { NeutralMatch } from "@/types";
 import {
   Group,
   KnockoutMatch,

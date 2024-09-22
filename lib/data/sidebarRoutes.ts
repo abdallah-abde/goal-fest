@@ -5,6 +5,7 @@ import {
   HomeIcon,
   TrophyIcon,
   SquareStackIcon,
+  BarChartIcon,
 } from "lucide-react";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 
@@ -46,6 +47,12 @@ export function getSidebarRoutes(params: Params) {
       label: "Title Holders",
       href: `/tournaments/${id}/editions/${editionId}/title-holders`,
       Icon: TrophyIcon,
+    },
+    {
+      id: 7,
+      label: "Stats",
+      href: `/tournaments/${id}/editions/${editionId}/stats`,
+      Icon: BarChartIcon,
     },
   ];
 }

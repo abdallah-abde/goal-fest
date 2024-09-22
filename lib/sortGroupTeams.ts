@@ -1,4 +1,4 @@
-import { TeamWithStats } from "@/typings";
+import { TeamWithStats } from "@/types";
 
 export function sortGroupTeams(a: TeamWithStats, b: TeamWithStats) {
   if (a.stats.points > b.stats.points) {

@@ -1,40 +1,36 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
-import { TournamentEdition, Tournament } from "@prisma/client";
+import { Tournament } from "@prisma/client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
-}
-
-export default function EditionsCards({
-  tournamentEditions,
+export default function TournamentsCards({
+  tournaments,
 }: {
-  tournamentEditions: TournamentEditionProps[];
+  tournaments: Tournament[];
 }) {
   return (
     <div className='h-screen flex flex-col md:flex-wrap md:flex-row gap-4 py-24'>
-      {tournamentEditions.length > 0 ? (
-        tournamentEditions.map(({ id, year, logoUrl, tournament }) => (
+      {tournaments.length > 0 ? (
+        tournaments.map(({ id, name, logoUrl }) => (
           <div key={id} className='md:overflow-auto last:pb-24'>
-            <Link href={`/tournaments/${tournament.id}/editions/${id}/info`}>
+            <Link href={`/tournaments/${id}`}>
               <Card className='bg-primary/5 text-secondary-foreground hover:shadow-lg transition duration-200 p-4 pt-0'>
                 <CardHeader>
-                  <CardTitle className='mx-auto text-xl'>
-                    {`${tournament.name} ${year.toString()}`}{" "}
-                  </CardTitle>
+                  <CardTitle className='mx-auto text-xl'>{name}</CardTitle>
                 </CardHeader>
                 {logoUrl && (
                   <CardContent className='mx-auto h-[150px] w-[150px] relative'>
                     <Image
                       src={logoUrl}
                       fill
-                      alt={`${tournament.name} ${year.toString()} Logo`}
-                      className='mx-auto object-contain '
+                      alt={`${name} Logo`}
+                      className='mx-auto object-contain'
                     />
                   </CardContent>
                 )}
@@ -43,7 +39,7 @@ export default function EditionsCards({
           </div>
         ))
       ) : (
-        <NoDataFoundComponent message='Sorry, No Tournament Editions Found' />
+        <NoDataFoundComponent message='Sorry, No Tournaments Found' />
       )}
     </div>
   );

@@ -241,3 +241,33 @@ export function FormSkeleton() {
     </>
   );
 }
+
+export function HistorySkeleton() {
+  return (
+    <>
+      <Skeleton className='h-[40px] w-full rounded-md bg-primary/20 mb-6 flex items-center justify-center'>
+        <Skeleton className='h-[25px] w-[60px]' />
+      </Skeleton>
+      <div className='w-full space-y-4'>
+        {Array.from({ length: 2 }).map((a, _) => (
+          <div key={_} className='flex items-end gap-2 '>
+            <div className='hidden sm:block'>
+              <Skeleton className='w-[90px] h-[120px] bg-primary/20' />
+            </div>
+            <div className='flex flex-col gap-2 '>
+              {Array.from({ length: 3 }).map((a, _) => (
+                <Skeleton key={_} className='w-[80px] h-[25px] bg-primary/20' />
+              ))}
+            </div>
+            <div className='flex flex-col gap-2 '>
+              {Array.from({ length: 2 }).map((a, _) => (
+                <Skeleton key={_} className='w-[80px] h-[25px] bg-primary/20' />
+              ))}
+            </div>
+            <Skeleton className='hidden xs:block w-[80px] h-[25px] bg-primary/20' />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

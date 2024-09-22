@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { ArrowDownAZ, ArrowDownZA, ArrowDownUp } from "lucide-react";
 
-import { SortDirectionValues } from "@/typings/sortValues";
+import { SortDirectionValues } from "@/types/sortValues";
 
 export default function SortComponent({
   label = "Name",

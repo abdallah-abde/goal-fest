@@ -1,6 +1,6 @@
 "use client";
 
-import { KnockoutMatch } from "@/typings";
+import { KnockoutMatch } from "@/types";
 import { FC } from "react";
 import {
   Bracket,

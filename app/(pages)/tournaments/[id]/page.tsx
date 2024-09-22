@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 
-import EditionsCards from "@/components/lists/EditionsCards";
+import EditionsCards from "@/components/lists/cards/EditionsCards";
 
 export default async function EditionsPage({
   params,
