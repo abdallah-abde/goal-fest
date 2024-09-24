@@ -30,6 +30,8 @@ export default async function EditionPage({
         winner: true,
         titleHolder: true,
         hostingCountries: true,
+        matches: true,
+        knockoutMatches: true,
       },
     }),
     await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(

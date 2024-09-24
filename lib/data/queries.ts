@@ -6,6 +6,7 @@ export function getTeamsGoalsScored(
 SELECT 
   t.id AS teamId,
   t.name AS teamName,
+  t.code AS teamCode,
   t.flagUrl AS teamFlagUrl,
 
   -- Sum of goals scored in regular matches for the specific tournament edition
@@ -66,6 +67,7 @@ export function getTeamsGoalsAgainst(
 SELECT 
   t.id AS teamId,
   t.name AS teamName,
+  t.code AS teamCode,
   t.flagUrl AS teamFlagUrl,
 
   -- Sum of goals against in regular matches for the specific tournament edition
@@ -126,6 +128,7 @@ export function getTeamsCleanSheets(
 SELECT 
   t.id AS teamId,
   t.name AS teamName,
+  t.code AS teamCode,
   t.flagUrl AS teamFlagUrl,
 
   -- Sum of clean sheets in regular matches for the specific tournament edition

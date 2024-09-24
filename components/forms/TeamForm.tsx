@@ -51,7 +51,7 @@ export default function TeamForm({ team }: { team?: Team | null }) {
         <FormField>
           <Label htmlFor='flagUrl'>Flag</Label>
           <Input type='file' id='flagUrl' name='flagUrl' />
-          {team != null && team?.flagUrl != "" && (
+          {team != null && team?.flagUrl && (
             <div className='current-flag-wrapper'>
               <Label>Current Flag</Label>
               <Image

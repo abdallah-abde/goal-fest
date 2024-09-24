@@ -51,7 +51,7 @@ export default function CountryForm({ country }: { country?: Country | null }) {
         <FormField>
           <Label htmlFor='flagUrl'>Flag</Label>
           <Input type='file' id='flagUrl' name='flagUrl' />
-          {country != null && country?.flagUrl != "" && (
+          {country != null && country?.flagUrl && (
             <div className='current-flag-wrapper'>
               <Label>Current Flag</Label>
               <Image

@@ -46,7 +46,7 @@ export default function TournamentForm({
         <FormField>
           <Label htmlFor='logoUrl'>Logo</Label>
           <Input type='file' id='logoUrl' name='logoUrl' />
-          {tournament != null && tournament?.logoUrl != "" && (
+          {tournament != null && tournament?.logoUrl && (
             <div className='current-flag-wrapper'>
               <Image
                 src={tournament?.logoUrl || ""}

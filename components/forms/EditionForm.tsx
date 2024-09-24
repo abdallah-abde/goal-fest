@@ -173,7 +173,7 @@ export default function EditionForm({
         <FormField>
           <Label htmlFor='logoUrl'>Logo</Label>
           <Input type='file' id='logoUrl' name='logoUrl' />
-          {tournamentEdition != null && tournamentEdition?.logoUrl != "" && (
+          {tournamentEdition != null && tournamentEdition?.logoUrl && (
             <div className='current-flag-wrapper'>
               <Label>Current Logo</Label>
               <Image

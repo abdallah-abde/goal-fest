@@ -11,9 +11,9 @@ export default function TotalCleanSheetsCard({
   label: string;
 }) {
   return (
-    <Card className='flex-1 min-w-80 bg-primary/10 text-primary'>
-      <CardHeader className='p-3 text-center'>
-        <CardTitle className='text-lg'>{label}</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle className='text-[16px] text-center'>{label}</CardTitle>
       </CardHeader>
       <CardContent>
         {teamsCleanSheets.map((team) => (
@@ -22,15 +22,20 @@ export default function TotalCleanSheetsCard({
             className='flex justify-between border-b border-primary/10 py-2 last:border-0'
           >
             <div className='flex gap-4 items-center'>
-              <Image
-                src={team.teamFlagUrl}
-                alt={team.teamName}
-                width={25}
-                height={25}
-              />
-              <span>{team.teamName}</span>
+              {team.teamFlagUrl && (
+                <Image
+                  src={team.teamFlagUrl}
+                  alt={team.teamName}
+                  width={25}
+                  height={25}
+                />
+              )}
+              <span className='hidden sm:block font-bold'>{team.teamName}</span>
+              <span className='hidden max-sm:block font-bold'>
+                {team.teamCode}
+              </span>
             </div>
-            <Badge variant='outline' className='text-sm'>
+            <Badge variant='secondary' className='text-sm'>
               {(
                 team.groupMatchCleanSheets + team.knockoutMatchCleanSheets
               ).toString()}
