@@ -13,11 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import PageHeader from "@/components/PageHeader";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/table-parts/SortComponent";
-import PageHeader from "@/components/PageHeader";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
@@ -50,28 +50,28 @@ export default async function DashboardTournamentsPage({
 
   return (
     <>
-      <PageHeader label='Tournaments List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Tournaments List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/tournaments/new'
-          label='Add New Tournament'
+          href="/dashboard/tournaments/new"
+          label="Add New Tournament"
         />
       </div>
       {tournaments.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='name' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="name" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tournaments.map(({ id, name }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/tournaments/${id}`}
                 />
@@ -81,7 +81,7 @@ export default async function DashboardTournamentsPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={2} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Tournaments Found' />
+        <NoDataFoundComponent message="No Tournaments Found" />
       )}
     </>
   );

@@ -1,12 +1,15 @@
 import prisma from "@/lib/db";
-import EditionInfo from "@/components/lists/cards/EditionInfo";
+import { Prisma } from "@prisma/client";
+
+import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
+
+import EditionInfo from "@/components/lists/cards/edition-info-cards/EditionInfoCards";
+
 import {
   getTeamsGoalsAgainst,
   getTeamsGoalsScored,
   getTeamsCleanSheets,
 } from "@/lib/data/queries";
-import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
-import { Prisma } from "@prisma/client";
 
 export default async function EditionPage({
   params,
@@ -30,8 +33,21 @@ export default async function EditionPage({
         winner: true,
         titleHolder: true,
         hostingCountries: true,
-        matches: true,
-        knockoutMatches: true,
+        matches: {
+          include: {
+            awayTeam: true,
+            group: true,
+            homeTeam: true,
+            tournamentEdition: true,
+          },
+        },
+        knockoutMatches: {
+          include: {
+            awayTeam: true,
+            homeTeam: true,
+            tournamentEdition: true,
+          },
+        },
       },
     }),
     await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(

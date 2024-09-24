@@ -1,1 +1,1 @@
-export const PAGE_RECORDS_COUNT = 5;
+export const PAGE_RECORDS_COUNT = 10;

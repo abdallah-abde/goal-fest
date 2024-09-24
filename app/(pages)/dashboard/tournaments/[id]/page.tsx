@@ -1,5 +1,6 @@
-import TournamentForm from "@/components/forms/TournamentForm";
 import prisma from "@/lib/db";
+
+import TournamentForm from "@/components/forms/TournamentForm";
 
 export default async function EditTournamentPage({
   params: { id },

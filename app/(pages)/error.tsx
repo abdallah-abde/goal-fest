@@ -1,6 +1,7 @@
 "use client"; // Error components must be Client Components
 
 import { useEffect } from "react";
+
 import { CircleX } from "lucide-react";
 
 export default function Error({
@@ -16,9 +17,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className='h-screen w-full flex flex-col items-center justify-center gap-y-4 text-destructive'>
-      <CircleX className='font-bold text-2xl size-28' />
-      <p className='font-bold text-2xl'>Something went wrong!!</p>
+    <div className="h-screen w-full flex flex-col items-center justify-center gap-y-4 text-destructive">
+      <CircleX className="font-bold text-2xl size-28" />
+      <p className="font-bold text-2xl">Something went wrong!!</p>
       {/* <button
         onClick={
           // Attempt to recover by trying to re-render the segment

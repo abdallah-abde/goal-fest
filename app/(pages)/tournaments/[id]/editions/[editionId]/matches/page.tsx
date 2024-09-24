@@ -1,12 +1,19 @@
 import prisma from "@/lib/db";
-import MatchesCards from "@/components/lists/cards/MatchesCards";
+
+import MatchesCards from "@/components/lists/cards/matches/MatchesCards";
 
 export default async function MatchesPage({
   params,
 }: {
   params: { editionId: string; id: string };
 }) {
-  const [matches, knockoutMatches] = await Promise.all([
+  const [tournamentEdition, matches, knockoutMatches] = await Promise.all([
+    prisma.tournamentEdition.findUnique({
+      where: { id: +params.editionId },
+      include: {
+        tournament: true,
+      },
+    }),
     prisma.match.findMany({
       where: {
         tournamentEditionId: +params.editionId,
@@ -36,5 +43,11 @@ export default async function MatchesPage({
     }),
   ]);
 
-  return <MatchesCards matches={matches} knockoutMatches={knockoutMatches} />;
+  return (
+    <MatchesCards
+      tournamentEdition={tournamentEdition}
+      matches={matches}
+      knockoutMatches={knockoutMatches}
+    />
+  );
 }

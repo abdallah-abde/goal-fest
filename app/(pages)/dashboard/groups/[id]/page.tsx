@@ -1,5 +1,6 @@
-import GroupForm from "@/components/forms/GroupForm";
 import prisma from "@/lib/db";
+
+import GroupForm from "@/components/forms/GroupForm";
 
 export default async function EditGroupPage({
   params: { id },
@@ -23,5 +24,5 @@ export default async function EditGroupPage({
 
   if (!group) throw new Error("Something went wrong");
 
-  return <GroupForm tournaments={tournaments} teams={teams} group={group} />;
+  return <GroupForm tournaments={tournaments} group={group} />;
 }

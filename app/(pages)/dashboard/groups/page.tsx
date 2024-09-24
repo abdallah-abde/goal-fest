@@ -13,11 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import PageHeader from "@/components/PageHeader";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/table-parts/SortComponent";
-import PageHeader from "@/components/PageHeader";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
@@ -115,40 +115,40 @@ export default async function DashboardGroupsPage({
 
   return (
     <>
-      <PageHeader label='Groups List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Groups List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/groups/new'
-          label='Add New Group'
+          href="/dashboard/groups/new"
+          label="Add New Group"
         />
       </div>
       {groups.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='tournament' label='Tournament' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="tournament" label="Tournament" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='edition' label='Edition' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="edition" label="Edition" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent label='Name' fieldName='name' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Name" fieldName="name" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groups.map(({ id, name, tournamentEdition }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">
                   {tournamentEdition.tournament.name}
                 </TableCell>
-                <TableCell className='dashboard-table-cell'>
+                <TableCell className="dashboard-table-cell">
                   {tournamentEdition.year.toString()}
                 </TableCell>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/groups/${id}`} />
               </TableRow>
             ))}
@@ -156,7 +156,7 @@ export default async function DashboardGroupsPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={4} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Groups Found' />
+        <NoDataFoundComponent message="No Groups Found" />
       )}
     </>
   );

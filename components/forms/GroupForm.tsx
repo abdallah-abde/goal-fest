@@ -38,11 +38,9 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function GroupForm({
   group,
-  // teams,
   tournaments,
 }: {
   group?: GroupProps | null;
-  // teams: Team[];
   tournaments: Tournament[];
 }) {
   const [error, action] = useFormState(
@@ -141,12 +139,12 @@ export default function GroupForm({
   return (
     <>
       <PageHeader label={group ? "Edit Group" : "Add Group"} />
-      <form action={action} className='form-styles'>
+      <form action={action} className="form-styles">
         {tournaments && tournaments.length > 0 ? (
           <FormField>
-            <Label htmlFor='tournamentId'>Tournament</Label>
+            <Label htmlFor="tournamentId">Tournament</Label>
             <Select
-              name='tournamentId'
+              name="tournamentId"
               defaultValue={
                 group?.tournamentEdition.tournamentId.toString() ||
                 tournamentId ||
@@ -155,8 +153,8 @@ export default function GroupForm({
               }
               onValueChange={(value) => setTournamentId(value)}
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Tournament' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Tournament" />
               </SelectTrigger>
               <SelectContent>
                 {tournaments.map(({ id, name }) => (
@@ -170,17 +168,17 @@ export default function GroupForm({
         ) : (
           <FormFieldLoadingState
             isLoading={false}
-            label=''
-            notFoundText='There is no tournaments, add some!'
+            label=""
+            notFoundText="There is no tournaments, add some!"
           />
         )}
         {tournamentsEditions &&
         tournamentsEditions.length > 0 &&
         !isEditionsLoading ? (
           <FormField>
-            <Label htmlFor='tournamentEditionId'>Tournament Edition</Label>
+            <Label htmlFor="tournamentEditionId">Tournament Edition</Label>
             <Select
-              name='tournamentEditionId'
+              name="tournamentEditionId"
               defaultValue={
                 tournamentsEditions[0].id.toString() ||
                 group?.tournamentEditionId.toString() ||
@@ -188,8 +186,8 @@ export default function GroupForm({
               }
               onValueChange={(value) => setTournamentEditionId(value)}
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Tournament Edition' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Tournament Edition" />
               </SelectTrigger>
               <SelectContent>
                 {tournamentsEditions.map(({ id, tournament, year }) => (
@@ -204,26 +202,26 @@ export default function GroupForm({
         ) : (
           <FormFieldLoadingState
             isLoading={isEditionsLoading}
-            label='Loading Editions...'
-            notFoundText='There is no editions, add some!'
+            label="Loading Editions..."
+            notFoundText="There is no editions, add some!"
           />
         )}
         <FormField>
-          <Label htmlFor='name'>Name</Label>
+          <Label htmlFor="name">Name</Label>
           <Input
-            type='text'
-            id='name'
-            name='name'
+            type="text"
+            id="name"
+            name="name"
             defaultValue={group?.name || ""}
           />
           <FormFieldError error={error?.name} />
         </FormField>
         {editionTeams && editionTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
-            <Label htmlFor='teams'>Teams</Label>
-            <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
+            <Label htmlFor="teams">Teams</Label>
+            <Input type="hidden" id="teams" name="teams" value={hiddenTeams} />
             <MultipleSelector
-              className='form-multiple-selector-styles'
+              className="form-multiple-selector-styles"
               ref={teamsRef}
               defaultOptions={editionTeams.map(({ id, name }) => {
                 return {
@@ -241,9 +239,9 @@ export default function GroupForm({
                     .join(",")
                 );
               }}
-              placeholder='Select teams you like to add to the group'
+              placeholder="Select teams you like to add to the group"
               emptyIndicator={
-                <p className='empty-indicator'>no teams found.</p>
+                <p className="empty-indicator">no teams found.</p>
               }
               value={selectedTeams}
             />
@@ -252,8 +250,8 @@ export default function GroupForm({
         ) : (
           <FormFieldLoadingState
             isLoading={isTeamsLoading}
-            label='Loading Teams...'
-            notFoundText='There is no teams, add some!'
+            label="Loading Teams..."
+            notFoundText="There is no teams, add some!"
           />
         )}
 

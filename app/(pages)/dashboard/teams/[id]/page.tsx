@@ -1,5 +1,6 @@
-import TeamForm from "@/components/forms/TeamForm";
 import prisma from "@/lib/db";
+
+import TeamForm from "@/components/forms/TeamForm";
 
 export default async function EditTeamPage({
   params: { id },

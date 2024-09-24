@@ -1,5 +1,6 @@
-import EditionForm from "@/components/forms/EditionForm";
 import prisma from "@/lib/db";
+
+import EditionForm from "@/components/forms/EditionForm";
 
 export default async function AddEditionPage() {
   const tournaments = await prisma.tournament.findMany();

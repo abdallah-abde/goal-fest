@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "@/app/globals.css";
-import NavigationMenu from "@/components/menus/NavigationMenu";
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { SessionProvider } from "next-auth/react";
+
+import { Inter } from "next/font/google";
+
 import { auth } from "@/auth";
+
+import "@/app/globals.css";
+
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import NavigationMenu from "@/components/menus/NavigationMenu";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,24 +27,24 @@ export default async function RootLayout({
 
   return (
     <SessionProvider session={session}>
-      <html lang='en' suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
         <body className={`${inter.className} bg-secondary h-screen`}>
           <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
+            attribute="class"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <header className='fixed z-50 w-full bg-secondary'>
-              <div className='border-b-2 border-primary/50'>
+            <header className="fixed z-50 w-full bg-secondary">
+              <div className="border-b-2 border-primary/50">
                 <NavigationMenu />
               </div>
             </header>
-            <main className='mx-auto px-4 md:container'>{children}</main>
+            <main className="mx-auto px-4 md:container">{children}</main>
             <Toaster />
-            <footer className='fixed z-50 bottom-0 w-full bg-secondary'>
-              <div className='border-t-2 border-primary/50'>
-                <ul className='mx-auto px-4 md:container flex justify-between py-6'>
+            <footer className="fixed z-50 bottom-0 w-full bg-secondary">
+              <div className="border-t-2 border-primary/50">
+                <ul className="mx-auto px-4 md:container flex justify-between py-6">
                   <li>Footer</li>
                   <li>&copy;{new Date().getFullYear().toString()}</li>
                 </ul>

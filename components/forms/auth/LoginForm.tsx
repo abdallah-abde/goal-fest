@@ -73,23 +73,23 @@ export default function LoginForm() {
   }
 
   return (
-    <div className='flex flex-col w-full sm:w-[75%] md:w[60%] lg:w-[50%] border-[1px] border-primary/20 p-4 rounded-md overflow-auto'>
-      <PageHeader label='Welcome back' />
+    <div className="flex flex-col w-full sm:w-[75%] md:w[60%] lg:w-[50%] border-[1px] border-primary/20 p-4 rounded-md overflow-auto">
+      <PageHeader label="Welcome back" />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className='space-y-4 grid grid-cols-1 gap-4 mb-4'
+          className="space-y-4 grid grid-cols-1 gap-4 mb-4"
         >
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {showTwoFactor && (
               <FormField
                 control={form.control}
-                name='code'
+                name="code"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Two Factor Code</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder='123456' />
+                      <Input {...field} placeholder="123456" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -100,15 +100,15 @@ export default function LoginForm() {
               <>
                 <FormField
                   control={form.control}
-                  name='email'
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          type='email'
-                          placeholder='Enter your login email'
+                          type="email"
+                          placeholder="Enter your login email"
                         />
                       </FormControl>
                       <FormMessage />
@@ -117,15 +117,15 @@ export default function LoginForm() {
                 />
                 <FormField
                   control={form.control}
-                  name='password'
+                  name="password"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          type='password'
-                          placeholder='Enter your login password'
+                          type="password"
+                          placeholder="Enter your login password"
                         />
                       </FormControl>
 
@@ -137,21 +137,21 @@ export default function LoginForm() {
             )}
           </div>
           {success && (
-            <div className='bg-emerald-500/15 text-emerald-500 p-2 flex gap-2 items-center'>
-              <BadgeCheck className='h-6 w-6' />
+            <div className="bg-emerald-500/15 text-emerald-500 p-2 flex gap-2 items-center">
+              <BadgeCheck className="h-6 w-6" />
               <p>{success}</p>
             </div>
           )}
           {error && (
-            <div className='bg-destructive/15 text-destructive p-2 flex gap-2 items-center'>
-              <TriangleAlert className='h-6 w-6' />
+            <div className="bg-destructive/15 text-destructive p-2 flex gap-2 items-center">
+              <TriangleAlert className="h-6 w-6" />
               <p>{error}</p>
             </div>
           )}
           <Button
-            type='submit'
-            className='w-full font-bold'
-            size='lg'
+            type="submit"
+            className="w-full font-bold"
+            size="lg"
             disabled={isPending}
           >
             {showTwoFactor ? "Confirm" : "Login"}
@@ -159,19 +159,19 @@ export default function LoginForm() {
         </form>
       </Form>
       <Button onClick={onClick}>
-        <Github className='mr-2' /> Sign in with Github
+        <Github className="mr-2" /> Sign in with Github
       </Button>
 
-      <div className='text-center pt-4 px-2 flex justify-between'>
+      <div className="text-center pt-4 px-2 flex justify-between">
         <Link
-          href='/auth/register'
-          className='text-sm hover:underline text-center'
+          href="/auth/register"
+          className="text-sm hover:underline text-center"
         >
-          Don't have an account? Sign up now.
+          Don&#39;t have an account? Sign up now.
         </Link>
         <Link
-          href='/auth/reset'
-          className='text-sm hover:underline text-center'
+          href="/auth/reset"
+          className="text-sm hover:underline text-center"
         >
           Forgot Password?
         </Link>

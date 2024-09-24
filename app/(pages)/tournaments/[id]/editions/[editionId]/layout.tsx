@@ -1,5 +1,6 @@
-import Sidebar from "@/components/menus/Sidebar";
 import prisma from "@/lib/db";
+
+import Sidebar from "@/components/menus/Sidebar";
 
 export default async function EditionLayout({
   children,
@@ -14,7 +15,7 @@ export default async function EditionLayout({
   });
 
   return (
-    <div className='h-screen flex flex-col 2md:flex-row gap-4 py-24'>
+    <div className="h-screen flex flex-col 2md:flex-row gap-4 py-24">
       {tournamentEdition && (
         <Sidebar
           logoUrl={tournamentEdition?.logoUrl || null}
@@ -25,7 +26,7 @@ export default async function EditionLayout({
           }
         />
       )}
-      <div className='2md:overflow-auto grow pl-1 2md:pr-2 pb-24 2md:pb-0 mt-8 2md:mt-0'>
+      <div className="2md:overflow-auto grow pl-1 2md:pr-2 pb-24 2md:pb-0 mt-8 2md:mt-0">
         {children}
       </div>
     </div>

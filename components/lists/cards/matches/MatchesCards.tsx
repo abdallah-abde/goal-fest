@@ -6,6 +6,7 @@ import {
   Team,
   KnockoutMatch,
   TournamentEdition,
+  Tournament,
 } from "@prisma/client";
 
 import { useState } from "react";
@@ -17,7 +18,7 @@ import * as _ from "lodash";
 import { Filter } from "lucide-react";
 
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import MatchCard from "@/components/lists/cards/MatchCard";
+import MatchCard from "@/components/lists/cards/matches/MatchCard";
 import ListTitle from "@/components/lists/ListTitle";
 
 import { NeutralMatch } from "@/types";
@@ -26,6 +27,11 @@ import {
   switchGroupMatchesToNeutralMatches,
   switchKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
+import PageHeader from "@/components/PageHeader";
+
+interface TournamentEditionProps extends TournamentEdition {
+  tournament: Tournament;
+}
 
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
@@ -40,10 +46,12 @@ interface MatchProps extends Match {
   tournamentEdition: TournamentEdition;
 }
 
-export default async function MatchesCards({
+export default function MatchesCards({
+  tournamentEdition,
   matches,
   knockoutMatches,
 }: {
+  tournamentEdition: TournamentEditionProps | null;
   matches: MatchProps[];
   knockoutMatches: KnockoutMatchProps[];
 }) {
@@ -56,26 +64,29 @@ export default async function MatchesCards({
 
   return (
     <>
+      <PageHeader
+        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.yearAsString} Matches`}
+      />
       {results.length > 0 ? (
         <>
-          <div className='flex justify-end pb-2'>
+          <div className="flex justify-end pb-2">
             <Button
-              variant='outline'
+              variant="outline"
               onClick={() => {
                 setGroupBy(groupBy === "stage" ? "onlyDate" : "stage");
               }}
-              className='flex gap-2 border-2 border-secondary hover:border-primary/10'
+              className="flex gap-2 border-2 border-secondary hover:border-primary/10"
             >
               <Filter />
               Group by {groupBy === "stage" ? "Date" : "Stage"}
             </Button>
           </div>
-          <div className='flex flex-col gap-8'>
+          <div className="flex flex-col gap-8">
             {results.map(([divider, list], index) => {
               return (
-                <div key={index} className='w-full'>
+                <div key={index} className="w-full">
                   <ListTitle groupBy={groupBy} divider={divider} />
-                  <div className='w-full space-y-2'>
+                  <div className="w-full space-y-2">
                     {list.map((match: NeutralMatch) => (
                       <MatchCard key={match.dbId} match={match} />
                     ))}
@@ -86,7 +97,7 @@ export default async function MatchesCards({
           </div>
         </>
       ) : (
-        <NoDataFoundComponent message='Sorry, No Matches Found' />
+        <NoDataFoundComponent message="Sorry, No Matches Found" />
       )}
     </>
   );

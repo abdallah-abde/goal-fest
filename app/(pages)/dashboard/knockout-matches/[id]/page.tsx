@@ -1,5 +1,6 @@
-import KnockoutMatchForm from "@/components/forms/KnockoutMatchForm";
 import prisma from "@/lib/db";
+
+import KnockoutMatchForm from "@/components/forms/KnockoutMatchForm";
 
 export default async function EditKnockoutMatchPage({
   params: { id },

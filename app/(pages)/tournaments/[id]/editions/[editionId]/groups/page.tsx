@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+
 import { calculateTeamStats } from "@/lib/calculateTeamStats";
 
 import GroupsTable from "@/components/lists/tables/GroupsTables";
@@ -8,21 +9,52 @@ export default async function GroupsPage({
 }: {
   params: { editionId: string; id: string };
 }) {
-  const groups = await prisma.group.findMany({
-    where: {
-      tournamentEditionId: +params.editionId,
-      tournamentEdition: {
-        tournamentId: +params.id,
+  const [tournamentEdition, groups] = await Promise.all([
+    prisma.tournamentEdition.findUnique({
+      where: { id: +params.editionId },
+      include: {
+        tournament: true,
       },
-    },
+    }),
+    prisma.group.findMany({
+      where: {
+        tournamentEditionId: +params.editionId,
+        tournamentEdition: {
+          tournamentId: +params.id,
+        },
+      },
 
-    select: {
-      id: true,
-      name: true,
-      tournamentEditionId: true,
-      teams: true,
-    },
-  });
+      select: {
+        id: true,
+        name: true,
+        tournamentEditionId: true,
+        teams: true,
+      },
+    }),
+  ]);
+
+  // const tournamentEdition = await prisma.tournamentEdition.findUnique({
+  //   where: { id: +params.editionId },
+  //   include: {
+  //     tournament: true,
+  //   },
+  // });
+
+  // const groups = await prisma.group.findMany({
+  //   where: {
+  //     tournamentEditionId: +params.editionId,
+  //     tournamentEdition: {
+  //       tournamentId: +params.id,
+  //     },
+  //   },
+
+  //   select: {
+  //     id: true,
+  //     name: true,
+  //     tournamentEditionId: true,
+  //     teams: true,
+  //   },
+  // });
 
   const groupsWithTeams = await Promise.all(
     groups.map(async (group) => ({
@@ -40,5 +72,10 @@ export default async function GroupsPage({
   //   setTimeout(() => {}, 300);
   // });
 
-  return <GroupsTable groupsWithTeams={groupsWithTeams} />;
+  return (
+    <GroupsTable
+      tournamentEdition={tournamentEdition}
+      groupsWithTeams={groupsWithTeams}
+    />
+  );
 }

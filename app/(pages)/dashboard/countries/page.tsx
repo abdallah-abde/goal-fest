@@ -13,11 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import PageHeader from "@/components/PageHeader";
+import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SortComponent from "@/components/table-parts/SortComponent";
-import PageHeader from "@/components/PageHeader";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
@@ -69,32 +69,32 @@ export default async function DashboardCountriesPage({
 
   return (
     <>
-      <PageHeader label='Countries List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Countries List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/countries/new'
-          label='Add New Country'
+          href="/dashboard/countries/new"
+          label="Add New Country"
         />
       </div>
       {countries.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='name' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="name" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent label='Country Code' fieldName='code' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Country Code" fieldName="code" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {countries.map(({ id, name, code }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
-                <TableCell className='dashboard-table-cell'>{code}</TableCell>
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
+                <TableCell className="dashboard-table-cell">{code}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
               </TableRow>
             ))}
@@ -102,7 +102,7 @@ export default async function DashboardCountriesPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Countries Found' />
+        <NoDataFoundComponent message="No Countries Found" />
       )}
     </>
   );

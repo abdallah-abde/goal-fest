@@ -12,6 +12,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { paginate } from "@/lib/paginate";
 
 export default function PaginationComponent({
   totalPages,
@@ -28,13 +29,14 @@ export default function PaginationComponent({
     return `${pathname}?${params.toString()}`;
   };
 
+  const pagination = paginate(totalPages, currentPage);
+
   return (
     <Pagination>
       <PaginationContent>
-        {/* {currentPage > 1 && ( */}
         <PaginationItem>
           <Button
-            variant='ghost'
+            variant="ghost"
             asChild
             disabled={!(currentPage > 1)}
             className={
@@ -48,27 +50,31 @@ export default function PaginationComponent({
             />
           </Button>
         </PaginationItem>
-        {/* )} */}
         {totalPages > 1 &&
-          Array.from({ length: totalPages }).map((_, a) => (
-            <PaginationItem key={a + 1}>
-              <PaginationLink
-                href={createPageURL(a + 1)}
-                isActive={currentPage - 1 === a}
-                className={
-                  currentPage - 1 === a
-                    ? "bg-primary text-secondary hover:bg-primary hover:text-secondary"
-                    : "hover:bg-primary/20 hover:text-primary"
-                }
-              >
-                {a + 1}
-              </PaginationLink>
-            </PaginationItem>
+          pagination.map((page) => (
+            <>
+              {page === "..." ? (
+                <PaginationEllipsis />
+              ) : (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href={createPageURL(page)}
+                    isActive={currentPage === page}
+                    className={
+                      currentPage === page
+                        ? "bg-primary text-secondary hover:bg-primary hover:text-secondary"
+                        : "hover:bg-primary/20 hover:text-primary"
+                    }
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              )}
+            </>
           ))}
-        {/* {currentPage < totalPages && ( */}
         <PaginationItem>
           <Button
-            variant='ghost'
+            variant="ghost"
             asChild
             disabled={!(currentPage < totalPages)}
             className={

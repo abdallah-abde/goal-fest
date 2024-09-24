@@ -1,15 +1,16 @@
-import TotalCleanSheetsCard from "@/components/lists/cards/TotalCleanSheetsCards";
-import TotalGoalsCard from "@/components/lists/cards/TotalGoalsCard";
+import prisma from "@/lib/db";
+import { Prisma } from "@prisma/client";
+
+import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
+
 import PageHeader from "@/components/PageHeader";
+import TeamsStats from "@/components/lists/cards/stats/TeamsStats";
+
 import {
   getTeamsCleanSheets,
   getTeamsGoalsAgainst,
   getTeamsGoalsScored,
 } from "@/lib/data/queries";
-
-import prisma from "@/lib/db";
-import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
-import { Prisma } from "@prisma/client";
 
 export default async function StatsPage({
   params,
@@ -54,30 +55,11 @@ export default async function StatsPage({
         label={`${tournamentEdition.tournament.name} ${tournamentEdition.yearAsString} Statistics`}
       />
 
-      {(teamsGoalsScored.length > 0 ||
-        teamsGoalsAgainst.length > 0 ||
-        teamsCleanSheets.length > 0) && (
-        <div className='flex flex-wrap gap-2 justify-between'>
-          {teamsGoalsScored && (
-            <TotalGoalsCard
-              label='Most goals scored'
-              teamsGoals={teamsGoalsScored}
-            />
-          )}
-          {teamsGoalsAgainst && (
-            <TotalGoalsCard
-              label='Most goals conceded'
-              teamsGoals={teamsGoalsAgainst}
-            />
-          )}
-          {teamsCleanSheets && (
-            <TotalCleanSheetsCard
-              label='Most clean sheets'
-              teamsCleanSheets={teamsCleanSheets}
-            />
-          )}
-        </div>
-      )}
+      <TeamsStats
+        teamsGoalsScored={teamsGoalsScored}
+        teamsGoalsAgainst={teamsGoalsAgainst}
+        teamsCleanSheets={teamsCleanSheets}
+      />
     </>
   );
 }

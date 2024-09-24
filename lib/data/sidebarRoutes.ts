@@ -38,21 +38,21 @@ export function getSidebarRoutes(params: Params) {
     },
     {
       id: 5,
+      label: "Stats",
+      href: `/tournaments/${id}/editions/${editionId}/stats`,
+      Icon: BarChartIcon,
+    },
+    {
+      id: 6,
       label: "History",
       href: `/tournaments/${id}/editions/${editionId}/history`,
       Icon: SquareStackIcon,
     },
     {
-      id: 6,
+      id: 7,
       label: "Title Holders",
       href: `/tournaments/${id}/editions/${editionId}/title-holders`,
       Icon: TrophyIcon,
-    },
-    {
-      id: 7,
-      label: "Stats",
-      href: `/tournaments/${id}/editions/${editionId}/stats`,
-      Icon: BarChartIcon,
     },
   ];
 }

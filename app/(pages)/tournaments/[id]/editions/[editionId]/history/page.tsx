@@ -1,8 +1,10 @@
-import PageHeader from "@/components/PageHeader";
-import { Badge } from "@/components/ui/badge";
 import prisma from "@/lib/db";
-import { KnockoutMatch, Match } from "@prisma/client";
+
 import Image from "next/image";
+
+import { Badge } from "@/components/ui/badge";
+
+import PageHeader from "@/components/PageHeader";
 
 export default async function HistoryPage({
   params,
@@ -102,7 +104,7 @@ export default async function HistoryPage({
         matches.map((match) => (
           <div
             key={match.id}
-            className='flex items-end py-4 gap-4 border-b border-primary/10 last:border-0'
+            className="flex items-end py-4 gap-4 border-b border-primary/10 last:border-0"
           >
             {match.tournamentEdition.logoUrl && (
               <Image
@@ -110,24 +112,24 @@ export default async function HistoryPage({
                 height={125}
                 src={match.tournamentEdition.logoUrl}
                 alt={`${match.tournamentEdition.tournament.name} ${match.tournamentEdition.year} Logo`}
-                className='hidden sm:block'
+                className="hidden sm:block"
               />
             )}
-            <div className='flex flex-col gap-2 flex-1'>
-              <Badge variant='outline' className='text-[16px] sm:text-lg w-fit'>
+            <div className="flex flex-col gap-2 flex-1">
+              <Badge variant="outline" className="text-[16px] sm:text-lg w-fit">
                 {match.tournamentEdition.year}
               </Badge>
-              <div className='grid grid-cols-[100px_1fr] grid-rows-2 gap-2 items-center'>
-                <span className='col-start-1 row-start-1 text-sm sm:text-[16px]'>
+              <div className="grid grid-cols-[100px_1fr] grid-rows-2 gap-2 items-center">
+                <span className="col-start-1 row-start-1 text-sm sm:text-[16px]">
                   Hosted by
                 </span>
-                <div className='col-start-2 row-start-1 flex flex-wrap gap-2'>
+                <div className="col-start-2 row-start-1 flex flex-wrap gap-2">
                   {match.tournamentEdition.hostingCountries.map((country) => (
-                    <div className='flex items-center gap-2'>
+                    <div key={country.id} className="flex items-center gap-2">
                       <Badge
                         key={country.id}
-                        variant='secondary'
-                        className='flex gap-2 items-center text-[16px] sm:text-lg'
+                        variant="secondary"
+                        className="flex gap-2 items-center text-[16px] sm:text-lg"
                       >
                         {country.flagUrl && (
                           <Image
@@ -135,7 +137,7 @@ export default async function HistoryPage({
                             height={30}
                             src={country.flagUrl}
                             alt={country.name + " Flag"}
-                            className='w-6 sm:w-8 h-6 sm:h-8'
+                            className="w-6 sm:w-8 h-6 sm:h-8"
                           />
                         )}
                         {country.name}
@@ -143,15 +145,15 @@ export default async function HistoryPage({
                     </div>
                   ))}
                 </div>
-                <span className='col-start-1 row-start-2 text-sm sm:text-[16px]'>
+                <span className="col-start-1 row-start-2 text-sm sm:text-[16px]">
                   Winner
                 </span>
-                <div className='col-start-2 row-start-2 flex gap-2 items-center justify-start'>
+                <div className="col-start-2 row-start-2 flex gap-2 items-center justify-start">
                   {match.tournamentEdition.winner && (
-                    <div className='flex flex-col xs:flex-row gap-2'>
+                    <div className="flex flex-col xs:flex-row gap-2">
                       <Badge
-                        variant='green'
-                        className='flex gap-2 items-center text-[16px] sm:text-lg'
+                        variant="green"
+                        className="flex gap-2 items-center text-[16px] sm:text-lg"
                       >
                         {match.tournamentEdition.winner.flagUrl && (
                           <Image
@@ -159,14 +161,14 @@ export default async function HistoryPage({
                             height={30}
                             src={match.tournamentEdition.winner.flagUrl}
                             alt={match.tournamentEdition.winner.name + " Flag"}
-                            className='w-6 sm:w-8 h-6 sm:h-8'
+                            className="w-6 sm:w-8 h-6 sm:h-8"
                           />
                         )}
                         {match.tournamentEdition.winner.name}
                       </Badge>
                       <Badge
-                        variant='outline'
-                        className='border-0 text-[12px] sm:text-sm text-ring'
+                        variant="outline"
+                        className="border-0 text-[12px] sm:text-sm text-ring"
                       >
                         {getScore(match)}
                       </Badge>

@@ -11,7 +11,7 @@ import {
   SeedItem,
   Seed,
 } from "react-brackets";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import * as _ from "lodash";
 
@@ -67,7 +67,7 @@ const KnockoutBrackets: FC<Props> = ({ matches }) => {
 
   return (
     <div>
-      <h2 className='text-center pb-4 font-bold'>Knockout Phase</h2>
+      <h2 className="text-center pb-4 font-bold">Knockout Phase</h2>
       <Bracket rounds={rounds} renderSeedComponent={SeedComponent} />
     </div>
   );
@@ -80,7 +80,7 @@ const SeedComponent = ({ seed }: IRenderSeedProps) => {
         {addSeedTeam(seed.teams[0])}
         {addSeedTeam(seed.teams[1])}
       </SeedItem>
-      <p className='pt-[2px] text-xs'>
+      <p className="pt-[2px] text-xs">
         {seed.date ? seed.date : "No Date Provided"}
       </p>
     </Seed>
@@ -90,7 +90,7 @@ const SeedComponent = ({ seed }: IRenderSeedProps) => {
 const addSeedTeam = (team: { [key: string]: any; name?: string }) => {
   return (
     <SeedTeam>
-      <div className='flex gap-2 items-center justify-center'>
+      <div className="flex gap-2 items-center justify-center">
         {team.flagUrl && (
           <Image
             src={`/teams/${team.flagUrl}`}
@@ -99,15 +99,15 @@ const addSeedTeam = (team: { [key: string]: any; name?: string }) => {
             alt={`${team.name} flag`}
           />
         )}
-        <p className='text-xs'>{team.name}</p>
+        <p className="text-xs">{team.name}</p>
       </div>
-      <div className='flex items-center justify-center gap-2'>
-        {team.goals && <p className='text-xs'>{`(${team.goals})`}</p>}
+      <div className="flex items-center justify-center gap-2">
+        {team.goals && <p className="text-xs">{`(${team.goals})`}</p>}
         {team.extraGoals && (
-          <p className='text-xs'>{`Ex(${team.extraGoals + team.goals})`}</p>
+          <p className="text-xs">{`Ex(${team.extraGoals + team.goals})`}</p>
         )}
         {team.penaltyGoals && (
-          <p className='text-xs'>{`P(${team.penaltyGoals})`}</p>
+          <p className="text-xs">{`P(${team.penaltyGoals})`}</p>
         )}
       </div>
     </SeedTeam>
