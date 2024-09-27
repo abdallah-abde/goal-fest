@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionValues } from "@/types/sortValues";
+import { SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -27,13 +27,13 @@ export default async function DashboardTournamentsPage({
   searchParams: {
     page?: string;
     query?: string;
-    sortDir?: SortDirectionValues;
+    sortDir?: SortDirectionOptions;
     sortField?: String;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
+  const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   // const sortField = searchParams?.sortField || "name";
 
   const totalTournamentsCount = await prisma.tournament.count({
@@ -50,28 +50,28 @@ export default async function DashboardTournamentsPage({
 
   return (
     <>
-      <PageHeader label="Tournaments List" />
-      <div className="dashboard-search-and-add">
+      <PageHeader label='Tournaments List' />
+      <div className='dashboard-search-and-add'>
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href="/dashboard/tournaments/new"
-          label="Add New Tournament"
+          href='/dashboard/tournaments/new'
+          label='Add New Tournament'
         />
       </div>
       {tournaments.length > 0 ? (
-        <Table className="dashboard-table">
+        <Table className='dashboard-table'>
           <TableHeader>
-            <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
+            <TableRow className='dashboard-head-table-row'>
+              <TableHead className='dashboard-head-table-cell'>
+                <SortComponent fieldName='name' />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {tournaments.map(({ id, name }) => (
-              <TableRow key={id} className="dashboard-table-row">
-                <TableCell className="dashboard-table-cell">{name}</TableCell>
+              <TableRow key={id} className='dashboard-table-row'>
+                <TableCell className='dashboard-table-cell'>{name}</TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/tournaments/${id}`}
                 />
@@ -81,7 +81,7 @@ export default async function DashboardTournamentsPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={2} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Tournaments Found" />
+        <NoDataFoundComponent message='No Tournaments Found' />
       )}
     </>
   );

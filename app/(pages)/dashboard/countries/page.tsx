@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionValues } from "@/types/sortValues";
+import { SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -27,13 +27,13 @@ export default async function DashboardCountriesPage({
   searchParams: {
     page?: string;
     query?: string;
-    sortDir?: SortDirectionValues;
+    sortDir?: SortDirectionOptions;
     sortField?: String;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
+  const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
 
   const totalCountriesCount = await prisma.country.count({
@@ -69,32 +69,32 @@ export default async function DashboardCountriesPage({
 
   return (
     <>
-      <PageHeader label="Countries List" />
-      <div className="dashboard-search-and-add">
+      <PageHeader label='Countries List' />
+      <div className='dashboard-search-and-add'>
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href="/dashboard/countries/new"
-          label="Add New Country"
+          href='/dashboard/countries/new'
+          label='Add New Country'
         />
       </div>
       {countries.length > 0 ? (
-        <Table className="dashboard-table">
+        <Table className='dashboard-table'>
           <TableHeader>
-            <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
+            <TableRow className='dashboard-head-table-row'>
+              <TableHead className='dashboard-head-table-cell'>
+                <SortComponent fieldName='name' />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Country Code" fieldName="code" />
+              <TableHead className='dashboard-head-table-cell'>
+                <SortComponent label='Country Code' fieldName='code' />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {countries.map(({ id, name, code }) => (
-              <TableRow key={id} className="dashboard-table-row">
-                <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{code}</TableCell>
+              <TableRow key={id} className='dashboard-table-row'>
+                <TableCell className='dashboard-table-cell'>{name}</TableCell>
+                <TableCell className='dashboard-table-cell'>{code}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
               </TableRow>
             ))}
@@ -102,7 +102,7 @@ export default async function DashboardCountriesPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Countries Found" />
+        <NoDataFoundComponent message='No Countries Found' />
       )}
     </>
   );

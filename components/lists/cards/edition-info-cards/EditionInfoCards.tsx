@@ -16,7 +16,6 @@ import {
 import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
 import { NeutralMatch } from "@/types";
 
-import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import PageHeader from "@/components/PageHeader";
 import CardsSectionContainer from "@/components/lists/cards/templates/CardsSectionContainer";
 import TeamsStats from "@/components/lists/cards/stats/TeamsStats";
@@ -58,14 +57,11 @@ export default function EditionInfo({
   teamsGoalsAgainst,
   teamsCleanSheets,
 }: {
-  tournamentEdition: TournamentEditionProps | null;
+  tournamentEdition: TournamentEditionProps;
   teamsGoalsScored: TotalGoalsProps[];
   teamsGoalsAgainst: TotalGoalsProps[];
   teamsCleanSheets: TotalCleanSheetsProps[];
 }) {
-  if (!tournamentEdition)
-    return <NoDataFoundComponent message="Sorry, No Info Found" />;
-
   const {
     tournament,
     yearAsString,
@@ -109,23 +105,23 @@ export default function EditionInfo({
   return (
     <>
       <PageHeader label={`${tournament.name} ${yearAsString} Information`} />
-      <div className="space-y-8">
+      <div className='space-y-8'>
         {/* INFO CARDS */}
-        <CardsSectionContainer className="*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]">
+        <CardsSectionContainer className='*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]'>
           <>
             {/* TEAMS NUMBER */}
             {teams && teams.length > 0 && (
-              <InfoCard label="Number of Teams">{teams.length}</InfoCard>
+              <InfoCard label='Number of Teams'>{teams.length}</InfoCard>
             )}
 
             {/* CURRENT STAGE */}
             {currentStage && (
-              <InfoCard label="Current Stage">{currentStage}</InfoCard>
+              <InfoCard label='Current Stage'>{currentStage}</InfoCard>
             )}
 
             {/* TITLE HOLDER */}
             {titleHolder && (
-              <InfoCard label="Title Holder" badgeClassName="justify-between">
+              <InfoCard label='Title Holder' badgeClassName='justify-between'>
                 <>
                   <span>{titleHolder?.name}</span>
                   {titleHolder?.flagUrl && (
@@ -142,7 +138,7 @@ export default function EditionInfo({
 
             {/* WINNER */}
             {winner && (
-              <InfoCard label="Winner" badgeClassName="justify-between">
+              <InfoCard label='Winner' badgeClassName='justify-between'>
                 <>
                   <span>{winner?.name}</span>
                   {winner?.flagUrl && (
@@ -162,8 +158,8 @@ export default function EditionInfo({
         {/* HOSTING COUNTRIES CARDS */}
         {hostingCountries && hostingCountries.length > 0 && (
           <CardsSectionContainer
-            label="Hosting Countries"
-            className="*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]"
+            label='Hosting Countries'
+            className='*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]'
           >
             {hostingCountries.map(({ id, name, flagUrl }) => (
               <TeamOrCountryCard
@@ -181,7 +177,7 @@ export default function EditionInfo({
 
         {/* STATISTICS CARDS */}
         <TeamsStats
-          label="Statistics"
+          label='Statistics'
           teamsGoalsScored={teamsGoalsScored}
           teamsGoalsAgainst={teamsGoalsAgainst}
           teamsCleanSheets={teamsCleanSheets}
@@ -190,8 +186,8 @@ export default function EditionInfo({
         {/* TEAMS CARDS */}
         {teams && teams.length > 0 && (
           <CardsSectionContainer
-            label="Teams"
-            className="*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]"
+            label='Teams'
+            className='*:sm:w-[calc((100%/3)-6px)] *:md:w-[calc((100%/4)-6px)]'
           >
             {teams.map(({ id, name, flagUrl }) => (
               <TeamOrCountryCard

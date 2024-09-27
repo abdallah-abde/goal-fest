@@ -61,6 +61,8 @@ export default async function EditionPage({
     )}`,
   ]);
 
+  if (!tournamentEdition) throw new Error("Something went wrong");
+
   return (
     <EditionInfo
       tournamentEdition={tournamentEdition}

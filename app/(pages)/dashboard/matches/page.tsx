@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionValues } from "@/types/sortValues";
+import { SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -29,13 +29,13 @@ export default async function DashboardGroupMatchesPage({
   searchParams: {
     page?: string;
     query?: string;
-    sortDir?: SortDirectionValues;
+    sortDir?: SortDirectionOptions;
     sortField?: String;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const sortDir = searchParams?.sortDir || SortDirectionValues.ASC;
+  const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "date";
 
   const totalMatchesCount = await prisma.match.count({
@@ -176,58 +176,58 @@ export default async function DashboardGroupMatchesPage({
 
   return (
     <>
-      <PageHeader label="Matches List" />
-      <div className="dashboard-search-and-add">
+      <PageHeader label='Matches List' />
+      <div className='dashboard-search-and-add'>
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href="/dashboard/matches/new"
-          label="Add New Match"
+          href='/dashboard/matches/new'
+          label='Add New Match'
         />
       </div>
       {matches.length > 0 ? (
-        <Table className="dashboard-table">
+        <Table className='dashboard-table'>
           <TableHeader>
-            <TableRow className="dashboard-head-table-row text-[12px]">
-              <TableHead className="dashboard-head-table-cell">
+            <TableRow className='dashboard-head-table-row text-[12px]'>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent
-                  fieldName="homeTeam"
-                  label="Home Team"
-                  labelForSmallerDevices="HT"
+                  fieldName='homeTeam'
+                  label='Home Team'
+                  labelForSmallerDevices='HT'
                 />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent
-                  fieldName="awayTeam"
-                  label="Away Team"
-                  labelForSmallerDevices="AT"
+                  fieldName='awayTeam'
+                  label='Away Team'
+                  labelForSmallerDevices='AT'
                 />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">Score</TableHead>
-              <TableHead className="dashboard-head-table-cell">
+              <TableHead className='dashboard-head-table-cell'>Score</TableHead>
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent
-                  fieldName="date"
-                  label="Date & Time"
-                  labelForSmallerDevices="D&T"
+                  fieldName='date'
+                  label='Date & Time'
+                  labelForSmallerDevices='D&T'
                 />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent
-                  fieldName="tournament"
-                  label="Tournament"
-                  labelForSmallerDevices="Tour"
+                  fieldName='tournament'
+                  label='Tournament'
+                  labelForSmallerDevices='Tour'
                 />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
+              <TableHead className='dashboard-head-table-cell'>
                 <SortComponent
-                  fieldName="edition"
-                  label="Edition"
-                  labelForSmallerDevices="Edi"
+                  fieldName='edition'
+                  label='Edition'
+                  labelForSmallerDevices='Edi'
                 />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody className="text-[11px] sm:text-[12px]">
+          <TableBody className='text-[11px] sm:text-[12px]'>
             {matches.map(
               ({
                 id,
@@ -238,30 +238,30 @@ export default async function DashboardGroupMatchesPage({
                 date,
                 tournamentEdition,
               }) => (
-                <TableRow key={id} className="dashboard-table-row">
-                  <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{homeTeam.code}</span>
-                    <span className="hidden sm:block">{homeTeam.name}</span>
+                <TableRow key={id} className='dashboard-table-row'>
+                  <TableCell className='dashboard-table-cell'>
+                    <span className='hidden max-sm:block'>{homeTeam.code}</span>
+                    <span className='hidden sm:block'>{homeTeam.name}</span>
                   </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{awayTeam.code}</span>
-                    <span className="hidden sm:block">{awayTeam.name}</span>
+                  <TableCell className='dashboard-table-cell'>
+                    <span className='hidden max-sm:block'>{awayTeam.code}</span>
+                    <span className='hidden sm:block'>{awayTeam.name}</span>
                   </TableCell>
-                  <TableCell className="dashboard-table-cell">
+                  <TableCell className='dashboard-table-cell'>
                     {homeGoals} - {awayGoals}
                   </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">
+                  <TableCell className='dashboard-table-cell'>
+                    <span className='hidden max-sm:block'>
                       {date ? getFormattedDateTime(date.toString(), true) : ""}
                     </span>
-                    <span className="hidden sm:block">
+                    <span className='hidden sm:block'>
                       {date ? getFormattedDateTime(date.toString()) : ""}
                     </span>
                   </TableCell>
-                  <TableCell className="dashboard-table-cell">
+                  <TableCell className='dashboard-table-cell'>
                     {tournamentEdition.tournament.name}
                   </TableCell>
-                  <TableCell className="dashboard-table-cell">
+                  <TableCell className='dashboard-table-cell'>
                     {tournamentEdition.year.toString()}
                   </TableCell>
                   <ActionsCellDropDown editHref={`/dashboard/matches/${id}`} />
@@ -272,7 +272,7 @@ export default async function DashboardGroupMatchesPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={7} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Matches Found" />
+        <NoDataFoundComponent message='No Matches Found' />
       )}
     </>
   );

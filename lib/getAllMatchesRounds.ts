@@ -36,3 +36,14 @@ export async function getAllMatchesRounds(tournamentEditionId: number) {
 
   return distinctRounds;
 }
+
+export async function checkRoundExisted(
+  tournamentEditionId: number,
+  round?: string | undefined
+) {
+  if (round === undefined) return undefined;
+
+  const rounds = await getAllMatchesRounds(tournamentEditionId);
+
+  return rounds.find((a) => a === round);
+}

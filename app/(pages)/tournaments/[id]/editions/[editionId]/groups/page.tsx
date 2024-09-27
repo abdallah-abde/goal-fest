@@ -6,14 +6,21 @@ import GroupsTable from "@/components/lists/tables/GroupsTables";
 
 export default async function GroupsPage({
   params,
+  searchParams,
 }: {
   params: { editionId: string; id: string };
+  searchParams: {
+    groupId: string;
+  };
 }) {
+  const groupId = searchParams?.groupId || "all";
+
   const [tournamentEdition, groups] = await Promise.all([
     prisma.tournamentEdition.findUnique({
       where: { id: +params.editionId },
       include: {
         tournament: true,
+        groups: true,
       },
     }),
     prisma.group.findMany({
@@ -22,6 +29,7 @@ export default async function GroupsPage({
         tournamentEdition: {
           tournamentId: +params.id,
         },
+        ...(groupId !== "all" && !isNaN(Number(groupId)) && { id: +groupId }),
       },
 
       select: {
@@ -33,28 +41,7 @@ export default async function GroupsPage({
     }),
   ]);
 
-  // const tournamentEdition = await prisma.tournamentEdition.findUnique({
-  //   where: { id: +params.editionId },
-  //   include: {
-  //     tournament: true,
-  //   },
-  // });
-
-  // const groups = await prisma.group.findMany({
-  //   where: {
-  //     tournamentEditionId: +params.editionId,
-  //     tournamentEdition: {
-  //       tournamentId: +params.id,
-  //     },
-  //   },
-
-  //   select: {
-  //     id: true,
-  //     name: true,
-  //     tournamentEditionId: true,
-  //     teams: true,
-  //   },
-  // });
+  if (!tournamentEdition) throw new Error("Something went wrong");
 
   const groupsWithTeams = await Promise.all(
     groups.map(async (group) => ({
@@ -67,10 +54,6 @@ export default async function GroupsPage({
       ),
     }))
   );
-
-  // await new Promise((resolve) => {
-  //   setTimeout(() => {}, 300);
-  // });
 
   return (
     <GroupsTable

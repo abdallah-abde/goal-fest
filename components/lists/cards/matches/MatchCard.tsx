@@ -65,21 +65,23 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
 
         {/* Date information */}
         <div className='row-start-3 col-start-1 col-end-3 self-center'>
+          <p>{match.date?.toString() || "No Date"}</p>
+          <p>{match.localDate}</p>
+          <p>{match.localDateOnlyDate}</p>
+          <p>{match.localTime}</p>
           <Badge
             variant={match.date ? "default" : "destructive"}
             className='hidden sm:inline-block hover:bg-primary'
           >
-            {match.date
-              ? getFormattedDate(match.date.toString())
+            {match.localDate
+              ? getFormattedDate(match.localDate)
               : "No date info"}
           </Badge>
           <Badge
             variant={match.date ? "default" : "destructive"}
             className='hidden max-sm:inline-block hover:bg-primary'
           >
-            {match.date
-              ? getFormattedDate(match.date.toString(), true)
-              : "No date info"}
+            {match.localTime || "No time info"}
           </Badge>
         </div>
 

@@ -46,6 +46,13 @@ export function switchGroupMatchToNeutralMatch(match: MatchProps) {
     awayPenaltyGoals: null,
     date: match.date,
     onlyDate: match.date ? match.date.toLocaleDateString() : "",
+    localDate: match.date ? match.date?.toLocaleString() : null,
+    localDateOnlyDate: match.date
+      ? match.date?.toLocaleString().split(",")[0]
+      : null,
+    localTime: match.date
+      ? match.date?.toLocaleString("en-US", { hour12: false }).split(",")[1]
+      : null,
     group: match.group,
     round: match.round,
     homeTeamPlaceholder: null,
@@ -84,6 +91,13 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
     awayPenaltyGoals: match.awayPenaltyGoals,
     date: match.date,
     onlyDate: match.date ? match.date.toLocaleDateString() : "",
+    localDate: match.date ? match.date?.toLocaleString() : null,
+    localDateOnlyDate: match.date
+      ? match.date?.toLocaleString().split(",")[0]
+      : null,
+    localTime: match.date
+      ? match.date?.toLocaleString("en-US", { hour12: false }).split(",")[1]
+      : null,
     group: null,
     round: match.round,
     homeTeamPlaceholder: match.homeTeamPlacehlder,

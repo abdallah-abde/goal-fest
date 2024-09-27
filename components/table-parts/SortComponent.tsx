@@ -5,28 +5,28 @@ import { useState } from "react";
 
 import { ArrowDownAZ, ArrowDownZA, ArrowDownUp } from "lucide-react";
 
-import { SortDirectionValues } from "@/types/sortValues";
+import { SortDirectionOptions } from "@/types/enums";
 
 export default function SortComponent({
   label = "Name",
   labelForSmallerDevices,
   fieldName,
-  direction = SortDirectionValues.ASC,
+  direction = SortDirectionOptions.ASC,
 }: {
   label?: string;
   labelForSmallerDevices?: string | null;
   fieldName: string;
-  direction?: SortDirectionValues | null;
+  direction?: SortDirectionOptions | null;
 }) {
   const [sortDirection, setSortDirection] =
-    useState<SortDirectionValues | null>(direction);
+    useState<SortDirectionOptions | null>(direction);
   // const [sortField, setSortField] = useState<String>("");
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { replace } = useRouter();
 
-  const handleSort = (sortDir: SortDirectionValues, sortField: string) => {
+  const handleSort = (sortDir: SortDirectionOptions, sortField: string) => {
     setSortDirection(sortDir);
     const params = new URLSearchParams(searchParams);
     params.set("sortDir", sortDir);
@@ -45,25 +45,25 @@ export default function SortComponent({
       <span className={`${labelForSmallerDevices ? "hidden sm:block" : ""}`}>
         {label}
       </span>
-      {sortDirection === SortDirectionValues.ASC && (
+      {sortDirection === SortDirectionOptions.ASC && (
         <ArrowDownZA
           size='24'
           className={iconStyles}
           onClick={() => {
             // setSortDirection(SortDirectionValues.DESC);
             // setSortField(fieldName);
-            handleSort(SortDirectionValues.DESC, fieldName);
+            handleSort(SortDirectionOptions.DESC, fieldName);
           }}
         />
       )}
-      {sortDirection === SortDirectionValues.DESC && (
+      {sortDirection === SortDirectionOptions.DESC && (
         <ArrowDownAZ
           size='24'
           className={iconStyles}
           onClick={() => {
             // setSortDirection(SortDirectionValues.ASC);
             // setSortField(fieldName);
-            handleSort(SortDirectionValues.ASC, fieldName);
+            handleSort(SortDirectionOptions.ASC, fieldName);
           }}
         />
       )}
