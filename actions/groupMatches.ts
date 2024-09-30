@@ -22,6 +22,9 @@ export async function addTournamentGroupMatch(
   const homeGoals = formData.get("homeGoals");
   const awayGoals = formData.get("awayGoals");
 
+  if (data.homeTeamId === data.awayTeamId)
+    return { awayTeamId: ["Home team & Away team can't be the same"] };
+
   await prisma.match.create({
     data: {
       homeTeamId: +data.homeTeamId,
@@ -62,6 +65,9 @@ export async function updateTournamentGroupMatch(
 
   const homeGoals = formData.get("homeGoals");
   const awayGoals = formData.get("awayGoals");
+
+  if (data.homeTeamId === data.awayTeamId)
+    return { awayTeamId: ["Home team & Away team can't be the same"] };
 
   await prisma.match.update({
     where: { id },

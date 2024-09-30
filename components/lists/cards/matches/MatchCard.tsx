@@ -65,10 +65,6 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
 
         {/* Date information */}
         <div className='row-start-3 col-start-1 col-end-3 self-center'>
-          <p>{match.date?.toString() || "No Date"}</p>
-          <p>{match.localDate}</p>
-          <p>{match.localDateOnlyDate}</p>
-          <p>{match.localTime}</p>
           <Badge
             variant={match.date ? "default" : "destructive"}
             className='hidden sm:inline-block hover:bg-primary'
@@ -81,7 +77,9 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
             variant={match.date ? "default" : "destructive"}
             className='hidden max-sm:inline-block hover:bg-primary'
           >
-            {match.localTime || "No time info"}
+            {match.localDate
+              ? getFormattedDate(match.localDate, true)
+              : "No date info"}
           </Badge>
         </div>
 
@@ -92,7 +90,7 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
             className='hidden sm:inline-block hover:bg-primary'
           >
             {match.date
-              ? getFormattedTime(match.date.toString())
+              ? getFormattedTime(match.date.toString(), false, true)
               : "No time info"}
           </Badge>
           <Badge
@@ -100,7 +98,7 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
             className='hidden max-sm:inline-block hover:bg-primary'
           >
             {match.date
-              ? getFormattedTime(match.date.toString(), true)
+              ? getFormattedTime(match.date.toString(), false, false)
               : "No time info"}
           </Badge>
         </div>

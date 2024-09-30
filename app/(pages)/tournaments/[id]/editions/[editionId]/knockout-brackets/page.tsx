@@ -10,9 +10,6 @@ export default async function KnockoutBracketsPage({
   const matches = await prisma.knockoutMatch.findMany({
     where: {
       tournamentEditionId: +params.editionId,
-      tournamentEdition: {
-        tournamentId: +params.id,
-      },
     },
     include: {
       homeTeam: true,
@@ -20,6 +17,6 @@ export default async function KnockoutBracketsPage({
       tournamentEdition: true,
     },
   });
-  // return <KnockoutBrakets matches={matches} />;
-  return <div>Brackets</div>;
+  return <KnockoutBrackets matches={matches} />;
+  // return <div>Brackets</div>;
 }

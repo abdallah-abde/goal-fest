@@ -6,6 +6,21 @@ import {
   checkRoundExisted,
 } from "@/lib/getAllMatchesRounds";
 
+function convertUTCDateToLocalDate(date: Date, isStart: boolean) {
+  let val = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
+  if (!isStart) {
+    val = date.getTime() - date.getTimezoneOffset() * 60 * 1000;
+  }
+  var newDate = new Date(val);
+
+  var offset = date.getTimezoneOffset() / 60;
+  var hours = date.getHours();
+
+  newDate.setHours(hours + offset);
+
+  return newDate;
+}
+
 export default async function MatchesPage({
   params,
   searchParams,
@@ -28,8 +43,10 @@ export default async function MatchesPage({
   const isAllTeams = !teamId || teamId === "all";
   const isAllGroups = !groupId || groupId === "all";
 
-  const startDate = date && new Date(`${date}T00:00:00.000Z`);
-  const endDate = date && new Date(`${date}T23:59:59.999Z`);
+  const startDate =
+    date && convertUTCDateToLocalDate(new Date(`${date}T00:00:00.000Z`), true);
+  const endDate =
+    date && convertUTCDateToLocalDate(new Date(`${date}T23:59:59.999Z`), false);
 
   const groupMatchConditions: any = {
     ...(groupId && !isAllGroups && { groupId: +groupId }), // Filter by group if specific group selected
@@ -101,11 +118,6 @@ export default async function MatchesPage({
         : [],
       getAllMatchesRounds(+params.editionId),
     ]);
-
-  const dd = new Date();
-  console.log(dd);
-  console.log(dd.toLocaleString());
-  console.log(dd.toLocaleDateString());
 
   if (!tournamentEdition) throw new Error("Something went wrong");
 

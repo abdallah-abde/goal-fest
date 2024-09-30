@@ -139,7 +139,12 @@ export default function MatchesFilterDialog({
           </FormField>
           <FormField>
             <Label htmlFor='date'>Date</Label>
-            <Input type='date' name='date' onChange={handleDateChange} />
+            <Input
+              type='date'
+              name='date'
+              onChange={handleDateChange}
+              value={date}
+            />
           </FormField>
         </div>
       </DialogContent>

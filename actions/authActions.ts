@@ -37,7 +37,6 @@ export async function login(values: z.infer<typeof LoginSchema>) {
   }
 
   const { email, password, code } = validatedFields.data;
-  console.log("validatedFields.data", validatedFields.data);
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -60,7 +59,6 @@ export async function login(values: z.infer<typeof LoginSchema>) {
   if (existingUser.isTwoFactorEnabled && existingUser.email) {
     if (code) {
       const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
-      console.log("twoFactorTokenBefore", twoFactorToken);
       if (!twoFactorToken) {
         return { error: "Invalid Code!" };
       }
@@ -94,7 +92,6 @@ export async function login(values: z.infer<typeof LoginSchema>) {
       });
     } else {
       const twoFactorToken = await generateTwoFactorToken(existingUser.email);
-      console.log("twoFactorToken", twoFactorToken);
 
       await sendTwoFactorTokenEmail(twoFactorToken.email, twoFactorToken.token);
 

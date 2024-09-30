@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getFormattedDateTime } from "@/lib/getFormattedDate";
+import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -309,12 +309,24 @@ export default async function DashboardKnockoutMatchesPage({
                     {homePenaltyGoals} - {awayPenaltyGoals}
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
-                    <span className='hidden max-sm:block'>
-                      {date ? getFormattedDateTime(date.toString(), true) : ""}
-                    </span>
-                    <span className='hidden sm:block'>
-                      {date ? getFormattedDateTime(date.toString()) : ""}
-                    </span>
+                    <div className='flex flex-col'>
+                      <span className='hidden max-sm:block'>
+                        {date ? getFormattedDate(date.toString(), true) : ""}
+                      </span>
+                      <span className='hidden max-sm:block'>
+                        {date
+                          ? getFormattedTime(date.toString(), true, false)
+                          : ""}
+                      </span>
+                      <span className='hidden sm:block'>
+                        {date ? getFormattedDate(date.toString(), true) : ""}
+                      </span>
+                      <span className='hidden sm:block'>
+                        {date
+                          ? getFormattedTime(date.toString(), false, false)
+                          : ""}
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell className='dashboard-table-cell'>
                     {round}

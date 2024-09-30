@@ -26,6 +26,9 @@ export async function addTournamentKnockoutMatch(
   const homePenaltyGoals = formData.get("homePenaltyGoals");
   const awayPenaltyGoals = formData.get("awayPenaltyGoals");
 
+  if (data.homeTeamId && data.awayTeamId && data.homeTeamId === data.awayTeamId)
+    return { awayTeamId: ["Home team & Away team can't be the same"] };
+
   await prisma.knockoutMatch.create({
     data: {
       homeTeamId: data.homeTeamId ? +data.homeTeamId : null,
@@ -79,6 +82,9 @@ export async function updateTournamentKnockoutMatch(
   const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
   const homePenaltyGoals = formData.get("homePenaltyGoals");
   const awayPenaltyGoals = formData.get("awayPenaltyGoals");
+
+  if (data.homeTeamId && data.awayTeamId && data.homeTeamId === data.awayTeamId)
+    return { awayTeamId: ["Home team & Away team can't be the same"] };
 
   await prisma.knockoutMatch.update({
     where: { id },

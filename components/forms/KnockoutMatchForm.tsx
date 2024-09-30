@@ -34,7 +34,7 @@ import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingStat
 
 import { useEffect, useState } from "react";
 
-import { getUTCDateValueForDateTimeInput } from "@/lib/getFormattedDate";
+import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface MatchProps extends KnockoutMatch {
   tournamentEdition: TournamentEditionProps;
@@ -241,8 +241,8 @@ export default function KnockoutMatchForm({
                   <Eraser strokeWidth='1.5px' />
                 </Button>
               </div>
-              <FormFieldError error={error?.homeTeamId} />
             </div>
+            <FormFieldError error={error?.homeTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -288,8 +288,8 @@ export default function KnockoutMatchForm({
                   <Eraser strokeWidth='1.5px' />
                 </Button>
               </div>
-              <FormFieldError error={error?.awayTeamId} />
             </div>
+            <FormFieldError error={error?.awayTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -379,14 +379,19 @@ export default function KnockoutMatchForm({
           <FormFieldError error={error?.awayPenaltyGoals} />
         </FormField>
         <FormField>
-          <Label htmlFor='date'>Date</Label>
+          <div className='flex items-baseline gap-4'>
+            <Label htmlFor='date'>Date</Label>
+            <span className='text-xs text-gray-500 font-semibold'>
+              Enter date-time in your local time
+            </span>
+          </div>
           <Input
             type='datetime-local'
             id='date'
             name='date'
             defaultValue={
               match?.date
-                ? getUTCDateValueForDateTimeInput(match?.date)
+                ? getDateValueForDateTimeInput(match?.date)
                 : undefined
             }
           />
