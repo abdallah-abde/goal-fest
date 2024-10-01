@@ -17,6 +17,6 @@ export default async function KnockoutBracketsPage({
       tournamentEdition: true,
     },
   });
-  return <KnockoutBrackets matches={matches} />;
-  // return <div>Brackets</div>;
+  // return <KnockoutBrackets matches={matches} />;
+  return <div>Brackets</div>;
 }
