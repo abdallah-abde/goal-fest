@@ -50,3 +50,39 @@ export function getDateValueForDateTimeInput(date: Date) {
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
+
+export function convertUTCDateToLocalDate(date: Date, isStart: boolean) {
+  let val = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
+  if (!isStart) {
+    val = date.getTime() - date.getTimezoneOffset() * 60 * 1000;
+  }
+  var newDate = new Date(val);
+
+  var offset = date.getTimezoneOffset() / 60;
+  var hours = date.getHours();
+
+  newDate.setHours(hours + offset);
+
+  return newDate;
+}
+
+export function getStartAndEndDates(date: string) {
+  const startDate =
+    date && convertUTCDateToLocalDate(new Date(`${date}T00:00:00.000Z`), true);
+  const endDate =
+    date && convertUTCDateToLocalDate(new Date(`${date}T23:59:59.999Z`), false);
+
+  return { startDate, endDate };
+}
+
+export function getDateAsShortDate(date: Date = new Date()) {
+  const [month, day, year] = date
+    .toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .split("/");
+
+  return `${year}-${month}-${day}`;
+}

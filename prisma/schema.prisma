@@ -15,6 +15,7 @@ model Tournament {
   name               String
   logoUrl            String?
   tournamentEditions TournamentEdition[]
+  type               String // e.g., 'international', 'europe', 'asia' ...
 }
 
 model TournamentEdition {
@@ -60,21 +61,12 @@ model Team {
   code                          String?
 }
 
-// model TeamsInGroups {
-//   group    Group @relation(fields: [groupId], references: [id])
-//   groupId  Int
-//   team     Team  @relation(fields: [teamId], references: [id])
-//   teamId   Int
-//   teamRank Int?
-
-//   @@id([groupId, teamId])
-// }
-
 model Country {
   id                 Int                 @id @default(autoincrement())
   name               String
   flagUrl            String?
   tournamentEditions TournamentEdition[]
+  Leagues            League[]
   code               String?
 }
 
@@ -92,6 +84,7 @@ model Match {
   tournamentEditionId Int
   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
   round               String?
+  isFeatured          Boolean           @default(false)
 }
 
 model KnockoutMatch {
@@ -112,6 +105,7 @@ model KnockoutMatch {
   round               String?
   homeTeamPlacehlder  String?
   awayTeamPlacehlder  String?
+  isFeatured          Boolean           @default(false)
 }
 
 model User {
@@ -186,4 +180,68 @@ model TwoFactorConfirmation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+model League {
+  id        Int            @id @default(autoincrement())
+  name      String
+  countryId Int?
+  country   Country?       @relation(fields: [countryId], references: [id])
+  logoUrl   String?
+  type      String // e.g., 'domestic', 'international', 'europe', 'asia' ...
+  seasons   LeagueSeason[]
+}
+
+model LeagueSeason {
+  id        Int           @id @default(autoincrement())
+  startYear Int
+  endYear   Int
+  year      String
+  logoUrl   String?
+  leagueId  Int
+  league    League        @relation(fields: [leagueId], references: [id])
+  matches   LeagueMatch[]
+  teams     LeagueTeam[]
+  standings Standing[]
+}
+
+model LeagueMatch {
+  id         Int          @id @default(autoincrement())
+  homeTeam   LeagueTeam   @relation("homeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId Int
+  awayTeam   LeagueTeam   @relation("awayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId Int
+  homeGoals  Int?
+  awayGoals  Int?
+  date       DateTime?
+  seasonId   Int
+  season     LeagueSeason @relation(fields: [seasonId], references: [id])
+  round      String?
+  isFeatured Boolean      @default(false)
+}
+
+model LeagueTeam {
+  id          Int            @id @default(autoincrement())
+  name        String
+  flagUrl     String?
+  seasons     LeagueSeason[]
+  matchesHome LeagueMatch[]  @relation("homeTeam")
+  matchesAway LeagueMatch[]  @relation("awayTeam")
+  standing    Standing[]
+  code        String?
+}
+
+model Standing {
+  id           Int          @id @default(autoincrement())
+  teamId       Int
+  team         LeagueTeam   @relation(fields: [teamId], references: [id])
+  seasonId     Int
+  season       LeagueSeason @relation(fields: [seasonId], references: [id])
+  played       Int          @default(0)
+  won          Int          @default(0)
+  lost         Int          @default(0)
+  drawn        Int          @default(0)
+  goalsFor     Int          @default(0)
+  goalsAgainst Int          @default(0)
+  points       Int          @default(0)
 }

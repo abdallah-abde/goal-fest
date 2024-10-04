@@ -147,7 +147,6 @@ async function main() {
       },
     ],
   });
-
   const countries = await prisma.country.create({
     data: {
       name: "Germany",
@@ -156,13 +155,12 @@ async function main() {
         "/images/countries/91c80dec-81de-472f-9829-76f9ba38191c-germany (1).png",
     },
   });
-
   const tournament = await prisma.tournament.create({
     data: {
       name: "Euro",
+      type: "Europe",
     },
   });
-
   const edition = await prisma.tournamentEdition.create({
     data: {
       year: 2024,
@@ -210,7 +208,6 @@ async function main() {
       },
     },
   });
-
   const groupA = await prisma.group.create({
     data: {
       name: "Group A",
@@ -229,7 +226,6 @@ async function main() {
       },
     },
   });
-
   const groupB = await prisma.group.create({
     data: {
       name: "Group B",
@@ -248,7 +244,6 @@ async function main() {
       },
     },
   });
-
   const groupC = await prisma.group.create({
     data: {
       name: "Group C",
@@ -267,7 +262,6 @@ async function main() {
       },
     },
   });
-
   const groupD = await prisma.group.create({
     data: {
       name: "Group D",
@@ -286,7 +280,6 @@ async function main() {
       },
     },
   });
-
   const groupE = await prisma.group.create({
     data: {
       name: "Group E",
@@ -305,7 +298,6 @@ async function main() {
       },
     },
   });
-
   const groupF = await prisma.group.create({
     data: {
       name: "Group F",
@@ -324,7 +316,6 @@ async function main() {
       },
     },
   });
-
   const germany = await prisma.team.findFirst({ where: { name: "Germany" } });
   const scotland = await prisma.team.findFirst({ where: { name: "Scotland" } });
   const hungary = await prisma.team.findFirst({ where: { name: "Hungary" } });
@@ -359,7 +350,6 @@ async function main() {
   const georgia = await prisma.team.findFirst({ where: { name: "Georgia" } });
   const portugal = await prisma.team.findFirst({ where: { name: "Portugal" } });
   const czechia = await prisma.team.findFirst({ where: { name: "Czechia" } });
-
   const matches = await prisma.match.createMany({
     data: [
       {
@@ -724,7 +714,6 @@ async function main() {
       },
     ],
   });
-
   const knockoutMatches = await prisma.knockoutMatch.createMany({
     data: [
       {
@@ -877,6 +866,804 @@ async function main() {
         round: "Final",
         homeGoals: 2,
         awayGoals: 1,
+      },
+    ],
+  });
+  const spainCountry = await prisma.country.create({
+    data: {
+      name: "Spain",
+      code: "ESP",
+      flagUrl:
+        "/images/teams/33e87f35-f778-4f29-ad5c-ecaa8c316745-flag (1).png",
+    },
+  });
+  const league = await prisma.league.create({
+    data: {
+      name: "LaLiga",
+      type: "DOMESTIC",
+      countryId: (
+        await prisma.country.findFirst({ where: { name: "Spain" } })
+      )?.id,
+    },
+  });
+  const leagueSeason = await prisma.leagueSeason.create({
+    data: {
+      startYear: 2024,
+      endYear: 2025,
+      year: "2024-2025",
+      leagueId:
+        (await prisma.league.findFirst({ where: { name: "LaLiga" } }))?.id || 0,
+    },
+  });
+  const leagueTeams = await prisma.leagueTeam.createMany({
+    data: [
+      {
+        name: "Barcelona",
+      },
+      {
+        name: "Real Madrid",
+      },
+      {
+        name: "Seville",
+      },
+      {
+        name: "Valencia",
+      },
+      {
+        name: "Reyal Maiorca",
+      },
+      {
+        name: "Reyal Valadwalid",
+      },
+      {
+        name: "Elchie",
+      },
+      {
+        name: "Osasuna",
+      },
+    ],
+  });
+  const standings = await prisma.standing.createMany({
+    data: [
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({ where: { name: "Barcelona" } })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Real Madrid" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({ where: { name: "Seville" } })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({ where: { name: "Valencia" } })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Reyal Maiorca" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Reyal Valadwalid" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({ where: { name: "Elchie" } })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        teamId:
+          (
+            await prisma.leagueTeam.findFirst({ where: { name: "Osasuna" } })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+    ],
+  });
+  const leagueMatches = await prisma.leagueMatch.createMany({
+    data: [
+      {
+        homeTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Barcelona" },
+            })
+          )?.id || 0,
+        awayTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Real Madrid" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        homeTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Elchie" },
+            })
+          )?.id || 0,
+        awayTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Osasuna" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        homeTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Seville" },
+            })
+          )?.id || 0,
+        awayTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Valencia" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+      {
+        homeTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Reyal Maiorca" },
+            })
+          )?.id || 0,
+        awayTeamId:
+          (
+            await prisma.leagueTeam.findFirst({
+              where: { name: "Reyal Valadwalid" },
+            })
+          )?.id || 0,
+        seasonId:
+          (
+            await prisma.leagueSeason.findFirst({
+              where: { year: "2024-2025" },
+            })
+          )?.id || 0,
+      },
+    ],
+  });
+  const italyCountry = await prisma.country.create({
+    data: {
+      name: "Italy",
+      code: "ITA",
+    },
+  });
+  const englandCountry = await prisma.country.create({
+    data: {
+      name: "England",
+      code: "ITA",
+    },
+  });
+  const seriaALeague = await prisma.league.create({
+    data: {
+      name: "Seria A",
+      type: "DOMESTIC",
+      countryId: italyCountry.id,
+    },
+  });
+  const PermierLeague = await prisma.league.create({
+    data: {
+      name: "Permier League",
+      type: "DOMESTIC",
+      countryId: englandCountry.id,
+    },
+  });
+  const seriaASeason2024 = await prisma.leagueSeason.create({
+    data: {
+      startYear: 2024,
+      endYear: 2025,
+      year: "2024-2025",
+      leagueId: seriaALeague.id,
+    },
+  });
+  const permierLeagueSeason2024 = await prisma.leagueSeason.create({
+    data: {
+      startYear: 2024,
+      endYear: 2025,
+      year: "2024-2025",
+      leagueId: PermierLeague.id,
+    },
+  });
+  const napoliTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Napoli",
+    },
+  });
+  const juventusTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Juventus",
+    },
+  });
+  const acMilanTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "AC Milan",
+    },
+  });
+  const interMilanTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Inter Milan",
+    },
+  });
+  const torinoTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Torino",
+    },
+  });
+  const empoliTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Empoli",
+    },
+  });
+  const lazioTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Lazio",
+    },
+  });
+  const udineseTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Udinese",
+    },
+  });
+  const asRomaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "AS Roma",
+    },
+  });
+  const comoTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Como",
+    },
+  });
+  const fiorentinaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Fiorentina",
+    },
+  });
+  const atalantaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Atalanta",
+    },
+  });
+  const bolognaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Bologna",
+    },
+  });
+  const hellasVeronaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Hellas Verona",
+    },
+  });
+  const parmaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Parma",
+    },
+  });
+  const genoaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Genoa",
+    },
+  });
+  const cagliariTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Cagliari",
+    },
+  });
+  const lecceTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Lecce",
+    },
+  });
+  const veneziaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Venezia",
+    },
+  });
+  const monzaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Monza",
+    },
+  });
+  const liverpoolTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Liverpool",
+    },
+  });
+  const manchesterCityTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Manchester City",
+    },
+  });
+  const arsenalTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Arsenal",
+    },
+  });
+  const chelseaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Chelsea",
+    },
+  });
+  const astonVillaTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Aston Villa",
+    },
+  });
+  const fulhamTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Fulham",
+    },
+  });
+  const newCastleTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "NewCastle",
+    },
+  });
+  const tottenhamTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Tottenham",
+    },
+  });
+  const brightonTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Brighton",
+    },
+  });
+  const nottinghamForestTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Nottingham Forest",
+    },
+  });
+  const bournemouthTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Bournemouth",
+    },
+  });
+  const brentfordTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Brentford",
+    },
+  });
+  const manchesterUnitedTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Manchester United",
+    },
+  });
+  const westHamTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "West Ham",
+    },
+  });
+  const ipswichTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Ipswich",
+    },
+  });
+  const evertonTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Everton",
+    },
+  });
+  const leicesterTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Leicester",
+    },
+  });
+  const crystalPalaceTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Crystal Palace",
+    },
+  });
+  const southhamptonTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Southhampton",
+    },
+  });
+  const wolvesTeam = await prisma.leagueTeam.create({
+    data: {
+      name: "Wolves",
+    },
+  });
+  const seriaAandPremierLeagueStandings = await prisma.standing.createMany({
+    data: [
+      {
+        teamId: napoliTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: juventusTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: acMilanTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: interMilanTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: torinoTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: empoliTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: lazioTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: udineseTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: asRomaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: comoTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: fiorentinaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: atalantaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: bolognaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: hellasVeronaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: parmaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: genoaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: cagliariTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: lecceTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: veneziaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: monzaTeam.id,
+        seasonId: seriaASeason2024.id,
+      },
+      {
+        teamId: liverpoolTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: manchesterCityTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: arsenalTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: chelseaTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: astonVillaTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: fulhamTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: newCastleTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: tottenhamTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: brightonTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: nottinghamForestTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: bournemouthTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: brentfordTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: manchesterUnitedTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: westHamTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: ipswichTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: evertonTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: leicesterTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: crystalPalaceTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: southhamptonTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+      {
+        teamId: wolvesTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+      },
+    ],
+  });
+  const seriaAandPremeirLeagueMatches = await prisma.leagueMatch.createMany({
+    data: [
+      {
+        homeTeamId: napoliTeam.id,
+        awayTeamId: comoTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 4, 2024 19:30:00"),
+        round: "Round 7",
+        isFeatured: true,
+      },
+      {
+        homeTeamId: hellasVeronaTeam.id,
+        awayTeamId: veneziaTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 4, 2024 21:45:00"),
+        round: "Round 7",
+        isFeatured: true,
+      },
+      {
+        homeTeamId: udineseTeam.id,
+        awayTeamId: lecceTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 5, 2024 16:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: atalantaTeam.id,
+        awayTeamId: genoaTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 5, 2024 19:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: interMilanTeam.id,
+        awayTeamId: torinoTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 5, 2024 21:45:00"),
+        round: "Round 7",
+        isFeatured: true,
+      },
+      {
+        homeTeamId: juventusTeam.id,
+        awayTeamId: cagliariTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 6, 2024 13:30:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: bolognaTeam.id,
+        awayTeamId: parmaTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 6, 2024 16:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: lazioTeam.id,
+        awayTeamId: empoliTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 6, 2024 16:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: monzaTeam.id,
+        awayTeamId: asRomaTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 6, 2024 19:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: fiorentinaTeam.id,
+        awayTeamId: acMilanTeam.id,
+        seasonId: seriaASeason2024.id,
+        date: new Date("October 6, 2024 21:45:00"),
+        round: "Round 7",
+        isFeatured: true,
+      },
+      {
+        homeTeamId: crystalPalaceTeam.id,
+        awayTeamId: liverpoolTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 14:30:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: arsenalTeam.id,
+        awayTeamId: southhamptonTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 17:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: brentfordTeam.id,
+        awayTeamId: wolvesTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 17:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: leicesterTeam.id,
+        awayTeamId: bournemouthTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 17:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: manchesterCityTeam.id,
+        awayTeamId: fulhamTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 17:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: westHamTeam.id,
+        awayTeamId: ipswichTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 17:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: evertonTeam.id,
+        awayTeamId: newCastleTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 5, 2024 19:30:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: astonVillaTeam.id,
+        awayTeamId: manchesterUnitedTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 6, 2024 16:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: chelseaTeam.id,
+        awayTeamId: nottinghamForestTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 6, 2024 16:00:00"),
+        round: "Round 7",
+      },
+      {
+        homeTeamId: brightonTeam.id,
+        awayTeamId: tottenhamTeam.id,
+        seasonId: permierLeagueSeason2024.id,
+        date: new Date("October 6, 2024 18:30:00"),
+        round: "Round 7",
       },
     ],
   });

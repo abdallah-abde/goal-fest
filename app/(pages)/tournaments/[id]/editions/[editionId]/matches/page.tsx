@@ -5,21 +5,7 @@ import {
   getAllMatchesRounds,
   checkRoundExisted,
 } from "@/lib/getAllMatchesRounds";
-
-function convertUTCDateToLocalDate(date: Date, isStart: boolean) {
-  let val = date.getTime() + date.getTimezoneOffset() * 60 * 1000;
-  if (!isStart) {
-    val = date.getTime() - date.getTimezoneOffset() * 60 * 1000;
-  }
-  var newDate = new Date(val);
-
-  var offset = date.getTimezoneOffset() / 60;
-  var hours = date.getHours();
-
-  newDate.setHours(hours + offset);
-
-  return newDate;
-}
+import { getStartAndEndDates } from "@/lib/getFormattedDate";
 
 export default async function MatchesPage({
   params,
@@ -43,10 +29,7 @@ export default async function MatchesPage({
   const isAllTeams = !teamId || teamId === "all";
   const isAllGroups = !groupId || groupId === "all";
 
-  const startDate =
-    date && convertUTCDateToLocalDate(new Date(`${date}T00:00:00.000Z`), true);
-  const endDate =
-    date && convertUTCDateToLocalDate(new Date(`${date}T23:59:59.999Z`), false);
+  const { startDate, endDate } = getStartAndEndDates(date);
 
   const groupMatchConditions: any = {
     ...(groupId && !isAllGroups && { groupId: +groupId }), // Filter by group if specific group selected
@@ -95,7 +78,7 @@ export default async function MatchesPage({
             include: {
               homeTeam: true,
               awayTeam: true,
-              tournamentEdition: true,
+              tournamentEdition: { include: { tournament: true } },
               group: true,
             },
           })
@@ -112,7 +95,7 @@ export default async function MatchesPage({
             include: {
               homeTeam: true,
               awayTeam: true,
-              tournamentEdition: true,
+              tournamentEdition: { include: { tournament: true } },
             },
           })
         : [],

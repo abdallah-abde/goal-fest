@@ -40,14 +40,14 @@ interface TournamentEditionProps extends TournamentEdition {
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
   awayTeam: Team | null;
-  tournamentEdition: TournamentEdition;
+  tournamentEdition: TournamentEdition & { tournament: Tournament };
 }
 
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEdition;
+  tournamentEdition: TournamentEdition & { tournament: Tournament };
 }
 
 export default function MatchesCards({
@@ -75,9 +75,9 @@ export default function MatchesCards({
       <PageHeader
         label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.yearAsString} Matches`}
       />
-      <div className='flex justify-end pb-2'>
+      <div className="flex justify-end pb-2">
         <Button
-          variant='outline'
+          variant="outline"
           onClick={() => {
             setGroupBy(
               groupBy === GroupByOptions.STAGE
@@ -85,7 +85,7 @@ export default function MatchesCards({
                 : GroupByOptions.STAGE
             );
           }}
-          className='flex gap-2 border-2 border-secondary hover:border-primary/10'
+          className="flex gap-2 border-2 border-secondary hover:border-primary/10"
         >
           {groupBy === GroupByOptions.STAGE ? (
             <>
@@ -104,12 +104,12 @@ export default function MatchesCards({
         />
       </div>
       {results.length > 0 ? (
-        <div className='flex flex-col gap-8'>
+        <div className="flex flex-col gap-8">
           {results.map(([divider, list], index) => {
             return (
-              <div key={index} className='w-full'>
+              <div key={index} className="w-full">
                 <ListTitle groupBy={groupBy} divider={divider} />
-                <div className='w-full space-y-2'>
+                <div className="w-full space-y-2">
                   {list.map((match: NeutralMatch) => (
                     <MatchCard key={match.dbId} match={match} />
                   ))}
@@ -119,7 +119,7 @@ export default function MatchesCards({
           })}
         </div>
       ) : (
-        <NoDataFoundComponent message='Sorry, No Matches Found' />
+        <NoDataFoundComponent message="Sorry, No Matches Found" />
       )}
     </>
   );

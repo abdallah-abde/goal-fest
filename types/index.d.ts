@@ -1,9 +1,14 @@
 import {
+  Country as PrismaCountry,
   Group as PrismaGroup,
   Team as PrismaTeam,
   TournamentEdition as PrismaTournamentEdition,
   Match as PrismaMatch,
   KnockoutMatch as PrismaKnockoutMatch,
+  Tournament as PrismaTournament,
+  LeagueSeason as PrismaLeagueSeason,
+  League as PrismaLeague,
+  LeagueTeam as PrismaLeagueTeam,
 } from "@prisma/client";
 
 export interface Tournament {
@@ -123,10 +128,24 @@ export interface GroupWithTeams extends PrismaGroup {
 export interface NeutralMatch {
   dbId: number;
   id: string;
-  type: "GROUP" | "KNOCKOUT";
-  tournamentEdition: PrismaTournamentEdition;
-  homeTeam?: PrismaTeam | null; // Not null in matches just in knockout
-  awayTeam?: PrismaTeam | null; // Not null in matches just in knockout
+  type: "GROUP" | "KNOCKOUT" | "LEAGUE";
+  tournamentEdition:
+    | (PrismaTournamentEdition & {
+        tournament: PrismaTournament;
+        hostingCountries: PrismaCountry[];
+      })
+    | null;
+  season:
+    | (PrismaLeagueSeason & {
+        league: PrismaLeague & { country: PrismaCountry | null };
+      })
+    | null;
+  tournamentOrLeagueName: String;
+  tournamentOrLeagueYear: String;
+  country: String;
+  fullTournamentName: String;
+  homeTeam?: PrismaTeam | PrismaLeagueTeam | null; // Not null in matches just in knockout
+  awayTeam?: PrismaTeam | PrismaLeagueTeam | null; // Not null in matches just in knockout
   homeGoals?: number | null;
   awayGoals?: number | null;
   homeExtraTimeGoals?: number | null; // Not existed in matches just in knockout
