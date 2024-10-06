@@ -1,15 +1,14 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useRef } from "react";
-import { Input } from "@/components/ui/input";
+
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  getStartAndEndDates,
-  getDateAsShortDate,
-} from "@/lib/getFormattedDate";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+
+import { Input } from "@/components/ui/input";
+
+import { getDateAsShortDate } from "@/lib/getFormattedDate";
 
 export default function MatchesCalender() {
   const searchParams = useSearchParams();

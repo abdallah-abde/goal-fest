@@ -20,8 +20,8 @@ export default function CategorizedMatchesByCountry({
 
   return (
     <Accordion type="single" collapsible className="bg-primary/10">
-      {results.map(([countryName, list]) => (
-        <AccordionItem key={countryName} value={countryName}>
+      {results.map(([countryName, list], idx) => (
+        <AccordionItem key={idx} value={countryName}>
           <AccordionTrigger className="px-4 hover:no-underline">
             {countryName}
           </AccordionTrigger>

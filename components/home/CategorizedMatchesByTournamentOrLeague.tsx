@@ -26,7 +26,7 @@ export default function CategorizedMatchesByTournamentOrLeague({
       className="bg-primary/15 first:border-t-2 border-primary/50"
     >
       {results.map(([tournamentName, list], idx) => (
-        <AccordionItem key={tournamentName} value={tournamentName}>
+        <AccordionItem key={idx} value={tournamentName}>
           <AccordionTrigger className="px-4 pl-8 hover:no-underline">
             {tournamentName}
           </AccordionTrigger>
@@ -38,7 +38,7 @@ export default function CategorizedMatchesByTournamentOrLeague({
               variant="link"
               className="text-center rounded-none w-full p-0 m-0 border-t-1 border-primary/25"
             >
-              click for more
+              Click for more
             </Button>
           </AccordionContent>
         </AccordionItem>

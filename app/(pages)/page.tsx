@@ -4,24 +4,11 @@ import Image from "next/image";
 
 import { NeutralMatch } from "@/types";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { cn } from "@/lib/utils";
-
-import _ from "lodash";
-
 import MatchesCalender from "@/components/home/MatchesCalender";
 import CategorizedMatchesByDate from "@/components/home/CategorizedMatchesByDate";
 import CategorizedMatchesByCountry from "@/components/home/CategorizedMatchesByCountry";
 import FeaturedMatches from "@/components/home/FeaturedMatches";
+import Standings from "@/components/home/Standings";
 
 import {
   switchGroupMatchesToNeutralMatches,
@@ -41,6 +28,52 @@ export default async function HomePage({
     date: string;
   };
 }) {
+  const values = new Array(
+    {
+      labels: [{ name: "Team" }],
+      className:
+        "dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]",
+    },
+    {
+      labels: [
+        { name: "P", className: "hidden max-xs:block" },
+        { name: "Played", className: "hidden xs:block" },
+      ],
+      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center",
+    },
+    {
+      labels: [{ name: "W" }],
+      className: "w-1/12 hidden sm:table-cell",
+    },
+    {
+      labels: [{ name: "L" }],
+      className: "w-1/12 hidden sm:table-cell",
+    },
+    {
+      labels: [{ name: "D" }],
+      className: "w-1/12 hidden sm:table-cell",
+    },
+    {
+      labels: [{ name: "GF" }],
+      className: "w-1/12 hidden sm:table-cell",
+    },
+    {
+      labels: [{ name: "GA" }],
+      className: "w-1/12 hidden sm:table-cell",
+    },
+    {
+      labels: [{ name: "+/-" }],
+      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3",
+    },
+    {
+      labels: [
+        { name: "Pts", className: "hidden max-xs:block" },
+        { name: "Points", className: "hidden xs:block" },
+      ],
+      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3",
+    }
+  );
+
   const date = searchParams?.date || getDateAsShortDate();
 
   const { startDate, endDate } = getStartAndEndDates(date);
@@ -123,75 +156,9 @@ export default async function HomePage({
         <FeaturedMatches />
 
         {/* <div>Goalers for most important leagues</div> */}
-        <div>
-          {/* Most important today League table */}
-          <Table className="dark:border-primary/10 border">
-            <TableCaption
-              className={cn(
-                "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10 py-4"
-              )}
-            >
-              UEFA Champions League
-            </TableCaption>
 
-            <TableHeader>
-              <TableRow className="dashboard-head-table-row">
-                <TableHead className="dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]">
-                  Team
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center">
-                  <span className="hidden max-xs:block">P</span>
-                  <span className="hidden xs:block">Played</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>W</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>L</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>D</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>GF</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>GA</span>
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3">
-                  <span>+/-</span>
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3">
-                  <span className="hidden max-xs:block">Pts</span>
-                  <span className="hidden xs:block">Points</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Array.from({ length: 10 }).map((team, idx) => (
-                <TableRow key={idx} className="dashboard-table-row">
-                  <TableCell className="dashboard-table-cell text-left flex gap-3 items-center">
-                    <Image
-                      width={25}
-                      height={25}
-                      src="/images/teams/d87feb39-e41a-4237-9ee0-7749ef89d50e-germany (1).png"
-                      alt="team"
-                    />
-                    <span className="hidden 2xs:block">Team Name</span>
-                  </TableCell>
-                  <TableCell className="py-4">2</TableCell>
-                  <TableCell className="hidden sm:table-cell py-4">2</TableCell>
-                  <TableCell className="hidden sm:table-cell py-4">0</TableCell>
-                  <TableCell className="hidden sm:table-cell py-4">0</TableCell>
-                  <TableCell className="hidden sm:table-cell py-4">5</TableCell>
-                  <TableCell className="hidden sm:table-cell py-4">1</TableCell>
-                  <TableCell className="py-4">4</TableCell>
-                  <TableCell className="py-4">6</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <Standings values={values} date={[startDate, endDate]} />
+
         <div className="flex gap-2 pb-24">
           <div className="flex-1">
             {/* Popular Leagues */}
