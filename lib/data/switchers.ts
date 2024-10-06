@@ -76,7 +76,7 @@ export function switchGroupMatchToNeutralMatch(match: MatchProps) {
     homePenaltyGoals: null,
     awayPenaltyGoals: null,
     date: match.date,
-    onlyDate: match.date ? match.date.toLocaleDateString() : "",
+    onlyDate: match.date ? match.date.toLocaleString() : "",
     localDate: match.date ? match.date?.toLocaleString() : null,
     localDateOnlyDate: match.date
       ? match.date?.toLocaleString().split(",")[0]
@@ -126,7 +126,7 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
     homePenaltyGoals: match.homePenaltyGoals,
     awayPenaltyGoals: match.awayPenaltyGoals,
     date: match.date,
-    onlyDate: match.date ? match.date.toLocaleDateString() : "",
+    onlyDate: match.date ? match.date.toLocaleString() : "",
     localDate: match.date ? match.date?.toLocaleString() : null,
     localDateOnlyDate: match.date
       ? match.date?.toLocaleString().split(",")[0]
@@ -174,7 +174,7 @@ export function switchLeagueMatchToNeutralMatch(match: LeagueMatchProps) {
     homeGoals: match.homeGoals,
     awayGoals: match.awayGoals,
     date: match.date,
-    onlyDate: match.date ? match.date.toLocaleDateString() : "",
+    onlyDate: match.date ? match.date.toLocaleString() : "",
     localDate: match.date ? match.date?.toLocaleString() : null,
     localDateOnlyDate: match.date
       ? match.date?.toLocaleString().split(",")[0]

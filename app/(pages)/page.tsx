@@ -10,16 +10,9 @@ import CategorizedMatchesByCountry from "@/components/home/CategorizedMatchesByC
 import FeaturedMatches from "@/components/home/FeaturedMatches";
 import Standings from "@/components/home/Standings";
 
-import {
-  switchGroupMatchesToNeutralMatches,
-  switchKnockoutMatchesToNeutralMatches,
-  switchLeagueMatchesToNeutralMatches,
-} from "@/lib/data/switchers";
+import { homePageStandingsHeaders } from "@/lib/data/homePageStandingsHeaders";
 
-import {
-  getStartAndEndDates,
-  getDateAsShortDate,
-} from "@/lib/getFormattedDate";
+import { getDateAsShortDate } from "@/lib/getFormattedDate";
 
 export default async function HomePage({
   searchParams,
@@ -28,136 +21,21 @@ export default async function HomePage({
     date: string;
   };
 }) {
-  const values = new Array(
-    {
-      labels: [{ name: "Team" }],
-      className:
-        "dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]",
-    },
-    {
-      labels: [
-        { name: "P", className: "hidden max-xs:block" },
-        { name: "Played", className: "hidden xs:block" },
-      ],
-      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center",
-    },
-    {
-      labels: [{ name: "W" }],
-      className: "w-1/12 hidden sm:table-cell",
-    },
-    {
-      labels: [{ name: "L" }],
-      className: "w-1/12 hidden sm:table-cell",
-    },
-    {
-      labels: [{ name: "D" }],
-      className: "w-1/12 hidden sm:table-cell",
-    },
-    {
-      labels: [{ name: "GF" }],
-      className: "w-1/12 hidden sm:table-cell",
-    },
-    {
-      labels: [{ name: "GA" }],
-      className: "w-1/12 hidden sm:table-cell",
-    },
-    {
-      labels: [{ name: "+/-" }],
-      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3",
-    },
-    {
-      labels: [
-        { name: "Pts", className: "hidden max-xs:block" },
-        { name: "Points", className: "hidden xs:block" },
-      ],
-      className: "w-1/12 max-xs:w-1/6 max-sm:w-1/3",
-    }
-  );
-
   const date = searchParams?.date || getDateAsShortDate();
-
-  const { startDate, endDate } = getStartAndEndDates(date);
-
-  const [matches, knockoutMatches, leagueMatches] = await Promise.all([
-    prisma.match.findMany({
-      where: {
-        date: { gte: startDate, lte: endDate },
-      },
-      include: {
-        tournamentEdition: {
-          include: {
-            tournament: true,
-            hostingCountries: true,
-          },
-        },
-        homeTeam: true,
-        awayTeam: true,
-        group: true,
-      },
-    }),
-    prisma.knockoutMatch.findMany({
-      where: {
-        date: { gte: startDate, lte: endDate },
-      },
-      include: {
-        tournamentEdition: {
-          include: {
-            tournament: true,
-            hostingCountries: true,
-          },
-        },
-        homeTeam: true,
-        awayTeam: true,
-      },
-    }),
-    prisma.leagueMatch.findMany({
-      where: {
-        date: { gte: startDate, lte: endDate },
-      },
-      include: {
-        homeTeam: true,
-        awayTeam: true,
-        season: { include: { league: { include: { country: true } } } },
-      },
-    }),
-  ]);
-
-  const allMatches: NeutralMatch[] = switchGroupMatchesToNeutralMatches(
-    matches
-  ).concat(
-    switchKnockoutMatchesToNeutralMatches(knockoutMatches),
-    switchLeagueMatchesToNeutralMatches(leagueMatches)
-  );
 
   return (
     <div className="h-screen py-24 flex gap-2">
       <div className="w-1/3 *:my-2">
         <MatchesCalender />
-        {allMatches.length > 0 && (
-          <div className="space-y-2">
-            {/* popular League and tournament matches separated by leagues and tournaments, and filtered by date */}
-            <h3 className="text-muted-foreground text-sm mt-5">
-              Popular League's and Tournament's Matches
-            </h3>
-            <CategorizedMatchesByDate allMatches={allMatches} />
-          </div>
-        )}
-        {allMatches.length > 0 && (
-          <div className="space-y-2 pb-24">
-            {/* Matches & Leagues by countries */}
-            <h3 className="text-muted-foreground text-sm mt-5">
-              Matches by countries
-            </h3>
-            <CategorizedMatchesByCountry allMatches={allMatches} />
-          </div>
-        )}
+        <CategorizedMatchesByDate date={date} />
+        <CategorizedMatchesByCountry date={date} />
       </div>
       <div className="w-2/3 *:my-2">
         <FeaturedMatches />
 
         {/* <div>Goalers for most important leagues</div> */}
 
-        <Standings values={values} date={[startDate, endDate]} />
+        <Standings values={homePageStandingsHeaders} date={date} />
 
         <div className="flex gap-2 pb-24">
           <div className="flex-1">

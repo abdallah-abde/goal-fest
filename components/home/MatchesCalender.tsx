@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 import { getDateAsShortDate } from "@/lib/getFormattedDate";
+import useGeoLocation from "@/hooks/useGeoLocation";
 
 export default function MatchesCalender() {
   const searchParams = useSearchParams();

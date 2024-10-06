@@ -16,6 +16,7 @@ model Tournament {
   logoUrl            String?
   tournamentEditions TournamentEdition[]
   type               String // e.g., 'international', 'europe', 'asia' ...
+  isPopular          Boolean             @default(false)
 }
 
 model TournamentEdition {
@@ -190,6 +191,7 @@ model League {
   logoUrl   String?
   type      String // e.g., 'domestic', 'international', 'europe', 'asia' ...
   seasons   LeagueSeason[]
+  isPopular Boolean        @default(false)
 }
 
 model LeagueSeason {

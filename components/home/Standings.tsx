@@ -1,20 +1,20 @@
+"use client";
+
 import prisma from "@/lib/db";
 
 import Image from "next/image";
 
-import {
-  Table,
-  TableCaption,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
 
-import { cn } from "@/lib/utils";
-
 import _ from "lodash";
+import { sortStandings } from "@/lib/sortGroupTeams";
+import { useEffect, useState } from "react";
+import { LeagueTeam, Standing } from "@prisma/client";
+import useGeoLocation from "@/hooks/useGeoLocation";
+import { LoadingSpinner } from "../LoadingComponents";
 
 interface TableHeadProps {
   labels: Array<{ name: string; className?: string | null }>;
@@ -26,96 +26,124 @@ export default async function Standings({
   date,
 }: {
   values: TableHeadProps[];
-  date: Array<string | Date>;
+  date: string;
 }) {
-  const [startDate, endDate] = date;
+  const [standings, setStandings] = useState<Array<Standing>>(
+    new Array<Standing>()
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const { location, loading, error } = useGeoLocation();
 
-  const standings = await prisma.standing.findMany({
-    where: {
-      season: {
-        matches: { some: { date: { gte: startDate, lte: endDate } } },
-      },
-    },
-    include: {
-      season: { include: { league: true } },
-      team: true,
-    },
-  });
+  useEffect(() => {
+    async function getStandings() {
+      try {
+        const res = await fetch(`/api/standings/${date}/${location?.country}`);
+        const data: Standing[] = await res.json();
+
+        setStandings(data);
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
+    }
+
+    getStandings();
+  }, [date]);
+
+  if (isLoading || loading) return <LoadingSpinner />;
+
+  if (standings.length === 0) return <div>No Data Found</div>;
 
   const results = Object.entries(_.groupBy(standings, "seasonId"));
-
-  console.log(results);
 
   return (
     <div className="space-y-2">
       {/* Most important today League table */}
-      {results.map(([divier, list], idx) => (
-        <Table key={idx} className="dark:border-primary/10 border">
-          <TableCaption
-            className={cn(
-              "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10 py-4"
-            )}
-          >
-            <div className=" flex items-center justify-between w-full px-2">
-              <p className="text-lg">{list[0].season.league.name}</p>
-              <p className="text-muted-foreground text-sm">
-                {list[0].season.year}
-              </p>
-            </div>
-          </TableCaption>
-          <StandingTableHeader values={values} />
-          <TableBody>
-            {list.map((stand, idx) => (
-              <TableRow key={idx} className="dashboard-table-row">
-                <TableCell className="text-left flex gap-3 items-center py-1">
-                  {stand.team.flagUrl && (
-                    <>
-                      <Image
-                        src={stand.team.flagUrl}
-                        width={20}
-                        height={20}
-                        alt={`${stand.team.name} flag`}
-                        className="hidden max-xs:block"
-                      />
-                      <Image
-                        src={stand.team.flagUrl}
-                        width={25}
-                        height={25}
-                        alt={`${stand.team.name} flag`}
-                        className="hidden xs:block"
-                      />
-                    </>
-                  )}
-                  <span className="hidden max-2xs:block">
-                    {stand.team.code || ""}
-                  </span>
-                  <span className="hidden 2xs:block">{stand.team.name}</span>
-                </TableCell>
-                <TableCell className="py-0">{stand.played}</TableCell>
-                <TableCell className="hidden sm:table-cell py-0">
-                  {stand.won}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell py-0">
-                  {stand.lost}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell py-0">
-                  {stand.drawn}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell py-0">
-                  {stand.goalsFor}
-                </TableCell>
-                <TableCell className="hidden sm:table-cell py-0">
-                  {stand.goalsAgainst}
-                </TableCell>
-                <TableCell className="py-0">
-                  {stand.goalsFor - stand.goalsAgainst}
-                </TableCell>
-                <TableCell className="py-0">{stand.points}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ))}
+      <Tabs defaultValue={results[0][0]} className="w-full">
+        <TabsList className="bg-background w-full justify-start rounded-none">
+          {results.map(([divider, list]: Array<any>, idx) => (
+            <TabsTrigger key={divider} value={divider}>
+              {list[0].season.league.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {results.map(([divider, list], idx) => (
+          <TabsContent key={divider} value={divider}>
+            <Table className="dark:border-primary/10 border">
+              {/* <TableCaption
+                className={cn(
+                  "bg-primary/20 text-foreground text-[16px] font-normal dark:border-primary/10 py-4"
+                )}
+              >
+                <div className=" flex items-center justify-between w-full px-2">
+                  <p className="text-lg">{list[0].season.league.name}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {list[0].season.year}
+                  </p>
+                </div>
+              </TableCaption> */}
+              <StandingTableHeader values={values} />
+              <TableBody>
+                {list
+                  .sort(sortStandings)
+                  .slice(0, 10)
+                  .map((stand: any, idx) => (
+                    <TableRow key={idx} className="dashboard-table-row">
+                      <TableCell className="text-left flex gap-3 items-center py-1">
+                        {stand.team.flagUrl && (
+                          <>
+                            <Image
+                              src={stand.team.flagUrl}
+                              width={20}
+                              height={20}
+                              alt={`${stand.team.name} flag`}
+                              className="hidden max-xs:block"
+                            />
+                            <Image
+                              src={stand.team.flagUrl}
+                              width={25}
+                              height={25}
+                              alt={`${stand.team.name} flag`}
+                              className="hidden xs:block"
+                            />
+                          </>
+                        )}
+                        <span className="hidden max-2xs:block">
+                          {stand.team.code || ""}
+                        </span>
+                        <span className="hidden 2xs:block">
+                          {stand.team.name}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-0">{stand.played}</TableCell>
+                      <TableCell className="hidden sm:table-cell py-0">
+                        {stand.won}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell py-0">
+                        {stand.lost}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell py-0">
+                        {stand.drawn}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell py-0">
+                        {stand.goalsFor}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell py-0">
+                        {stand.goalsAgainst}
+                      </TableCell>
+                      <TableCell className="py-0">
+                        {stand.goalsFor - stand.goalsAgainst}
+                      </TableCell>
+                      <TableCell className="py-0">{stand.points}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }

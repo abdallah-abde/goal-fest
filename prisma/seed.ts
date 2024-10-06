@@ -159,6 +159,7 @@ async function main() {
     data: {
       name: "Euro",
       type: "Europe",
+      isPopular: true,
     },
   });
   const edition = await prisma.tournamentEdition.create({
@@ -884,6 +885,7 @@ async function main() {
       countryId: (
         await prisma.country.findFirst({ where: { name: "Spain" } })
       )?.id,
+      isPopular: true,
     },
   });
   const leagueSeason = await prisma.leagueSeason.create({
@@ -1130,6 +1132,7 @@ async function main() {
       name: "Seria A",
       type: "DOMESTIC",
       countryId: italyCountry.id,
+      isPopular: true,
     },
   });
   const PermierLeague = await prisma.league.create({
@@ -1137,6 +1140,7 @@ async function main() {
       name: "Permier League",
       type: "DOMESTIC",
       countryId: englandCountry.id,
+      isPopular: true,
     },
   });
   const seriaASeason2024 = await prisma.leagueSeason.create({

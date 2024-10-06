@@ -67,10 +67,14 @@ export function convertUTCDateToLocalDate(date: Date, isStart: boolean) {
 }
 
 export function getStartAndEndDates(date: string) {
-  const startDate =
-    date && convertUTCDateToLocalDate(new Date(`${date}T00:00:00.000Z`), true);
-  const endDate =
-    date && convertUTCDateToLocalDate(new Date(`${date}T23:59:59.999Z`), false);
+  const startDate = convertUTCDateToLocalDate(
+    new Date(`${date}T00:00:00.000Z`),
+    true
+  );
+  const endDate = convertUTCDateToLocalDate(
+    new Date(`${date}T23:59:59.999Z`),
+    false
+  );
 
   return { startDate, endDate };
 }
