@@ -28,16 +28,16 @@ export default async function EditionPage({
         tournamentId: +params.id,
       },
       include: {
-        teams: true,
         tournament: true,
+        teams: true,
         winner: true,
         titleHolder: true,
         hostingCountries: true,
         matches: {
           include: {
-            awayTeam: true,
             group: true,
             homeTeam: true,
+            awayTeam: true,
             tournamentEdition: true,
           },
         },

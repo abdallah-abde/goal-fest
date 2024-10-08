@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { NeutralMatch } from "@/types";
 
 import _ from "lodash";
@@ -12,8 +14,7 @@ import {
 } from "@/components/ui/accordion";
 
 import CategorizedMatchesByTournamentOrLeague from "@/components/home/CategorizedMatchesByTournamentOrLeague";
-import { useEffect, useState } from "react";
-import { LoadingSpinner } from "../LoadingComponents";
+import { LoadingSpinner } from "@/components/LoadingComponents";
 
 export default function CategorizedMatchesByCountry({
   date,
@@ -26,7 +27,7 @@ export default function CategorizedMatchesByCountry({
   useEffect(() => {
     async function getMatches() {
       try {
-        const res = await fetch(`/api/matches/${date}/all`);
+        const res = await fetch(`/api/matches/all/${date}`);
         const data = await res.json();
 
         setAllMatches(data);
@@ -43,14 +44,14 @@ export default function CategorizedMatchesByCountry({
 
   if (isLoading) return <LoadingSpinner />;
 
-  if (allMatches.length === 0) return <div>No Data Found</div>;
+  if (allMatches.length === 0) return;
 
   const results = Object.entries(_.groupBy(allMatches, "country"));
 
   return (
     <div className="space-y-2 pb-24">
       <h3 className="text-muted-foreground text-sm mt-5">
-        Popular League&apos;s and Tournament&apos;s Matches
+        League&apos;s and Tournament&apos;s Matches By Countries
       </h3>
       <Accordion type="single" collapsible className="bg-primary/10">
         {results.map(([countryName, list], idx) => (

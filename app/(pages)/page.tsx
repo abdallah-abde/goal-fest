@@ -1,11 +1,7 @@
-import prisma from "@/lib/db";
-
 import Image from "next/image";
 
-import { NeutralMatch } from "@/types";
-
 import MatchesCalender from "@/components/home/MatchesCalender";
-import CategorizedMatchesByDate from "@/components/home/CategorizedMatchesByDate";
+import PopularMatches from "@/components/home/PopularMatches";
 import CategorizedMatchesByCountry from "@/components/home/CategorizedMatchesByCountry";
 import FeaturedMatches from "@/components/home/FeaturedMatches";
 import Standings from "@/components/home/Standings";
@@ -27,7 +23,7 @@ export default async function HomePage({
     <div className="h-screen py-24 flex gap-2">
       <div className="w-1/3 *:my-2">
         <MatchesCalender />
-        <CategorizedMatchesByDate date={date} />
+        <PopularMatches date={date} />
         <CategorizedMatchesByCountry date={date} />
       </div>
       <div className="w-2/3 *:my-2">

@@ -1,36 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Image from "next/image";
 
-import prisma from "@/lib/db";
+import useGeoLocation from "@/hooks/useGeoLocation";
 
 import { NeutralMatch } from "@/types";
 
 import _ from "lodash";
 
-import CategorizedMatchCard from "./CategorizedMatchCard";
-import useGeoLocation from "@/hooks/useGeoLocation";
-import { useEffect, useState } from "react";
-import {
-  switchGroupMatchesToNeutralMatches,
-  switchKnockoutMatchesToNeutralMatches,
-  switchLeagueMatchesToNeutralMatches,
-} from "@/lib/data/switchers";
-import {
-  getDateValueForDateTimeInput,
-  getStartAndEndDates,
-} from "@/lib/getFormattedDate";
-import { LoadingSpinner } from "../LoadingComponents";
+import CategorizedMatchCard from "@/components/home/CategorizedMatchCard";
 
-export default function CategorizedMatchesByDate({ date }: { date: string }) {
+import { LoadingSpinner } from "@/components/LoadingComponents";
+
+export default function PopularMatches({ date }: { date: string }) {
+  const { location, loading, error } = useGeoLocation();
   const [allMatches, setAllMatches] = useState<Array<NeutralMatch>>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { location, loading, error } = useGeoLocation();
 
   useEffect(() => {
     async function getMatches() {
       try {
-        const res = await fetch(`/api/matches/${date}/${location?.country}`);
+        const res = await fetch(
+          `/api/matches/popular/${date}/${location?.country}`
+        );
         const data = await res.json();
 
         setAllMatches(data);
@@ -43,17 +37,17 @@ export default function CategorizedMatchesByDate({ date }: { date: string }) {
     }
 
     getMatches();
-  }, [date]);
+  }, [date, location?.country]);
 
   if (isLoading || loading) return <LoadingSpinner />;
 
-  if (allMatches.length === 0) return <div>No Data Found</div>;
+  if (allMatches.length === 0) return;
 
   const results = Object.entries(_.groupBy(allMatches, "fullTournamentName"));
 
   return (
     <div className="space-y-2">
-      {/* popular League and tournament matches separated by leagues and tournaments, and filtered by date */}
+      {/* popular League and tournament matches separated by leagues and tournaments, and filtered by date and country */}
       <h3 className="text-muted-foreground text-sm mt-5">
         Popular League&apos;s and Tournament&apos;s Matches
       </h3>

@@ -1,27 +1,29 @@
 "use client";
 
-import prisma from "@/lib/db";
+import { useEffect, useState } from "react";
 
 import Image from "next/image";
+
+import { Standing } from "@prisma/client";
+
+import _ from "lodash";
+
+import useGeoLocation from "@/hooks/useGeoLocation";
 
 import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
+import { LoadingSpinner } from "@/components/LoadingComponents";
 
-import _ from "lodash";
 import { sortStandings } from "@/lib/sortGroupTeams";
-import { useEffect, useState } from "react";
-import { LeagueTeam, Standing } from "@prisma/client";
-import useGeoLocation from "@/hooks/useGeoLocation";
-import { LoadingSpinner } from "../LoadingComponents";
 
 interface TableHeadProps {
   labels: Array<{ name: string; className?: string | null }>;
   className: string;
 }
 
-export default async function Standings({
+export default function Standings({
   values,
   date,
 }: {
@@ -50,11 +52,11 @@ export default async function Standings({
     }
 
     getStandings();
-  }, [date]);
+  }, [date, location?.country]);
 
   if (isLoading || loading) return <LoadingSpinner />;
 
-  if (standings.length === 0) return <div>No Data Found</div>;
+  if (standings.length === 0) return;
 
   const results = Object.entries(_.groupBy(standings, "seasonId"));
 

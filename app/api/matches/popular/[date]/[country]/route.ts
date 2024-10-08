@@ -1,14 +1,16 @@
+import prisma from "@/lib/db";
+
 import {
   switchGroupMatchesToNeutralMatches,
   switchKnockoutMatchesToNeutralMatches,
   switchLeagueMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
-import prisma from "@/lib/db";
+
 import { getStartAndEndDates } from "@/lib/getFormattedDate";
 
 export async function GET(
   request: Request,
-  { params }: { params: { date: string; country: string } }
+  { params }: { params: { date: string; country: string | undefined } }
 ) {
   const { startDate, endDate } = getStartAndEndDates(params.date);
 

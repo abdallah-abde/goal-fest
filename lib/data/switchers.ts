@@ -13,23 +13,27 @@ import {
   TournamentEdition,
 } from "@prisma/client";
 
+interface TournamentEditionProps extends TournamentEdition {
+  tournament: Tournament;
+  teams: Team[];
+  winner: Team | null;
+  titleHolder: Team | null;
+  hostingCountries: Country[];
+  matches: MatchProps[];
+  knockoutMatches: KnockoutMatchProps[];
+}
+
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEdition & {
-    tournament: Tournament;
-    hostingCountries: Country[];
-  };
+  tournamentEdition: TournamentEditionProps;
 }
 
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
   awayTeam: Team | null;
-  tournamentEdition: TournamentEdition & {
-    tournament: Tournament;
-    hostingCountries: Country[];
-  };
+  tournamentEdition: TournamentEditionProps;
 }
 
 interface LeagueProps extends League {
@@ -113,10 +117,24 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
     type: "KNOCKOUT",
     tournamentEdition: match.tournamentEdition,
     season: null,
-    tournamentOrLeagueName: match.tournamentEdition.tournament.name,
+    tournamentOrLeagueName: match.tournamentEdition
+      ? match.tournamentEdition.tournament
+        ? match.tournamentEdition.tournament.name
+        : ""
+      : "",
     tournamentOrLeagueYear: match.tournamentEdition.yearAsString,
-    country: match.tournamentEdition.tournament.type,
-    fullTournamentName: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.yearAsString})`,
+    country: match.tournamentEdition
+      ? match.tournamentEdition.tournament
+        ? match.tournamentEdition.tournament.type
+        : ""
+      : "",
+    fullTournamentName: `${
+      match.tournamentEdition
+        ? match.tournamentEdition.tournament
+          ? match.tournamentEdition.tournament.name
+          : ""
+        : ""
+    } (${match.tournamentEdition.yearAsString})`,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeGoals: match.homeGoals,

@@ -7,13 +7,14 @@ import {
   KnockoutMatch,
   TournamentEdition,
   Tournament,
+  Country,
 } from "@prisma/client";
 
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { GroupIcon, CalendarDays } from "lucide-react";
 
@@ -35,19 +36,20 @@ interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
   teams: Team[];
   groups: Group[];
+  hostingCountries: Country[];
 }
 
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
   awayTeam: Team | null;
-  tournamentEdition: TournamentEdition & { tournament: Tournament };
+  tournamentEdition: TournamentEditionProps;
 }
 
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEdition & { tournament: Tournament };
+  tournamentEdition: TournamentEditionProps;
 }
 
 export default function MatchesCards({
