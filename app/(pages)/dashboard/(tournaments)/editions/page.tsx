@@ -41,104 +41,115 @@ export default async function DashboardEditionsPage({
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "year";
 
+  const where = {
+    OR: [
+      { tournament: { name: { contains: query } } },
+      { yearAsString: { contains: query } },
+      { winner: { name: { contains: query } } },
+      { titleHolder: { name: { contains: query } } },
+    ],
+  };
+
+  const orderBy = {
+    ...(sortField === "name"
+      ? { tournament: { name: sortDir } }
+      : sortField === "year"
+      ? { year: sortDir }
+      : sortField === "winner"
+      ? { winner: { name: sortDir } }
+      : sortField === "titleHolder"
+      ? { titleHolder: { name: sortDir } }
+      : {}),
+  };
+
   const totalEditionsCount = await prisma.tournamentEdition.count({
     where: {
-      OR: [
-        { tournament: { name: { contains: query } } },
-        { yearAsString: { contains: query } },
-      ],
+      ...where,
     },
   });
+
   const totalPages = Math.ceil(totalEditionsCount / PAGE_RECORDS_COUNT);
 
-  let editions;
-
-  if (sortField === "name") {
-    editions = await prisma.tournamentEdition.findMany({
-      where: {
-        OR: [
-          { tournament: { name: { contains: query } } },
-          { yearAsString: { contains: query } },
-        ],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { tournament: { name: sortDir } },
-      include: {
-        tournament: true,
-        hostingCountries: true,
-      },
-    });
-  } else {
-    editions = await prisma.tournamentEdition.findMany({
-      where: {
-        OR: [
-          { tournament: { name: { contains: query } } },
-          { yearAsString: { contains: query } },
-        ],
-      },
-
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { year: sortDir },
-      include: {
-        tournament: true,
-        hostingCountries: true,
-      },
-    });
-  }
+  const editions = await prisma.tournamentEdition.findMany({
+    where: {
+      ...where,
+    },
+    skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+    take: PAGE_RECORDS_COUNT,
+    orderBy: { ...orderBy },
+    include: {
+      tournament: true,
+      hostingCountries: true,
+      winner: true,
+      titleHolder: true,
+    },
+  });
 
   return (
     <>
-      <PageHeader label='Tournaments Editions List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Tournaments Editions List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/editions/new'
-          label='Add New Edition'
+          href="/dashboard/editions/new"
+          label="Add New Edition"
         />
       </div>
       {editions.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='name' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="name" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent label='Year' fieldName='year' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Year" fieldName="year" />
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Winner" fieldName="winner" />
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="TitleHolder" fieldName="Title Holder" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {editions.map(({ id, tournament: { name }, year }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
-                <TableCell className='dashboard-table-cell'>
-                  {year.toString()}
-                </TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/editions/${id}`}>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    asChild
-                    className='items-center justify-center'
-                  >
-                    <Link
-                      href={`/dashboard/editions/${id}/update-current-stage`}
-                      className='w-full cursor-pointer'
+            {editions.map(
+              ({ id, tournament: { name }, year, winner, titleHolder }) => (
+                <TableRow key={id} className="dashboard-table-row">
+                  <TableCell className="dashboard-table-cell">{name}</TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {year.toString()}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {winner?.name || "No winner yet"}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {titleHolder?.name || "No title holder"}
+                  </TableCell>
+                  <ActionsCellDropDown editHref={`/dashboard/editions/${id}`}>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      asChild
+                      className="items-center justify-center"
                     >
-                      Update Current Stage
-                    </Link>
-                  </DropdownMenuItem>
-                </ActionsCellDropDown>
-              </TableRow>
-            ))}
+                      <Link
+                        href={`/dashboard/editions/${id}/update-current-stage`}
+                        className="w-full cursor-pointer"
+                      >
+                        Update Current Stage
+                      </Link>
+                    </DropdownMenuItem>
+                  </ActionsCellDropDown>
+                </TableRow>
+              )
+            )}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
+          <DashboardTableFooter totalPages={totalPages} colSpan={5} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Editions Found' />
+        <NoDataFoundComponent message="No Editions Found" />
       )}
     </>
   );

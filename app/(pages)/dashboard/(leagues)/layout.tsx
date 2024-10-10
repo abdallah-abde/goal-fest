@@ -4,7 +4,7 @@ import { Ban } from "lucide-react";
 
 import DashboardSidebar from "@/components/menus/DashboardSidebar";
 
-export default async function DashboardTournamentsLayout({
+export default async function DashboardLeaguesLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ export default async function DashboardTournamentsLayout({
 
   return (
     <div className="h-screen flex flex-col md:flex-row gap-4 py-24">
-      <DashboardSidebar source="tournaments" />
+      <DashboardSidebar source="leagues" />
       <div className="md:overflow-auto grow pl-1 md:pr-2 pb-24 md:pb-0 mt-8 md:mt-0">
         {children}
       </div>

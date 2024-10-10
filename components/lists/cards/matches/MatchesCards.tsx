@@ -35,21 +35,23 @@ import {
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
   teams: Team[];
-  groups: Group[];
+  // groups: Group[];
+  winner: Team | null;
+  titleHolder: Team | null;
   hostingCountries: Country[];
 }
 
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
   awayTeam: Team | null;
-  tournamentEdition: TournamentEditionProps;
+  tournamentEdition: TournamentEdition;
 }
 
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEditionProps;
+  tournamentEdition: TournamentEdition;
 }
 
 export default function MatchesCards({

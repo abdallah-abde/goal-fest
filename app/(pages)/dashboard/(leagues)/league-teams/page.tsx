@@ -21,7 +21,7 @@ import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-export default async function DashboardTeamsPage({
+export default async function DashboardLeagueTeamsPage({
   searchParams,
 }: {
   searchParams: {
@@ -48,16 +48,14 @@ export default async function DashboardTeamsPage({
       : {}),
   };
 
-  const totalTeamsCount = await prisma.team.count({
+  const totalLeagueTeamsCount = await prisma.leagueTeam.count({
     where: { ...where },
   });
 
-  const totalPages = Math.ceil(totalTeamsCount / PAGE_RECORDS_COUNT);
+  const totalPages = Math.ceil(totalLeagueTeamsCount / PAGE_RECORDS_COUNT);
 
-  const teams = await prisma.team.findMany({
-    where: {
-      ...where,
-    },
+  const LeagueTeams = await prisma.leagueTeam.findMany({
+    where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
     orderBy: { ...orderBy },
@@ -65,12 +63,15 @@ export default async function DashboardTeamsPage({
 
   return (
     <>
-      <PageHeader label="Teams List" />
+      <PageHeader label="Leagues Teams List" />
       <div className="dashboard-search-and-add">
         <SearchFieldComponent />
-        <AddNewLinkComponent href="/dashboard/teams/new" label="Add New Team" />
+        <AddNewLinkComponent
+          href="/dashboard/league-teams/new"
+          label="Add New Team"
+        />
       </div>
-      {teams.length > 0 ? (
+      {LeagueTeams.length > 0 ? (
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
@@ -84,18 +85,20 @@ export default async function DashboardTeamsPage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {teams.map(({ id, name, code }) => (
+            {LeagueTeams.map(({ id, name, code }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">{code}</TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/teams/${id}`} />
+                <ActionsCellDropDown
+                  editHref={`/dashboard/league-teams/${id}`}
+                />
               </TableRow>
             ))}
           </TableBody>
           <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Teams Found" />
+        <NoDataFoundComponent message="No League Teams Found" />
       )}
     </>
   );

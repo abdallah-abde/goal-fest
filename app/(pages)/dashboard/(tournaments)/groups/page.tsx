@@ -36,119 +36,83 @@ export default async function DashboardGroupsPage({
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
 
+  const where = {
+    OR: [
+      { tournamentEdition: { tournament: { name: { contains: query } } } },
+      { tournamentEdition: { yearAsString: { contains: query } } },
+      { name: { contains: query } },
+    ],
+  };
+
+  const orderBy = {
+    ...(sortField === "tournament"
+      ? { tournamentEdition: { tournament: { name: sortDir } } }
+      : sortField === "edition"
+      ? { tournamentEdition: { year: sortDir } }
+      : sortField === "name"
+      ? { name: sortDir }
+      : {}),
+  };
+
   const totalGroupsCount = await prisma.group.count({
     where: {
-      OR: [
-        { tournamentEdition: { tournament: { name: { contains: query } } } },
-        { tournamentEdition: { yearAsString: { contains: query } } },
-        { name: { contains: query } },
-      ],
+      ...where,
     },
   });
+
   const totalPages = Math.ceil(totalGroupsCount / PAGE_RECORDS_COUNT);
 
-  let groups;
-  if (sortField === "tournament") {
-    groups = await prisma.group.findMany({
-      where: {
-        OR: [
-          { tournamentEdition: { tournament: { name: { contains: query } } } },
-          { tournamentEdition: { yearAsString: { contains: query } } },
-          { name: { contains: query } },
-        ],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { tournamentEdition: { tournament: { name: sortDir } } },
-      include: {
-        teams: true,
-        tournamentEdition: {
-          include: {
-            tournament: true,
-          },
+  const groups = await prisma.group.findMany({
+    where: { ...where },
+    skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+    take: PAGE_RECORDS_COUNT,
+    orderBy: { ...orderBy },
+    include: {
+      teams: true,
+      tournamentEdition: {
+        include: {
+          tournament: true,
         },
       },
-    });
-  } else if (sortField === "edition") {
-    groups = await prisma.group.findMany({
-      where: {
-        OR: [
-          { tournamentEdition: { tournament: { name: { contains: query } } } },
-          { tournamentEdition: { yearAsString: { contains: query } } },
-          { name: { contains: query } },
-        ],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { tournamentEdition: { year: sortDir } },
-      include: {
-        teams: true,
-        tournamentEdition: {
-          include: {
-            tournament: true,
-          },
-        },
-      },
-    });
-  } else {
-    groups = await prisma.group.findMany({
-      where: {
-        OR: [
-          { tournamentEdition: { tournament: { name: { contains: query } } } },
-          { tournamentEdition: { yearAsString: { contains: query } } },
-          { name: { contains: query } },
-        ],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { name: sortDir },
-      include: {
-        teams: true,
-        tournamentEdition: {
-          include: {
-            tournament: true,
-          },
-        },
-      },
-    });
-  }
+    },
+  });
 
   return (
     <>
-      <PageHeader label='Groups List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Groups List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/groups/new'
-          label='Add New Group'
+          href="/dashboard/groups/new"
+          label="Add New Group"
         />
       </div>
       {groups.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='tournament' label='Tournament' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="tournament" label="Tournament" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='edition' label='Edition' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="edition" label="Edition" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent label='Name' fieldName='name' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Name" fieldName="name" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groups.map(({ id, name, tournamentEdition }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">
                   {tournamentEdition.tournament.name}
                 </TableCell>
-                <TableCell className='dashboard-table-cell'>
+                <TableCell className="dashboard-table-cell">
                   {tournamentEdition.year.toString()}
                 </TableCell>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/groups/${id}`} />
               </TableRow>
             ))}
@@ -156,7 +120,7 @@ export default async function DashboardGroupsPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={4} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Groups Found' />
+        <NoDataFoundComponent message="No Groups Found" />
       )}
     </>
   );

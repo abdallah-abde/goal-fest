@@ -25,7 +25,7 @@ import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import { Check, X } from "lucide-react";
 
-export default async function DashboardKnockoutMatchesPage({
+export default async function DashboardLeagueMatchesPage({
   searchParams,
 }: {
   searchParams: {
@@ -42,40 +42,37 @@ export default async function DashboardKnockoutMatchesPage({
 
   const where = {
     OR: [
-      { tournamentEdition: { tournament: { name: { contains: query } } } },
-      { tournamentEdition: { yearAsString: { contains: query } } },
+      { season: { league: { name: { contains: query } } } },
+      { season: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
       { awayTeam: { name: { contains: query } } },
     ],
   };
 
   const orderBy = {
-    ...(sortField === "tournament"
-      ? { tournamentEdition: { tournament: { name: sortDir } } }
-      : sortField === "edition"
-      ? { tournamentEdition: { year: sortDir } }
+    ...(sortField === "league"
+      ? { season: { league: { name: sortDir } } }
+      : sortField === "season"
+      ? { season: { year: sortDir } }
       : sortField === "homeTeam"
       ? { homeTeam: { name: sortDir } }
       : sortField === "awayTeam"
       ? { awayTeam: { name: sortDir } }
-      : sortField === "round"
-      ? { round: sortDir }
       : sortField === "isFeatured"
       ? { isFeatured: sortDir }
+      : sortField === "round"
+      ? { round: sortDir }
       : sortField === "date"
       ? { date: sortDir }
       : {}),
   };
 
-  const totalMatchesCount = await prisma.knockoutMatch.count({
-    where: {
-      ...where,
-    },
+  const totalMatchesCount = await prisma.leagueMatch.count({
+    where: { ...where },
   });
-
   const totalPages = Math.ceil(totalMatchesCount / PAGE_RECORDS_COUNT);
 
-  const matches = await prisma.knockoutMatch.findMany({
+  const leagueMatches = await prisma.leagueMatch.findMany({
     where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
@@ -83,9 +80,9 @@ export default async function DashboardKnockoutMatchesPage({
     include: {
       homeTeam: true,
       awayTeam: true,
-      tournamentEdition: {
+      season: {
         include: {
-          tournament: true,
+          league: true,
         },
       },
     },
@@ -93,16 +90,15 @@ export default async function DashboardKnockoutMatchesPage({
 
   return (
     <>
-      <PageHeader label="Knockout Matches List" />
+      <PageHeader label="Leagues Matches List" />
       <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href="/dashboard/knockout-matches/new"
+          href="/dashboard/league-matches/new"
           label="Add New Match"
         />
       </div>
-
-      {matches.length > 0 ? (
+      {leagueMatches.length > 0 ? (
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
@@ -120,18 +116,7 @@ export default async function DashboardKnockoutMatchesPage({
                   labelForSmallerDevices="AT"
                 />
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <span className="hidden max-sm:block">MT</span>
-                <span className="hidden sm:block">Main Time</span>
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <span className="hidden max-sm:block">ET</span>
-                <span className="hidden sm:block">Extra Time</span>
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <span className="hidden max-sm:block">Pen</span>
-                <span className="hidden sm:block">Penalties</span>
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Score</TableHead>
               <TableHead className="dashboard-head-table-cell">
                 <SortComponent
                   fieldName="date"
@@ -147,18 +132,10 @@ export default async function DashboardKnockoutMatchesPage({
                 />
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
-                  fieldName="tournament"
-                  label="Tournament"
-                  labelForSmallerDevices="Tour"
-                />
+                <SortComponent fieldName="league" label="League" />
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
-                  fieldName="edition"
-                  label="Edition"
-                  labelForSmallerDevices="Edi"
-                />
+                <SortComponent fieldName="season" label="Season" />
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
                 <SortComponent fieldName="isFeatured" label="Is Featured" />
@@ -167,49 +144,29 @@ export default async function DashboardKnockoutMatchesPage({
             </TableRow>
           </TableHeader>
           <TableBody className="text-[11px] sm:text-[12px]">
-            {matches.map(
+            {leagueMatches.map(
               ({
                 id,
                 homeTeam,
                 awayTeam,
                 homeGoals,
                 awayGoals,
-                homeExtraTimeGoals,
-                awayExtraTimeGoals,
-                homeTeamPlacehlder,
-                awayTeamPlacehlder,
-                homePenaltyGoals,
-                awayPenaltyGoals,
-                date,
                 round,
-                tournamentEdition,
+                date,
+                season,
                 isFeatured,
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">
-                      {homeTeam ? homeTeam.code : homeTeamPlacehlder}
-                    </span>
-                    <span className="hidden sm:block">
-                      {homeTeam ? homeTeam.name : homeTeamPlacehlder}
-                    </span>
+                    <span className="hidden max-sm:block">{homeTeam.code}</span>
+                    <span className="hidden sm:block">{homeTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">
-                      {awayTeam ? awayTeam.code : awayTeamPlacehlder}
-                    </span>
-                    <span className="hidden sm:block">
-                      {awayTeam ? awayTeam.name : awayTeamPlacehlder}
-                    </span>
+                    <span className="hidden max-sm:block">{awayTeam.code}</span>
+                    <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {homeGoals} - {awayGoals}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {homeExtraTimeGoals} - {awayExtraTimeGoals}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {homePenaltyGoals} - {awayPenaltyGoals}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <div className="flex flex-col">
@@ -235,25 +192,25 @@ export default async function DashboardKnockoutMatchesPage({
                     {round}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {tournamentEdition.tournament.name}
+                    {season.league.name}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {tournamentEdition.year.toString()}
+                    {season.year}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {isFeatured ? <Check /> : <X />}
                   </TableCell>
                   <ActionsCellDropDown
-                    editHref={`/dashboard/knockout-matches/${id}`}
+                    editHref={`/dashboard/league-matches/${id}`}
                   />
                 </TableRow>
               )
             )}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={11} />
+          <DashboardTableFooter totalPages={totalPages} colSpan={9} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Knockout Matches Found" />
+        <NoDataFoundComponent message="No League Matches Found" />
       )}
     </>
   );

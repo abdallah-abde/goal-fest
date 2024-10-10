@@ -36,65 +36,63 @@ export default async function DashboardCountriesPage({
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
 
+  const where = {
+    OR: [{ name: { contains: query } }, { code: { contains: query } }],
+  };
+
+  const orderBy = {
+    ...(sortField === "name"
+      ? { name: sortDir }
+      : sortField === "code"
+      ? { code: sortDir }
+      : {}),
+  };
+
   const totalCountriesCount = await prisma.country.count({
-    where: { name: { contains: query } },
+    where: { ...where },
   });
+
   const totalPages = Math.ceil(totalCountriesCount / PAGE_RECORDS_COUNT);
 
-  let countries;
-
-  if (sortField === "name") {
-    countries = await prisma.country.findMany({
-      where: {
-        OR: [{ name: { contains: query } }, { code: { contains: query } }],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { name: sortDir },
-    });
-  } else {
-    countries = await prisma.country.findMany({
-      where: {
-        OR: [{ name: { contains: query } }, { code: { contains: query } }],
-      },
-      skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
-      take: PAGE_RECORDS_COUNT,
-      orderBy: { code: sortDir },
-    });
-  }
+  const countries = await prisma.country.findMany({
+    where: { ...where },
+    skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
+    take: PAGE_RECORDS_COUNT,
+    orderBy: { ...orderBy },
+  });
 
   // await new Promise((resolve) => {
   //   setTimeout(() => {}, 300);
   // });
 
   return (
-    <>
-      <PageHeader label='Countries List' />
-      <div className='dashboard-search-and-add'>
+    <div className="py-24">
+      <PageHeader label="Countries List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/countries/new'
-          label='Add New Country'
+          href="/dashboard/countries/new"
+          label="Add New Country"
         />
       </div>
       {countries.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='name' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="name" />
               </TableHead>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent label='Country Code' fieldName='code' />
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="Country Code" fieldName="code" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {countries.map(({ id, name, code }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
-                <TableCell className='dashboard-table-cell'>{code}</TableCell>
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
+                <TableCell className="dashboard-table-cell">{code}</TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
               </TableRow>
             ))}
@@ -102,8 +100,8 @@ export default async function DashboardCountriesPage({
           <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Countries Found' />
+        <NoDataFoundComponent message="No Countries Found" />
       )}
-    </>
+    </div>
   );
 }

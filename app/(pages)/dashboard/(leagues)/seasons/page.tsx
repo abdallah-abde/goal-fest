@@ -21,7 +21,7 @@ import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-export default async function DashboardTeamsPage({
+export default async function DashboardSeasonsPage({
   searchParams,
 }: {
   searchParams: {
@@ -34,43 +34,54 @@ export default async function DashboardTeamsPage({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
-  const sortField = searchParams?.sortField || "name";
+  const sortField = searchParams?.sortField || "year";
 
   const where = {
-    OR: [{ name: { contains: query } }, { code: { contains: query } }],
+    OR: [
+      { league: { name: { contains: query } } },
+      { year: { contains: query } },
+    ],
   };
 
   const orderBy = {
     ...(sortField === "name"
-      ? { name: sortDir }
-      : sortField === "code"
-      ? { code: sortDir }
+      ? { league: { name: sortDir } }
+      : sortField === "year"
+      ? { year: sortDir }
       : {}),
   };
 
-  const totalTeamsCount = await prisma.team.count({
-    where: { ...where },
+  const totalSeasonsCount = await prisma.leagueSeason.count({
+    where: {
+      ...where,
+    },
   });
 
-  const totalPages = Math.ceil(totalTeamsCount / PAGE_RECORDS_COUNT);
+  const totalPages = Math.ceil(totalSeasonsCount / PAGE_RECORDS_COUNT);
 
-  const teams = await prisma.team.findMany({
+  const seasons = await prisma.leagueSeason.findMany({
     where: {
       ...where,
     },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
     orderBy: { ...orderBy },
+    include: {
+      league: true,
+    },
   });
 
   return (
     <>
-      <PageHeader label="Teams List" />
+      <PageHeader label="Leagues Seasons List" />
       <div className="dashboard-search-and-add">
         <SearchFieldComponent />
-        <AddNewLinkComponent href="/dashboard/teams/new" label="Add New Team" />
+        <AddNewLinkComponent
+          href="/dashboard/seasons/new"
+          label="Add New Season"
+        />
       </div>
-      {teams.length > 0 ? (
+      {seasons.length > 0 ? (
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
@@ -78,24 +89,24 @@ export default async function DashboardTeamsPage({
                 <SortComponent fieldName="name" />
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Team Code" fieldName="code" />
+                <SortComponent label="Year" fieldName="year" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {teams.map(({ id, name, code }) => (
+            {seasons.map(({ id, league: { name }, year }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{code}</TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/teams/${id}`} />
+                <TableCell className="dashboard-table-cell">{year}</TableCell>
+                <ActionsCellDropDown editHref={`/dashboard/seasons/${id}`} />
               </TableRow>
             ))}
           </TableBody>
           <DashboardTableFooter totalPages={totalPages} colSpan={3} />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No Teams Found" />
+        <NoDataFoundComponent message="No Seasons Found" />
       )}
     </>
   );

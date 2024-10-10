@@ -21,6 +21,8 @@ import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
+import { Check, X } from "lucide-react";
+
 export default async function DashboardTournamentsPage({
   searchParams,
 }: {
@@ -34,54 +36,79 @@ export default async function DashboardTournamentsPage({
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
-  // const sortField = searchParams?.sortField || "name";
+  const sortField = searchParams?.sortField || "name";
+
+  const where = {
+    name: { contains: query },
+  };
+
+  const orderBy = {
+    ...(sortField === "name"
+      ? { name: sortDir }
+      : sortField === "type"
+      ? { type: sortDir }
+      : sortField === "isPopular"
+      ? { isPopular: sortDir }
+      : {}),
+  };
 
   const totalTournamentsCount = await prisma.tournament.count({
-    where: { name: { contains: query } },
+    where: { ...where },
   });
+
   const totalPages = Math.ceil(totalTournamentsCount / PAGE_RECORDS_COUNT);
 
   const tournaments = await prisma.tournament.findMany({
-    where: { name: { contains: query } },
+    where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
-    orderBy: { name: sortDir },
+    orderBy: { ...orderBy },
   });
 
   return (
     <>
-      <PageHeader label='Tournaments List' />
-      <div className='dashboard-search-and-add'>
+      <PageHeader label="Tournaments List" />
+      <div className="dashboard-search-and-add">
         <SearchFieldComponent />
         <AddNewLinkComponent
-          href='/dashboard/tournaments/new'
-          label='Add New Tournament'
+          href="/dashboard/tournaments/new"
+          label="Add New Tournament"
         />
       </div>
       {tournaments.length > 0 ? (
-        <Table className='dashboard-table'>
+        <Table className="dashboard-table">
           <TableHeader>
-            <TableRow className='dashboard-head-table-row'>
-              <TableHead className='dashboard-head-table-cell'>
-                <SortComponent fieldName='name' />
+            <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="name" />
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="type" label="Type" />
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="isPopular" label="Is Popular" />
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tournaments.map(({ id, name }) => (
-              <TableRow key={id} className='dashboard-table-row'>
-                <TableCell className='dashboard-table-cell'>{name}</TableCell>
+            {tournaments.map(({ id, name, type, isPopular }) => (
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
+                <TableCell className="dashboard-table-cell">{type}</TableCell>
+                <TableCell className="dashboard-table-cell">
+                  {isPopular ? <Check /> : <X />}
+                </TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/tournaments/${id}`}
                 />
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={2} />
+          <DashboardTableFooter totalPages={totalPages} colSpan={4} />
         </Table>
       ) : (
-        <NoDataFoundComponent message='No Tournaments Found' />
+        <NoDataFoundComponent message="No Tournaments Found" />
       )}
     </>
   );

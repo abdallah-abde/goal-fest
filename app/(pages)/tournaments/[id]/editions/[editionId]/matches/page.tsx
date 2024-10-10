@@ -63,7 +63,10 @@ export default async function MatchesPage({
         include: {
           tournament: true,
           teams: true,
-          groups: true,
+          // groups: true,
+          hostingCountries: true,
+          winner: true,
+          titleHolder: true,
         },
       }),
       isAllGroups || groupId
@@ -78,7 +81,16 @@ export default async function MatchesPage({
             include: {
               homeTeam: true,
               awayTeam: true,
-              tournamentEdition: { include: { tournament: true } },
+              tournamentEdition: {
+                include: {
+                  tournament: true,
+                  hostingCountries: true,
+                  teams: true,
+                  winner: true,
+                  titleHolder: true,
+                  // groups: true,
+                },
+              },
               group: true,
             },
           })
@@ -95,7 +107,17 @@ export default async function MatchesPage({
             include: {
               homeTeam: true,
               awayTeam: true,
-              tournamentEdition: { include: { tournament: true } },
+              // tournamentEdition: true,
+              tournamentEdition: {
+                include: {
+                  tournament: true,
+                  hostingCountries: true,
+                  teams: true,
+                  winner: true,
+                  titleHolder: true,
+                  // groups: true,
+                },
+              },
             },
           })
         : [],
