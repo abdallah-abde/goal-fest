@@ -3,13 +3,10 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { GroupMatchSchema, GroupMatchScoreSchema } from "@/schemas";
+import { LeagueMatchSchema, LeagueMatchScoreSchema } from "@/schemas";
 
-export async function addTournamentGroupMatch(
-  prevState: unknown,
-  formData: FormData
-) {
-  const result = GroupMatchSchema.safeParse(
+export async function addLeagueMatch(prevState: unknown, formData: FormData) {
+  const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 
@@ -25,29 +22,28 @@ export async function addTournamentGroupMatch(
   if (data.homeTeamId === data.awayTeamId)
     return { awayTeamId: ["Home team & Away team can't be the same"] };
 
-  await prisma.match.create({
+  await prisma.leagueMatch.create({
     data: {
       homeTeamId: +data.homeTeamId,
       awayTeamId: +data.awayTeamId,
       homeGoals: homeGoals ? +homeGoals : null,
       awayGoals: awayGoals ? +awayGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
-      groupId: +data.groupId,
-      tournamentEditionId: +data.tournamentEditionId,
+      seasonId: +data.seasonId,
       round: data.round ? data.round.toString() : null,
     },
   });
 
-  revalidatePath("/dashboard/matches");
-  redirect("/dashboard/matches");
+  revalidatePath("/dashboard/league-matches");
+  redirect("/dashboard/league-matches");
 }
 
-export async function updateTournamentGroupMatch(
+export async function updateLeagueMatch(
   id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const result = GroupMatchSchema.safeParse(
+  const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 
@@ -57,7 +53,7 @@ export async function updateTournamentGroupMatch(
 
   const data = result.data;
 
-  const currentMatch = await prisma.match.findUnique({
+  const currentMatch = await prisma.leagueMatch.findUnique({
     where: { id },
   });
 
@@ -69,7 +65,7 @@ export async function updateTournamentGroupMatch(
   if (data.homeTeamId === data.awayTeamId)
     return { awayTeamId: ["Home team & Away team can't be the same"] };
 
-  await prisma.match.update({
+  await prisma.leagueMatch.update({
     where: { id },
     data: {
       homeTeamId: +data.homeTeamId,
@@ -77,54 +73,58 @@ export async function updateTournamentGroupMatch(
       homeGoals: homeGoals ? +homeGoals : null,
       awayGoals: awayGoals ? +awayGoals : null,
       date: data.date ? new Date(data.date.toString()) : null,
-      groupId: +data.groupId,
-      tournamentEditionId: +data.tournamentEditionId,
+      seasonId: +data.seasonId,
       round: data.round ? data.round.toString() : null,
     },
   });
 
-  revalidatePath("/dashboard/matches");
-  redirect("/dashboard/matches");
+  revalidatePath("/dashboard/league-matches");
+  redirect("/dashboard/league-matches");
 }
 
-export async function updateGroupMatchFeaturedStatus(
+export async function updateLeagueMatchFeaturedStatus(
   id: number,
   isFeatured: boolean,
   searchParams: string
 ) {
-  const currentMatch = await prisma.match.findUnique({
+  const currentMatch = await prisma.leagueMatch.findUnique({
     where: { id },
   });
 
   if (currentMatch == null) return notFound();
 
-  await prisma.match.update({
+  await prisma.leagueMatch.update({
     where: { id },
     data: {
       isFeatured,
     },
   });
 
-  revalidatePath("/dashboard/matches");
-  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
+  revalidatePath("/dashboard/league-matches");
+  redirect(
+    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }
 
-export async function updateGroupMatchScore(
+export async function updateLeagueMatchScore(
   args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
+  // searchParams: string
 ) {
   const { id, searchParams } = args;
 
-  const result = GroupMatchScoreSchema.safeParse(
+  const result = LeagueMatchScoreSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
+
+  console.log(result.success);
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
   }
 
-  const currentMatch = await prisma.match.findUnique({
+  const currentMatch = await prisma.leagueMatch.findUnique({
     where: { id },
   });
 
@@ -133,7 +133,7 @@ export async function updateGroupMatchScore(
   const homeGoals = formData.get("homeGoals");
   const awayGoals = formData.get("awayGoals");
 
-  await prisma.match.update({
+  await prisma.leagueMatch.update({
     where: { id },
     data: {
       homeGoals: homeGoals ? +homeGoals : null,
@@ -141,6 +141,11 @@ export async function updateGroupMatchScore(
     },
   });
 
-  revalidatePath("/dashboard/matches");
-  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
+  // revalidatePath("/dashboard/league-matches");
+  // redirect("/dashboard/league-matches");
+
+  revalidatePath("/dashboard/league-matches");
+  redirect(
+    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }

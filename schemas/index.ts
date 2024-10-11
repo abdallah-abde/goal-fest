@@ -45,6 +45,7 @@ export const TeamSchema = z.object({
 export const TournamentSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   logoUrl: ImageSchema.optional(),
+  type: z.string().min(1, { message: "Type is required!" }),
 });
 
 export const EditionSchema = z.object({
@@ -108,6 +109,15 @@ export const GroupMatchSchema = z.object({
   round: z.string().optional(),
 });
 
+export const GroupMatchScoreSchema = z.object({
+  homeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+});
+
 export const knockoutMatchSchema = z.object({
   homeTeamId: z.union([
     z.coerce
@@ -153,4 +163,95 @@ export const knockoutMatchSchema = z.object({
   awayTeamPlacehlder: z
     .string()
     .min(2, { message: "Away Team Placeholder is required" }),
+});
+
+export const knockoutMatchScoreSchema = z.object({
+  homeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  homeExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  homePenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayPenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+});
+
+export const LeagueSchema = z.object({
+  name: z.string().min(1, { message: "Name is required!" }),
+  logoUrl: ImageSchema.optional(),
+  countryId: z.union([z.coerce.number().optional(), z.string()]),
+  type: z.string().min(1, { message: "Type is required!" }),
+});
+
+export const SeasonSchema = z.object({
+  leagueId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "League is required" }),
+  startYear: z.coerce
+    .number({ message: "Please enter a valid year" })
+    .int()
+    .refine((data) => data > 1900 && data < new Date().getFullYear() + 10, {
+      message: `Start year is required and must be between 1900 & ${
+        new Date().getFullYear() + 10
+      } `,
+    }),
+  endYear: z.coerce
+    .number({ message: "Please enter a valid year" })
+    .int()
+    .refine((data) => data > 1900 && data < new Date().getFullYear() + 10, {
+      message: `End year is required and must be between 1900 & ${
+        new Date().getFullYear() + 10
+      } `,
+    }),
+  logoUrl: ImageSchema.optional(),
+  teams: z.string().optional(),
+});
+
+export const LeagueTeamSchema = z.object({
+  name: z.string().min(1, { message: "Name is required!" }),
+  flagUrl: ImageSchema.optional(),
+  code: z.string().optional(),
+});
+
+export const LeagueMatchSchema = z.object({
+  homeTeamId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Home Team is required" }),
+  awayTeamId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Away Team is required" }),
+  homeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  date: z.union([z.coerce.date().optional(), z.string()]),
+  seasonId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Season is required" }),
+  round: z.string().optional(),
+});
+
+export const LeagueMatchScoreSchema = z.object({
+  homeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
 });

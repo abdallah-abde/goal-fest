@@ -13,7 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
+import {
+  getFormattedDate,
+  getFormattedDateTime,
+  getFormattedTime,
+} from "@/lib/getFormattedDate";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -24,6 +28,9 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import { Check, X } from "lucide-react";
+import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
+import PopoverKnockoutMatchScoreUpdator from "@/components/table-parts/PopoverKnockoutMatchScoreUpdator";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardKnockoutMatchesPage({
   searchParams,
@@ -203,13 +210,91 @@ export default async function DashboardKnockoutMatchesPage({
                     </span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {homeGoals} - {awayGoals}
+                    <PopoverKnockoutMatchScoreUpdator
+                      id={id}
+                      homeTeamName={
+                        homeTeam ? homeTeam.name : homeTeamPlacehlder || ""
+                      }
+                      awayTeamName={
+                        awayTeam ? awayTeam.name : awayTeamPlacehlder || ""
+                      }
+                      tournamentName={tournamentEdition.tournament.name}
+                      editionName={tournamentEdition.year.toString()}
+                      roundName={round || ""}
+                      date={
+                        date
+                          ? getFormattedDateTime(date.toString())
+                          : "No date information"
+                      }
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                      homeExtraTimeGoals={homeExtraTimeGoals}
+                      awayExtraTimeGoals={awayExtraTimeGoals}
+                      homePenaltyGoals={homePenaltyGoals}
+                      awayPenaltyGoals={awayPenaltyGoals}
+                    >
+                      <Button variant="ghost">
+                        {homeGoals} - {awayGoals}
+                      </Button>
+                    </PopoverKnockoutMatchScoreUpdator>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {homeExtraTimeGoals} - {awayExtraTimeGoals}
+                    <PopoverKnockoutMatchScoreUpdator
+                      id={id}
+                      homeTeamName={
+                        homeTeam ? homeTeam.name : homeTeamPlacehlder || ""
+                      }
+                      awayTeamName={
+                        awayTeam ? awayTeam.name : awayTeamPlacehlder || ""
+                      }
+                      tournamentName={tournamentEdition.tournament.name}
+                      editionName={tournamentEdition.year.toString()}
+                      roundName={round || ""}
+                      date={
+                        date
+                          ? getFormattedDateTime(date.toString())
+                          : "No date information"
+                      }
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                      homeExtraTimeGoals={homeExtraTimeGoals}
+                      awayExtraTimeGoals={awayExtraTimeGoals}
+                      homePenaltyGoals={homePenaltyGoals}
+                      awayPenaltyGoals={awayPenaltyGoals}
+                    >
+                      <Button variant="ghost">
+                        {homeExtraTimeGoals} - {awayExtraTimeGoals}
+                      </Button>
+                    </PopoverKnockoutMatchScoreUpdator>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {homePenaltyGoals} - {awayPenaltyGoals}
+                    <PopoverKnockoutMatchScoreUpdator
+                      id={id}
+                      homeTeamName={
+                        homeTeam ? homeTeam.name : homeTeamPlacehlder || ""
+                      }
+                      awayTeamName={
+                        awayTeam ? awayTeam.name : awayTeamPlacehlder || ""
+                      }
+                      tournamentName={tournamentEdition.tournament.name}
+                      editionName={tournamentEdition.year.toString()}
+                      roundName={round || ""}
+                      date={
+                        date
+                          ? getFormattedDateTime(date.toString())
+                          : "No date information"
+                      }
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                      homeExtraTimeGoals={homeExtraTimeGoals}
+                      awayExtraTimeGoals={awayExtraTimeGoals}
+                      homePenaltyGoals={homePenaltyGoals}
+                      awayPenaltyGoals={awayPenaltyGoals}
+                    >
+                      <Button variant="ghost">
+                        {homePenaltyGoals} - {awayPenaltyGoals}
+                      </Button>
+                    </PopoverKnockoutMatchScoreUpdator>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <div className="flex flex-col">
@@ -241,7 +326,12 @@ export default async function DashboardKnockoutMatchesPage({
                     {tournamentEdition.year.toString()}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {isFeatured ? <Check /> : <X />}
+                    <FeaturedSwitcher
+                      id={id}
+                      type="knockoutMatches"
+                      isFeatured={isFeatured}
+                    />
+                    {/* {isFeatured ? <Check /> : <X />} */}
                   </TableCell>
                   <ActionsCellDropDown
                     editHref={`/dashboard/knockout-matches/${id}`}

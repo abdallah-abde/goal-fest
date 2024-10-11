@@ -39,6 +39,7 @@ export async function addTournament(prevState: unknown, formData: FormData) {
     data: {
       name: data.name.toString(),
       logoUrl: logoUrlPath,
+      type: data.type.toString(),
     },
   });
 
@@ -90,9 +91,32 @@ export async function updateTournament(
     data: {
       name: data.name.toString(),
       logoUrl: logoUrlPath,
+      type: data.type.toString(),
     },
   });
 
   revalidatePath("/dashboard/tournaments");
   redirect("/dashboard/tournaments");
+}
+
+export async function updateTournamentPopularStatus(
+  id: number,
+  isPopular: boolean,
+  searchParams: string
+) {
+  const currentTournament = await prisma.tournament.findUnique({
+    where: { id },
+  });
+
+  if (currentTournament == null) return notFound();
+
+  await prisma.tournament.update({
+    where: { id },
+    data: {
+      isPopular,
+    },
+  });
+
+  revalidatePath("/dashboard/tournaments");
+  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
 }

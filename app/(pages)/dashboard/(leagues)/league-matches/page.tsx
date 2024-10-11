@@ -13,7 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
+import {
+  getFormattedDate,
+  getFormattedDateTime,
+  getFormattedTime,
+} from "@/lib/getFormattedDate";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -23,7 +27,9 @@ import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-import { Check, X } from "lucide-react";
+import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
+import PopoverMatchScoreUpdator from "@/components/table-parts/PopoverMatchScoreUpdator";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardLeagueMatchesPage({
   searchParams,
@@ -166,7 +172,26 @@ export default async function DashboardLeagueMatchesPage({
                     <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {homeGoals} - {awayGoals}
+                    <PopoverMatchScoreUpdator
+                      id={id}
+                      type="leagueMatches"
+                      homeTeamName={homeTeam.name}
+                      awayTeamName={awayTeam.name}
+                      tournamentName={season.league.name}
+                      editionName={season.year}
+                      roundName={round || ""}
+                      date={
+                        date
+                          ? getFormattedDateTime(date.toString())
+                          : "No date information"
+                      }
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                    >
+                      <Button variant="ghost">
+                        {homeGoals} - {awayGoals}
+                      </Button>
+                    </PopoverMatchScoreUpdator>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <div className="flex flex-col">
@@ -198,7 +223,12 @@ export default async function DashboardLeagueMatchesPage({
                     {season.year}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {isFeatured ? <Check /> : <X />}
+                    <FeaturedSwitcher
+                      id={id}
+                      type="leagueMatches"
+                      isFeatured={isFeatured}
+                    />
+                    {/* {isFeatured ? <Check /> : <X />} */}
                   </TableCell>
                   <ActionsCellDropDown
                     editHref={`/dashboard/league-matches/${id}`}

@@ -5,31 +5,31 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Tournament } from "@prisma/client";
+import { LeagueTeam } from "@prisma/client";
 
 import { useFormState } from "react-dom";
-import { addTournament, updateTournament } from "@/actions/tournaments";
+import { addLeagueTeam, updateLeagueTeam } from "@/actions/leagueTeams";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-export default function TournamentForm({
-  tournament,
+export default function LeagueTeamForm({
+  leagueTeam,
 }: {
-  tournament?: Tournament | null;
+  leagueTeam?: LeagueTeam | null;
 }) {
   const [error, action] = useFormState(
-    tournament == null
-      ? addTournament
-      : updateTournament.bind(null, tournament.id),
+    leagueTeam == null
+      ? addLeagueTeam
+      : updateLeagueTeam.bind(null, leagueTeam.id),
     {}
   );
 
   return (
     <>
-      <PageHeader label={tournament ? "Edit Tournament" : "Add Tournament"} />
+      <PageHeader label={leagueTeam ? "Edit LeagueTeam" : "Add LeagueTeam"} />
       <form action={action} className="form-styles">
         <FormField>
           <Label htmlFor="name">Name</Label>
@@ -38,34 +38,35 @@ export default function TournamentForm({
             id="name"
             name="name"
             // required
-            defaultValue={tournament?.name || ""}
+            defaultValue={leagueTeam?.name || ""}
             autoFocus
           />
           <FormFieldError error={error?.name} />
         </FormField>
         <FormField>
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="code">Team Code</Label>
           <Input
             type="text"
-            id="type"
-            name="type"
+            id="code"
+            name="code"
             // required
-            defaultValue={tournament?.type || ""}
+            defaultValue={leagueTeam?.code || ""}
           />
-          <FormFieldError error={error?.type} />
+          <FormFieldError error={error?.code} />
         </FormField>
         <FormField>
-          <Label htmlFor="logoUrl">Logo</Label>
-          <Input type="file" id="logoUrl" name="logoUrl" />
-          {tournament != null && tournament?.logoUrl && (
+          <Label htmlFor="flagUrl">Flag</Label>
+          <Input type="file" id="flagUrl" name="flagUrl" />
+          {leagueTeam != null && leagueTeam?.flagUrl && (
             <div className="current-flag-wrapper">
+              <Label>Current Flag</Label>
               <Image
-                src={tournament?.logoUrl || ""}
+                src={leagueTeam?.flagUrl || ""}
                 height="100"
                 width="100"
-                alt="Tournament Logo"
+                alt="Team Flag"
               />
-              <FormFieldError error={error?.logoUrl} />
+              <FormFieldError error={error?.flagUrl} />
             </div>
           )}
         </FormField>

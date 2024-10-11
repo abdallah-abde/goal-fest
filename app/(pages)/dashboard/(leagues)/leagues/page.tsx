@@ -22,6 +22,7 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import { Check, X } from "lucide-react";
+import PopularSwitcher from "@/components/table-parts/PopularSwitcher";
 
 export default async function DashboardleaguesPage({
   searchParams,
@@ -111,7 +112,12 @@ export default async function DashboardleaguesPage({
                 </TableCell>
                 <TableCell className="dashboard-table-cell">{type}</TableCell>
                 <TableCell className="dashboard-table-cell">
-                  {isPopular ? <Check /> : <X />}
+                  <PopularSwitcher
+                    id={id}
+                    type="leagues"
+                    isPopular={isPopular}
+                  />
+                  {/* {isPopular ? <Check /> : <X />} */}
                 </TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/leagues/${id}`} />
               </TableRow>

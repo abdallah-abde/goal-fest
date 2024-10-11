@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { knockoutMatchSchema } from "@/schemas";
+import { knockoutMatchSchema, knockoutMatchScoreSchema } from "@/schemas";
 
 export async function addTournamentKnockoutMatch(
   prevState: unknown,
@@ -111,4 +111,74 @@ export async function updateTournamentKnockoutMatch(
 
   revalidatePath("/dashboard/knockout-matches");
   redirect("/dashboard/knockout-matches");
+}
+
+export async function updateKnockoutMatchFeaturedStatus(
+  id: number,
+  isFeatured: boolean,
+  searchParams: string
+) {
+  const currentMatch = await prisma.knockoutMatch.findUnique({
+    where: { id },
+  });
+
+  if (currentMatch == null) return notFound();
+
+  await prisma.knockoutMatch.update({
+    where: { id },
+    data: {
+      isFeatured,
+    },
+  });
+
+  revalidatePath("/dashboard/knockout-matches");
+  redirect(
+    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
+  );
+}
+
+export async function updateKnockoutMatchScore(
+  args: { id: number; searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { id, searchParams } = args;
+
+  const result = knockoutMatchScoreSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const currentMatch = await prisma.knockoutMatch.findUnique({
+    where: { id },
+  });
+
+  if (currentMatch == null) return notFound();
+
+  const homeGoals = formData.get("homeGoals");
+  const awayGoals = formData.get("awayGoals");
+  const homeExtraTimeGoals = formData.get("homeExtraTimeGoals");
+  const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
+  const homePenaltyGoals = formData.get("homePenaltyGoals");
+  const awayPenaltyGoals = formData.get("awayPenaltyGoals");
+
+  await prisma.knockoutMatch.update({
+    where: { id },
+    data: {
+      homeGoals: homeGoals ? +homeGoals : null,
+      awayGoals: awayGoals ? +awayGoals : null,
+      homeExtraTimeGoals: homeExtraTimeGoals ? +homeExtraTimeGoals : null,
+      awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
+      homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
+      awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
+    },
+  });
+
+  revalidatePath("/dashboard/knockout-matches");
+  redirect(
+    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }

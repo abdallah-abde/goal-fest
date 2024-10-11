@@ -13,7 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
+import {
+  getFormattedDate,
+  getFormattedDateTime,
+  getFormattedTime,
+} from "@/lib/getFormattedDate";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -24,6 +28,9 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import { Check, X } from "lucide-react";
+import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
+import { Button } from "@/components/ui/button";
+import PopoverMatchScoreUpdator from "@/components/table-parts/PopoverMatchScoreUpdator";
 
 export default async function DashboardGroupMatchesPage({
   searchParams,
@@ -188,7 +195,26 @@ export default async function DashboardGroupMatchesPage({
                     <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {homeGoals} - {awayGoals}
+                    <PopoverMatchScoreUpdator
+                      id={id}
+                      type="matches"
+                      homeTeamName={homeTeam.name}
+                      awayTeamName={awayTeam.name}
+                      tournamentName={tournamentEdition.tournament.name}
+                      editionName={tournamentEdition.year.toString()}
+                      roundName={round || ""}
+                      date={
+                        date
+                          ? getFormattedDateTime(date.toString())
+                          : "No date information"
+                      }
+                      homeGoals={homeGoals}
+                      awayGoals={awayGoals}
+                    >
+                      <Button variant="ghost">
+                        {homeGoals} - {awayGoals}
+                      </Button>
+                    </PopoverMatchScoreUpdator>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <div className="flex flex-col">
@@ -223,7 +249,12 @@ export default async function DashboardGroupMatchesPage({
                     {tournamentEdition.year.toString()}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {isFeatured ? <Check /> : <X />}
+                    <FeaturedSwitcher
+                      id={id}
+                      type="matches"
+                      isFeatured={isFeatured}
+                    />
+                    {/* {isFeatured ? <Check /> : <X />} */}
                   </TableCell>
                   <ActionsCellDropDown editHref={`/dashboard/matches/${id}`} />
                 </TableRow>
