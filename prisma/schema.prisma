@@ -14,28 +14,30 @@ model Tournament {
   id                 Int                 @id @default(autoincrement())
   name               String
   logoUrl            String?
-  tournamentEditions TournamentEdition[]
   type               String // e.g., 'international', 'europe', 'asia' ...
+  tournamentEditions TournamentEdition[]
   isPopular          Boolean             @default(false)
 }
 
 model TournamentEdition {
   id               Int             @id @default(autoincrement())
-  year             Int
-  yearAsString     String
+  startYear        Int
+  endYear          Int
+  year             String
   logoUrl          String?
   tournamentId     Int
   tournament       Tournament      @relation(fields: [tournamentId], references: [id])
-  groups           Group[]
-  knockoutMatches  KnockoutMatch[]
-  matches          Match[]
   teams            Team[]
+  matches          Match[]
+  knockoutMatches  KnockoutMatch[]
+  groups           Group[]
   hostingCountries Country[]
   winner           Team?           @relation("winnerTeam", fields: [winnerId], references: [id])
   winnerId         Int?
   titleHolder      Team?           @relation("titleHolderTeam", fields: [titleHolderId], references: [id])
   titleHolderId    Int?
   currentStage     String?
+  slug             String          @unique
 }
 
 model Group {
@@ -51,14 +53,14 @@ model Team {
   id                            Int                 @id @default(autoincrement())
   name                          String
   flagUrl                       String?
-  groups                        Group[]
   tournamentEditions            TournamentEdition[]
-  tournamentEditionWinners      TournamentEdition[] @relation("winnerTeam")
-  tournamentEditionTitleHolders TournamentEdition[] @relation("titleHolderTeam")
   matchesHome                   Match[]             @relation("homeTeam")
   matchesAway                   Match[]             @relation("awayTeam")
+  tournamentEditionWinners      TournamentEdition[] @relation("winnerTeam")
+  tournamentEditionTitleHolders TournamentEdition[] @relation("titleHolderTeam")
   knockoutMatchesHome           KnockoutMatch[]     @relation("homeTeam")
   knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
+  groups                        Group[]
   code                          String?
 }
 
@@ -80,12 +82,13 @@ model Match {
   homeGoals           Int?
   awayGoals           Int?
   date                DateTime?
-  groupId             Int
-  group               Group             @relation(fields: [groupId], references: [id])
   tournamentEditionId Int
   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
   round               String?
   isFeatured          Boolean           @default(false)
+  groupId             Int
+  group               Group             @relation(fields: [groupId], references: [id])
+  status              String?
 }
 
 model KnockoutMatch {
@@ -107,6 +110,7 @@ model KnockoutMatch {
   homeTeamPlacehlder  String?
   awayTeamPlacehlder  String?
   isFeatured          Boolean           @default(false)
+  status              String?
 }
 
 model User {
@@ -195,16 +199,22 @@ model League {
 }
 
 model LeagueSeason {
-  id        Int           @id @default(autoincrement())
-  startYear Int
-  endYear   Int
-  year      String
-  logoUrl   String?
-  leagueId  Int
-  league    League        @relation(fields: [leagueId], references: [id])
-  matches   LeagueMatch[]
-  teams     LeagueTeam[]
-  standings Standing[]
+  id            Int           @id @default(autoincrement())
+  startYear     Int
+  endYear       Int
+  year          String
+  logoUrl       String?
+  leagueId      Int
+  league        League        @relation(fields: [leagueId], references: [id])
+  teams         LeagueTeam[]
+  matches       LeagueMatch[]
+  // standings Standing[]
+  winner        LeagueTeam?   @relation("winnerLeagueTeam", fields: [winnerId], references: [id])
+  winnerId      Int?
+  titleHolder   LeagueTeam?   @relation("titleHolderLeagueTeam", fields: [titleHolderId], references: [id])
+  titleHolderId Int?
+  currentStage  String?
+  slug          String        @unique
 }
 
 model LeagueMatch {
@@ -220,30 +230,33 @@ model LeagueMatch {
   season     LeagueSeason @relation(fields: [seasonId], references: [id])
   round      String?
   isFeatured Boolean      @default(false)
+  status     String?
 }
 
 model LeagueTeam {
-  id          Int            @id @default(autoincrement())
-  name        String
-  flagUrl     String?
-  seasons     LeagueSeason[]
-  matchesHome LeagueMatch[]  @relation("homeTeam")
-  matchesAway LeagueMatch[]  @relation("awayTeam")
-  standing    Standing[]
-  code        String?
+  id                     Int            @id @default(autoincrement())
+  name                   String
+  flagUrl                String?
+  seasons                LeagueSeason[]
+  matchesHome            LeagueMatch[]  @relation("homeTeam")
+  matchesAway            LeagueMatch[]  @relation("awayTeam")
+  leagueTeamWinners      LeagueSeason[] @relation("winnerLeagueTeam")
+  leagueTeamTitleHolders LeagueSeason[] @relation("titleHolderLeagueTeam")
+  // standing    Standing[]
+  code                   String?
 }
 
-model Standing {
-  id           Int          @id @default(autoincrement())
-  teamId       Int
-  team         LeagueTeam   @relation(fields: [teamId], references: [id])
-  seasonId     Int
-  season       LeagueSeason @relation(fields: [seasonId], references: [id])
-  played       Int          @default(0)
-  won          Int          @default(0)
-  lost         Int          @default(0)
-  drawn        Int          @default(0)
-  goalsFor     Int          @default(0)
-  goalsAgainst Int          @default(0)
-  points       Int          @default(0)
-}
+// model Standing {
+//   id           Int          @id @default(autoincrement())
+//   teamId       Int
+//   team         LeagueTeam   @relation(fields: [teamId], references: [id])
+//   seasonId     Int
+//   season       LeagueSeason @relation(fields: [seasonId], references: [id])
+//   played       Int          @default(0)
+//   won          Int          @default(0)
+//   lost         Int          @default(0)
+//   drawn        Int          @default(0)
+//   goalsFor     Int          @default(0)
+//   goalsAgainst Int          @default(0)
+//   points       Int          @default(0)
+// }

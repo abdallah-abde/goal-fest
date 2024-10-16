@@ -3,8 +3,6 @@ import {
   Group,
   Team,
   TournamentEdition,
-  Match,
-  KnockoutMatch,
   Tournament,
   LeagueSeason,
   League,
@@ -125,7 +123,11 @@ export interface GroupWithTeams extends Group {
   teams: TeamWithStats[];
 }
 
-interface TournamentEditionProps extends TournamentEdition {
+export interface StandingTeams extends LeagueTeam {
+  stats: TeamStats;
+}
+
+export interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
   teams: Team[];
   winner: Team | null;
@@ -169,4 +171,5 @@ export interface NeutralMatch {
   homeTeamPlaceholder?: string | null; // Not existed in matches just in knockout
   awayTeamPlaceholder?: string | null; // Not existed in matches just in knockout
   stage: string; // Not existed in matches or knockout
+  status: string | null;
 }

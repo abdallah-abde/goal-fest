@@ -85,3 +85,18 @@ export const dashboardLeaguesRoutes = [
     Icon: LandPlot,
   },
 ];
+
+export const dashboardOtherRoutes = [
+  {
+    id: 1,
+    label: "Home Page",
+    href: `/dashboard`,
+    Icon: Home,
+  },
+  {
+    id: 2,
+    label: "Countries",
+    href: `/dashboard/countries`,
+    Icon: Flag,
+  },
+];

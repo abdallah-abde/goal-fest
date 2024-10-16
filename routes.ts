@@ -1,5 +1,6 @@
 export const publicRoutes = ["/", "/auth/new-verification"];
 export const tournamentsPublicPrefix = "/tournaments";
+export const leaguesPublicPrefix = "/leagues";
 
 export const authRoutes = [
   "/auth/login",
@@ -9,6 +10,6 @@ export const authRoutes = [
   "/auth/new-password",
 ];
 
-export const apiAuthPrefix = "/api/auth";
+export const apiPrefix = "/api";
 
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard";

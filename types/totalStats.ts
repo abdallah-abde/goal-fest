@@ -1,17 +1,33 @@
-export interface TotalGoalsProps {
+export interface TournamentTotalGoalsProps {
   teamId: number;
   teamName: string;
   teamCode: string;
   teamFlagUrl: string;
-  groupMatchGoals: number;
-  knockoutMatchGoals: number;
+  groupMatchesGoals: number;
+  knockoutMatchesGoals: number;
 }
 
-export interface TotalCleanSheetsProps {
+export interface LeagueTotalGoalsProps {
   teamId: number;
   teamName: string;
   teamCode: string;
   teamFlagUrl: string;
-  groupMatchCleanSheets: number;
-  knockoutMatchCleanSheets: number;
+  matchesGoals: number;
+}
+
+export interface TournamentTotalCleanSheetsProps {
+  teamId: number;
+  teamName: string;
+  teamCode: string;
+  teamFlagUrl: string;
+  groupMatchesCleanSheets: number;
+  knockoutMatchesCleanSheets: number;
+}
+
+export interface LeagueTotalCleanSheetsProps {
+  teamId: number;
+  teamName: string;
+  teamCode: string;
+  teamFlagUrl: string;
+  matchesCleanSheets: number;
 }

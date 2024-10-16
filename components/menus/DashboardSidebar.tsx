@@ -16,16 +16,23 @@ import {
 import {
   dashboardTournamentsRoutes,
   dashboardLeaguesRoutes,
+  dashboardOtherRoutes,
 } from "@/lib/data/dashboardRoutes";
 import { Menu } from "lucide-react";
 
-export default function DashboardSidebar({ source }: { source: string }) {
+export default function DashboardSidebar({
+  source,
+}: {
+  source: "tournaments" | "leagues" | "other";
+}) {
   const pathname = usePathname();
   const routes =
     source === "tournaments"
       ? dashboardTournamentsRoutes
       : source === "leagues"
       ? dashboardLeaguesRoutes
+      : source === "other"
+      ? dashboardOtherRoutes
       : null;
 
   if (!routes) return;

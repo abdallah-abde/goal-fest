@@ -1,5 +1,5 @@
-import { TeamWithStats } from "@/types";
-import { Standing } from "@prisma/client";
+import { NeutralMatch, TeamWithStats } from "@/types";
+// import { Standing } from "@prisma/client";
 
 export function sortGroupTeams(a: TeamWithStats, b: TeamWithStats) {
   if (a.stats.points > b.stats.points) {
@@ -21,25 +21,38 @@ export function sortGroupTeams(a: TeamWithStats, b: TeamWithStats) {
   }
 }
 
-export function sortStandings(a: Standing, b: Standing) {
-  if (a.points > b.points) {
-    return -1;
-  } else if (a.points < b.points) {
-    return 1;
-  } else {
-    const aTeamgoalDifference = a.goalsFor - a.goalsAgainst;
-    const bTeamgoalDifference = b.goalsFor - b.goalsAgainst;
-
-    if (aTeamgoalDifference > bTeamgoalDifference) {
+export function sortMatches(a: NeutralMatch, b: NeutralMatch) {
+  if (a.date && b.date)
+    if (a.date > b.date) {
       return -1;
-    } else if (aTeamgoalDifference < bTeamgoalDifference) {
+    } else if (a.date < b.date) {
       return 1;
     } else {
-      if (a.goalsFor > b.goalsFor) {
-        return -1;
-      } else if (a.goalsFor < b.goalsFor) {
-        return 1;
-      } else return 0;
+      return 0;
     }
-  }
+
+  return 0;
 }
+
+// export function sortStandings(a: Standing, b: Standing) {
+//   if (a.points > b.points) {
+//     return -1;
+//   } else if (a.points < b.points) {
+//     return 1;
+//   } else {
+//     const aTeamgoalDifference = a.goalsFor - a.goalsAgainst;
+//     const bTeamgoalDifference = b.goalsFor - b.goalsAgainst;
+
+//     if (aTeamgoalDifference > bTeamgoalDifference) {
+//       return -1;
+//     } else if (aTeamgoalDifference < bTeamgoalDifference) {
+//       return 1;
+//     } else {
+//       if (a.goalsFor > b.goalsFor) {
+//         return -1;
+//       } else if (a.goalsFor < b.goalsFor) {
+//         return 1;
+//       } else return 0;
+//     }
+//   }
+// }

@@ -2,7 +2,10 @@ import CardsSectionContainer from "@/components/lists/cards/templates/CardsSecti
 import TotalCleanSheetsCard from "@/components/lists/cards/stats/TotalCleanSheetsCards";
 import TotalGoalsCard from "@/components/lists/cards/stats/TotalGoalsCard";
 
-import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
+import {
+  TournamentTotalCleanSheetsProps,
+  TournamentTotalGoalsProps,
+} from "@/types/totalStats";
 
 export default function TeamsStats({
   label,
@@ -11,9 +14,9 @@ export default function TeamsStats({
   teamsCleanSheets,
 }: {
   label?: string | null;
-  teamsGoalsScored: TotalGoalsProps[];
-  teamsGoalsAgainst: TotalGoalsProps[];
-  teamsCleanSheets: TotalCleanSheetsProps[];
+  teamsGoalsScored: TournamentTotalGoalsProps[];
+  teamsGoalsAgainst: TournamentTotalGoalsProps[];
+  teamsCleanSheets: TournamentTotalCleanSheetsProps[];
 }) {
   return (
     <>

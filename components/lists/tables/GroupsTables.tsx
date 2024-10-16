@@ -36,7 +36,7 @@ export default function GroupsTables({
   return (
     <>
       <PageHeader
-        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.yearAsString} Groups`}
+        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.year} Groups`}
       />
       <div className="flex justify-end pb-2">
         <GroupsFilterDialog groups={tournamentEdition.groups} />

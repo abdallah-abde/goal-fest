@@ -7,6 +7,7 @@ import { updateLeaguePopularStatus } from "@/actions/leagues";
 import { updateTournamentPopularStatus } from "@/actions/tournaments";
 
 import { Switch } from "@/components/ui/switch";
+import { LoadingSpinner } from "@/components/LoadingComponents";
 
 export default function PopularSwitcher({
   id,
@@ -23,29 +24,35 @@ export default function PopularSwitcher({
 
   return (
     <>
-      <Switch
-        disabled={isPending}
-        checked={isPopular}
-        onCheckedChange={async (value) =>
-          startTransition(async () => {
-            type === "leagues"
-              ? await updateLeaguePopularStatus(
-                  id,
-                  !isPopular,
-                  searchParams.toString()
-                )
-              : type === "tournaments"
-              ? await updateTournamentPopularStatus(
-                  id,
-                  !isPopular,
-                  searchParams.toString()
-                )
-              : null;
+      {!isPending ? (
+        <Switch
+          disabled={isPending}
+          checked={isPopular}
+          onCheckedChange={async (value) =>
+            startTransition(async () => {
+              type === "leagues"
+                ? await updateLeaguePopularStatus(
+                    id,
+                    !isPopular,
+                    searchParams.toString()
+                  )
+                : type === "tournaments"
+                ? await updateTournamentPopularStatus(
+                    id,
+                    !isPopular,
+                    searchParams.toString()
+                  )
+                : null;
 
-            router.refresh();
-          })
-        }
-      />
+              router.refresh();
+            })
+          }
+        />
+      ) : (
+        <span>
+          <LoadingSpinner />
+        </span>
+      )}
     </>
   );
 }

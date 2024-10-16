@@ -31,11 +31,12 @@ import {
   switchGroupMatchesToNeutralMatches,
   switchKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
+import { sortMatches } from "@/lib/sortGroupTeams";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
   teams: Team[];
-  // groups: Group[];
+  groups: Group[];
   winner: Team | null;
   titleHolder: Team | null;
   hostingCountries: Country[];
@@ -72,12 +73,14 @@ export default function MatchesCards({
   const [groupBy, setGroupBy] = useState<GroupByOptions>(
     GroupByOptions.ONLYDATE
   );
-  const results = Object.entries(_.groupBy(allMatches, groupBy));
+  const results = Object.entries(
+    _.groupBy(allMatches.sort(sortMatches), groupBy)
+  );
 
   return (
     <>
       <PageHeader
-        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.yearAsString} Matches`}
+        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.year} Matches`}
       />
       <div className="flex justify-end pb-2">
         <Button

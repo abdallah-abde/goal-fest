@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import MatchesCalender from "@/components/home/MatchesCalender";
 import PopularMatches from "@/components/home/PopularMatches";
-import CategorizedMatchesByCountry from "@/components/home/CategorizedMatchesByCountry";
+import CountriesMatches from "@/components/home/CountriesMatches";
 import FeaturedMatches from "@/components/home/FeaturedMatches";
 import Standings from "@/components/home/Standings";
 
@@ -24,7 +24,7 @@ export default async function HomePage({
       <div className="w-1/3 *:my-2">
         <MatchesCalender />
         <PopularMatches date={date} />
-        <CategorizedMatchesByCountry date={date} />
+        <CountriesMatches date={date} />
       </div>
       <div className="w-2/3 *:my-2">
         <FeaturedMatches />

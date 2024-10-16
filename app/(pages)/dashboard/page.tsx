@@ -16,7 +16,7 @@ export default async function DashboardPage() {
             className="hover:bg-primary/20 transition duration-300"
           >
             <Card className="bg-transparent border-0 shadow-none">
-              <CardTitle>Countries</CardTitle>
+              <CardTitle>Other</CardTitle>
             </Card>
           </Link>
           <Link
@@ -36,7 +36,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
         </div>
-        {/* <pre>{JSON.stringify(session)}</pre> */}
       </div>
     </>
   );

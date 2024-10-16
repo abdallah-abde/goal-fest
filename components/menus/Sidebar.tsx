@@ -20,24 +20,26 @@ import { Menu } from "lucide-react";
 export default function Sidebar({
   logoUrl,
   name,
+  source,
 }: {
   logoUrl?: string | null;
   name: string;
+  source: "tournaments" | "leagues";
 }) {
   const params = useParams();
   const pathname = usePathname();
 
-  const routes = getSidebarRoutes(params);
+  const routes = getSidebarRoutes(params, source);
 
   return (
-    <div className='flex flex-col 2md:border-r-2 border-primary/10 2md:pr-4 w-full 2md:min-w-52 2md:max-w-52'>
+    <div className="flex flex-col 2md:border-r-2 border-primary/10 2md:pr-4 w-full 2md:min-w-52 2md:max-w-52">
       {logoUrl && (
-        <div className='mx-auto h-[140px] w-[140px] mb-2 relative'>
+        <div className="mx-auto h-[140px] w-[140px] mb-2 relative">
           <Image
             fill
             src={logoUrl}
             alt={name + " Logo"}
-            className='mx-auto object-contain'
+            className="mx-auto object-contain"
           />
         </div>
       )}
@@ -61,9 +63,9 @@ export default function Sidebar({
       </div>
       <Sheet>
         <SheetTrigger asChild>
-          <Menu className='block 2md:hidden size-8 mx-auto mb-4 cursor-pointer fixed z-50 bg-primary text-secondary rounded-full p-1' />
+          <Menu className="block 2md:hidden size-8 mx-auto mb-4 cursor-pointer fixed z-50 bg-primary text-secondary rounded-full p-1" />
         </SheetTrigger>
-        <SheetContent side='left'>
+        <SheetContent side="left">
           <div className={`space-y-2 overflow-auto mt-4`}>
             {routes.map(({ id, href, label, Icon }) => (
               <SheetClose asChild key={id}>

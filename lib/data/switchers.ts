@@ -68,9 +68,9 @@ export function switchGroupMatchToNeutralMatch(match: MatchProps) {
     tournamentEdition: match.tournamentEdition,
     season: null,
     tournamentOrLeagueName: match.tournamentEdition.tournament.name,
-    tournamentOrLeagueYear: match.tournamentEdition.yearAsString,
+    tournamentOrLeagueYear: match.tournamentEdition.year,
     country: match.tournamentEdition.tournament.type,
-    fullTournamentName: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.yearAsString})`,
+    fullTournamentName: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.year})`,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeGoals: match.homeGoals,
@@ -93,6 +93,7 @@ export function switchGroupMatchToNeutralMatch(match: MatchProps) {
     homeTeamPlaceholder: null,
     awayTeamPlaceholder: null,
     stage: "Groups Stage",
+    status: match.status,
   };
 
   return neutralMatch;
@@ -122,7 +123,7 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
         ? match.tournamentEdition.tournament.name
         : ""
       : "",
-    tournamentOrLeagueYear: match.tournamentEdition.yearAsString,
+    tournamentOrLeagueYear: match.tournamentEdition.year,
     country: match.tournamentEdition
       ? match.tournamentEdition.tournament
         ? match.tournamentEdition.tournament.type
@@ -134,7 +135,7 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
           ? match.tournamentEdition.tournament.name
           : ""
         : ""
-    } (${match.tournamentEdition.yearAsString})`,
+    } (${match.tournamentEdition.year})`,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeGoals: match.homeGoals,
@@ -157,6 +158,7 @@ export function switchKnockoutMatchToNeutralMatch(match: KnockoutMatchProps) {
     homeTeamPlaceholder: match.homeTeamPlacehlder,
     awayTeamPlaceholder: match.awayTeamPlacehlder,
     stage: match.round || "",
+    status: match.status,
   };
 
   return neutralMatch;
@@ -181,16 +183,20 @@ export function switchLeagueMatchToNeutralMatch(match: LeagueMatchProps) {
     type: "LEAGUE",
     season: match.season,
     tournamentEdition: null,
-    tournamentOrLeagueName: match.season.league.name,
-    tournamentOrLeagueYear: match.season.year,
-    country: match.season.league.country
-      ? match.season.league.country?.name
-      : match.season.league.type,
-    fullTournamentName: `${match.season.league.name} (${match.season.year})`,
+    tournamentOrLeagueName: match.season?.league?.name,
+    tournamentOrLeagueYear: match.season?.year,
+    country: match.season?.league?.country
+      ? match.season?.league?.country?.name
+      : match.season?.league?.type,
+    fullTournamentName: `${match.season?.league?.name} (${match.season?.year})`,
     homeTeam: match.homeTeam,
     awayTeam: match.awayTeam,
     homeGoals: match.homeGoals,
     awayGoals: match.awayGoals,
+    homeExtraTimeGoals: null,
+    awayExtraTimeGoals: null,
+    homePenaltyGoals: null,
+    awayPenaltyGoals: null,
     date: match.date,
     onlyDate: match.date ? match.date.toLocaleString() : "",
     localDate: match.date ? match.date?.toLocaleString() : null,
@@ -203,6 +209,9 @@ export function switchLeagueMatchToNeutralMatch(match: LeagueMatchProps) {
     group: null,
     round: match.round,
     stage: match.round || "",
+    status: match.status,
+    awayTeamPlaceholder: "",
+    homeTeamPlaceholder: "",
   };
 
   return neutralMatch;
