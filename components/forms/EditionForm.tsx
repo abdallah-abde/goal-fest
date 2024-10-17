@@ -128,12 +128,12 @@ export default function EditionForm({
             : "Add Tournament Edition"
         }
       />
-      <form action={action} className='form-styles'>
+      <form action={action} className="form-styles">
         {tournaments && tournaments.length > 0 ? (
           <FormField>
-            <Label htmlFor='tournamentId'>Tournament Name</Label>
+            <Label htmlFor="tournamentId">Tournament Name</Label>
             <Select
-              name='tournamentId'
+              name="tournamentId"
               defaultValue={
                 (tournamentEdition?.tournamentId &&
                   tournamentEdition?.tournamentId.toString()) ||
@@ -141,8 +141,8 @@ export default function EditionForm({
                 undefined
               }
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Tournament' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Tournament" />
               </SelectTrigger>
               <SelectContent>
                 {tournaments.map(({ id, name }) => (
@@ -157,48 +157,57 @@ export default function EditionForm({
         ) : (
           <FormFieldLoadingState
             isLoading={false}
-            label=''
-            notFoundText='There is no tournaments, add some!'
+            label=""
+            notFoundText="There is no tournaments, add some!"
           />
         )}
         <FormField>
-          <Label htmlFor='year'>Year</Label>
+          <Label htmlFor="startYear">Start Year</Label>
           <Input
-            id='year'
-            name='year'
-            defaultValue={tournamentEdition?.year || undefined}
+            id="startYear"
+            name="startYear"
+            defaultValue={tournamentEdition?.startYear || undefined}
           />
-          <FormFieldError error={error?.year} />
+          <FormFieldError error={error?.startYear} />
         </FormField>
         <FormField>
-          <Label htmlFor='logoUrl'>Logo</Label>
-          <Input type='file' id='logoUrl' name='logoUrl' />
+          <Label htmlFor="endYear">End Year</Label>
+          <Input
+            id="endYear"
+            name="endYear"
+            defaultValue={tournamentEdition?.endYear || undefined}
+          />
+          <FormFieldError error={error?.endYear} />
+        </FormField>
+        <FormField>
+          <Label htmlFor="logoUrl">Logo</Label>
+          <Input type="file" id="logoUrl" name="logoUrl" />
           {tournamentEdition != null && tournamentEdition?.logoUrl && (
-            <div className='current-flag-wrapper'>
+            <div className="current-flag-wrapper">
               <Label>Current Logo</Label>
               <Image
                 src={tournamentEdition?.logoUrl || ""}
-                height='100'
-                width='100'
-                alt='Tournament Edition Logo'
+                height="100"
+                width="100"
+                alt="Tournament Edition Logo"
               />
               <FormFieldError error={error?.logoUrl} />
             </div>
           )}
         </FormField>
         <FormField>
-          <Label htmlFor='winnerId'>Winner Team</Label>
+          <Label htmlFor="winnerId">Winner Team</Label>
           <div>
-            <div className='flex items-center gap-2'>
+            <div className="flex items-center gap-2">
               <Select
-                name='winnerId'
+                name="winnerId"
                 key={winnerKey}
                 defaultValue={
                   (winnerValue && winnerValue.toString()) || undefined
                 }
               >
-                <SelectTrigger className='flex-1'>
-                  <SelectValue placeholder='Choose Winner Team' />
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Choose Winner Team" />
                 </SelectTrigger>
                 <SelectContent>
                   {teams.map(({ id, name }) => (
@@ -209,35 +218,35 @@ export default function EditionForm({
                 </SelectContent>
               </Select>
               <Button
-                type='button'
-                className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
-                variant='outline'
-                size='icon'
+                type="button"
+                className="bg-secondary/50 hover:bg-primary/50 transition duration-300"
+                variant="outline"
+                size="icon"
                 onClick={(e) => {
                   e.stopPropagation();
                   setWinnerValue(undefined);
                   setWinnerKey(+new Date());
                 }}
               >
-                <Eraser strokeWidth='1.5px' />
+                <Eraser strokeWidth="1.5px" />
               </Button>
             </div>
             <FormFieldError error={error?.winnerId} />
           </div>
         </FormField>
         <FormField>
-          <Label htmlFor='titleHolderId'>Title Holder Team</Label>
+          <Label htmlFor="titleHolderId">Title Holder Team</Label>
           <div>
-            <div className='flex items-center gap-2'>
+            <div className="flex items-center gap-2">
               <Select
-                name='titleHolderId'
+                name="titleHolderId"
                 key={titleHolderKey}
                 defaultValue={
                   (titleHolderValue && titleHolderValue.toString()) || undefined
                 }
               >
-                <SelectTrigger className='flex-1'>
-                  <SelectValue placeholder='Choose Title Holder Team' />
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Choose Title Holder Team" />
                 </SelectTrigger>
                 <SelectContent>
                   {teams.map(({ id, name }) => (
@@ -248,32 +257,32 @@ export default function EditionForm({
                 </SelectContent>
               </Select>
               <Button
-                type='button'
-                className='bg-secondary/50 hover:bg-primary/50 transition duration-300'
-                variant='outline'
-                size='icon'
+                type="button"
+                className="bg-secondary/50 hover:bg-primary/50 transition duration-300"
+                variant="outline"
+                size="icon"
                 onClick={(e) => {
                   e.stopPropagation();
                   setTitleHolderValue(undefined);
                   setTitleHolderKey(+new Date());
                 }}
               >
-                <Eraser strokeWidth='1.5px' />
+                <Eraser strokeWidth="1.5px" />
               </Button>
             </div>
             <FormFieldError error={error?.titleHolderId} />
           </div>
         </FormField>
         <FormField>
-          <Label htmlFor='hostingCountries'>Hosting Countries</Label>
+          <Label htmlFor="hostingCountries">Hosting Countries</Label>
           <Input
-            type='hidden'
-            id='hostingCountries'
-            name='hostingCountries'
+            type="hidden"
+            id="hostingCountries"
+            name="hostingCountries"
             value={hiddenHostingCountries}
           />
           <MultipleSelector
-            className='form-multiple-selector-styles'
+            className="form-multiple-selector-styles"
             ref={hostingCountriesRef}
             defaultOptions={countries.map(({ id, name }) => {
               return {
@@ -291,19 +300,19 @@ export default function EditionForm({
                   .join(",")
               );
             }}
-            placeholder='Select hosting countries for this tournament'
+            placeholder="Select hosting countries for this tournament"
             emptyIndicator={
-              <p className='empty-indicator'>No countries found</p>
+              <p className="empty-indicator">No countries found</p>
             }
             value={selectedHostingCountries}
           />
           <FormFieldError error={error?.hostingCountries} />
         </FormField>
         <FormField>
-          <Label htmlFor='teams'>Teams</Label>
-          <Input type='hidden' id='teams' name='teams' value={hiddenTeams} />
+          <Label htmlFor="teams">Teams</Label>
+          <Input type="hidden" id="teams" name="teams" value={hiddenTeams} />
           <MultipleSelector
-            className='form-multiple-selector-styles'
+            className="form-multiple-selector-styles"
             ref={teamsRef}
             defaultOptions={teams.map(({ id, name }) => {
               return {
@@ -321,8 +330,8 @@ export default function EditionForm({
                   .join(",")
               );
             }}
-            placeholder='Select teams you like to add to the tournament'
-            emptyIndicator={<p className='empty-indicator'>No teams found.</p>}
+            placeholder="Select teams you like to add to the tournament"
+            emptyIndicator={<p className="empty-indicator">No teams found.</p>}
             value={selectedTeams}
           />
           <FormFieldError error={error?.teams} />

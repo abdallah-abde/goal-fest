@@ -44,9 +44,10 @@ export default async function DashboardEditionsPage({
   const where = {
     OR: [
       { tournament: { name: { contains: query } } },
-      { yearAsString: { contains: query } },
+      { year: { contains: query } },
       { winner: { name: { contains: query } } },
       { titleHolder: { name: { contains: query } } },
+      { currentStage: { contains: query } },
     ],
   };
 
@@ -59,6 +60,8 @@ export default async function DashboardEditionsPage({
       ? { winner: { name: sortDir } }
       : sortField === "titleHolder"
       ? { titleHolder: { name: sortDir } }
+      : sortField === "currentStage"
+      ? { currentStage: sortDir }
       : {}),
   };
 
@@ -111,23 +114,39 @@ export default async function DashboardEditionsPage({
               <TableHead className="dashboard-head-table-cell">
                 <SortComponent label="TitleHolder" fieldName="Title Holder" />
               </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent label="currentStage" fieldName="Stage" />
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Slug</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {editions.map(
-              ({ id, tournament: { name }, year, winner, titleHolder }) => (
+              ({
+                id,
+                tournament: { name },
+                year,
+                winner,
+                titleHolder,
+                currentStage,
+                slug,
+              }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">{name}</TableCell>
                   <TableCell className="dashboard-table-cell">
                     {year.toString()}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {winner?.name || "No winner yet"}
+                    {winner?.name || "..."}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {titleHolder?.name || "No title holder"}
+                    {titleHolder?.name || "..."}
                   </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {currentStage || "..."}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">{slug}</TableCell>
                   <ActionsCellDropDown editHref={`/dashboard/editions/${id}`}>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

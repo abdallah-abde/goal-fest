@@ -87,7 +87,11 @@ export default function GroupForm({
         const data: TournamentEditionProps[] = await res.json();
 
         setTournamentsEditions(data);
-        if (data.length > 0) setTournamentEditionId(data[0].id.toString());
+        if (data.length > 0) {
+          setTournamentEditionId(data[0].id.toString());
+        } else {
+          setTournamentEditionId(null);
+        }
       }
       setIsEditionsLoading(false);
     }
@@ -104,6 +108,9 @@ export default function GroupForm({
         const data = await res.json();
 
         setEditionTeams(data.teams);
+        // if (data.teams.length < 1) setEditionTeams(null);
+      } else {
+        setEditionTeams(null);
       }
       setIsTeamsLoading(false);
     }
@@ -261,7 +268,10 @@ export default function GroupForm({
             tournaments.length <= 0 ||
             isEditionsLoading ||
             !tournamentsEditions ||
-            tournamentsEditions.length < 1
+            tournamentsEditions.length < 1 ||
+            isTeamsLoading ||
+            !editionTeams ||
+            editionTeams.length < 1
           }
         />
       </form>

@@ -39,7 +39,7 @@ export default async function DashboardGroupsPage({
   const where = {
     OR: [
       { tournamentEdition: { tournament: { name: { contains: query } } } },
-      { tournamentEdition: { yearAsString: { contains: query } } },
+      { tournamentEdition: { year: { contains: query } } },
       { name: { contains: query } },
     ],
   };

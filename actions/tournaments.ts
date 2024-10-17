@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { TournamentSchema } from "@/schemas";
+import { IsPopularOptions } from "@/types/enums";
 
 export async function addTournament(prevState: unknown, formData: FormData) {
   const result = TournamentSchema.safeParse(
@@ -40,6 +41,7 @@ export async function addTournament(prevState: unknown, formData: FormData) {
       name: data.name.toString(),
       logoUrl: logoUrlPath,
       type: data.type.toString(),
+      isPopular: data.isPopular === IsPopularOptions.Yes,
     },
   });
 
@@ -92,6 +94,7 @@ export async function updateTournament(
       name: data.name.toString(),
       logoUrl: logoUrlPath,
       type: data.type.toString(),
+      isPopular: data.isPopular === IsPopularOptions.Yes,
     },
   });
 

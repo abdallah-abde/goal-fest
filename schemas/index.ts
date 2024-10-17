@@ -46,6 +46,7 @@ export const TournamentSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   logoUrl: ImageSchema.optional(),
   type: z.string().min(1, { message: "Type is required!" }),
+  isPopular: z.string().refine((data) => data === "Yes" || data === "No"),
 });
 
 export const EditionSchema = z.object({
@@ -53,11 +54,19 @@ export const EditionSchema = z.object({
     .number()
     .int()
     .refine((data) => data > 0, { message: "Tournament is required" }),
-  year: z.coerce
-    .number({ message: "Please enter a valid year" })
+  startYear: z.coerce
+    .number({ message: "Please enter a valid start year" })
     .int()
     .refine((data) => data > 1900 && data < new Date().getFullYear() + 10, {
-      message: `Year is required and must be between 1900 & ${
+      message: `Start Year is required and must be between 1900 & ${
+        new Date().getFullYear() + 10
+      } `,
+    }),
+  endYear: z.coerce
+    .number({ message: "Please enter a valid end year" })
+    .int()
+    .refine((data) => data > 1900 && data < new Date().getFullYear() + 10, {
+      message: `End Year is required and must be between 1900 & ${
         new Date().getFullYear() + 10
       } `,
     }),

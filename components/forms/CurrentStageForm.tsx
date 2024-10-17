@@ -12,6 +12,7 @@ import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
+import { TournamentStages } from "@/types/enums";
 
 export default function CurrentStageFormForm({
   tournamentEdition,
@@ -39,7 +40,13 @@ export default function CurrentStageFormForm({
             id="currentStage"
             name="currentStage"
             defaultValue={tournamentEdition?.currentStage || undefined}
+            list="stages"
           />
+          <datalist id="stages">
+            {Object.values(TournamentStages).map((dl) => (
+              <option value={dl}></option>
+            ))}
+          </datalist>
           <FormFieldError error={error?.currentStage} />
         </FormField>
         <SubmitButton />

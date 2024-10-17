@@ -50,9 +50,12 @@ export default async function DashboardGroupMatchesPage({
   const where = {
     OR: [
       { tournamentEdition: { tournament: { name: { contains: query } } } },
-      { tournamentEdition: { yearAsString: { contains: query } } },
+      { tournamentEdition: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
       { awayTeam: { name: { contains: query } } },
+      { group: { name: { contains: query } } },
+      { round: { contains: query } },
+      { status: { contains: query } },
     ],
   };
 
@@ -72,6 +75,8 @@ export default async function DashboardGroupMatchesPage({
       : sortField === "isFeatured"
       ? { isFeatured: sortDir }
       : sortField === "date"
+      ? { date: sortDir }
+      : sortField === "status"
       ? { date: sortDir }
       : {}),
   };
@@ -168,6 +173,9 @@ export default async function DashboardGroupMatchesPage({
               <TableHead className="dashboard-head-table-cell">
                 <SortComponent fieldName="isFeatured" label="Is Featured" />
               </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <SortComponent fieldName="status" label="Status" />
+              </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -184,6 +192,7 @@ export default async function DashboardGroupMatchesPage({
                 date,
                 tournamentEdition,
                 isFeatured,
+                status,
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">
@@ -254,7 +263,9 @@ export default async function DashboardGroupMatchesPage({
                       type="matches"
                       isFeatured={isFeatured}
                     />
-                    {/* {isFeatured ? <Check /> : <X />} */}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {status || "..."}
                   </TableCell>
                   <ActionsCellDropDown editHref={`/dashboard/matches/${id}`} />
                 </TableRow>
