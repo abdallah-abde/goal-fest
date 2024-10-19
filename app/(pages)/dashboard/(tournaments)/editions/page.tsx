@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import { SortDirectionOptions, TournamentStages } from "@/types/enums";
 
 import {
   Table,
@@ -25,6 +25,8 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
+import Filters from "@/components/table-parts/filters/Filters";
 
 export default async function DashboardEditionsPage({
   searchParams,
@@ -33,13 +35,15 @@ export default async function DashboardEditionsPage({
     page?: string;
     query?: string;
     sortDir?: SortDirectionOptions;
-    sortField?: String;
+    sortField?: string;
+    stage?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "year";
+  const stageCondition = searchParams?.stage || "all";
 
   const where = {
     OR: [
@@ -47,8 +51,13 @@ export default async function DashboardEditionsPage({
       { year: { contains: query } },
       { winner: { name: { contains: query } } },
       { titleHolder: { name: { contains: query } } },
-      { currentStage: { contains: query } },
+      // { currentStage: { contains: query } },
     ],
+    ...(stageCondition !== "all"
+      ? {
+          currentStage: stageCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -88,10 +97,39 @@ export default async function DashboardEditionsPage({
     },
   });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Year", fieldName: "year" },
+    {
+      label: "Winner",
+      fieldName: "winner",
+    },
+    {
+      label: "Title Holder",
+      fieldName: "titleHolder",
+    },
+    {
+      label: "Current Stage",
+      fieldName: "currentStage",
+    },
+  ];
+
+  const listFilters = [
+    {
+      title: "Stage",
+      fieldName: "stage",
+      searchParamName: "stage",
+      placeholder: "Choose Stage...",
+      options: Object.values(TournamentStages),
+    },
+  ];
+
   return (
     <>
       <PageHeader label="Tournaments Editions List" />
       <div className="dashboard-search-and-add">
+        <SortByList list={sortingList} defaultField="name" />
+        <Filters listFilters={listFilters} />
         <SearchFieldComponent />
         <AddNewLinkComponent
           href="/dashboard/editions/new"
@@ -102,21 +140,15 @@ export default async function DashboardEditionsPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Year</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
+                Winner
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Year" fieldName="year" />
+                Title Holder
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Winner" fieldName="winner" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="TitleHolder" fieldName="Title Holder" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="currentStage" fieldName="Stage" />
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Stage</TableHead>
               <TableHead className="dashboard-head-table-cell">Slug</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -165,7 +197,11 @@ export default async function DashboardEditionsPage({
               )
             )}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={5} />
+          <DashboardTableFooter
+            totalCount={totalEditionsCount}
+            totalPages={totalPages}
+            colSpan={5}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Editions Found" />

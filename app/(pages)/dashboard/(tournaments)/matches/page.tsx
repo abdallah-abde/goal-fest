@@ -27,7 +27,6 @@ import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-import { Check, X } from "lucide-react";
 import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
 import { Button } from "@/components/ui/button";
 import PopoverMatchScoreUpdator from "@/components/table-parts/PopoverMatchScoreUpdator";
@@ -55,7 +54,7 @@ export default async function DashboardGroupMatchesPage({
       { awayTeam: { name: { contains: query } } },
       { group: { name: { contains: query } } },
       { round: { contains: query } },
-      { status: { contains: query } },
+      // { status: { contains: query } },
     ],
   };
 
@@ -77,7 +76,7 @@ export default async function DashboardGroupMatchesPage({
       : sortField === "date"
       ? { date: sortDir }
       : sortField === "status"
-      ? { date: sortDir }
+      ? { status: sortDir }
       : {}),
   };
 
@@ -272,7 +271,11 @@ export default async function DashboardGroupMatchesPage({
               )
             )}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={10} />
+          <DashboardTableFooter
+            totalCount={totalMatchesCount}
+            totalPages={totalPages}
+            colSpan={10}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Matches Found" />

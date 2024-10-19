@@ -20,6 +20,7 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
 
 export default async function DashboardTeamsPage({
   searchParams,
@@ -63,10 +64,16 @@ export default async function DashboardTeamsPage({
     orderBy: { ...orderBy },
   });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Code", fieldName: "code" },
+  ];
+
   return (
     <>
       <PageHeader label="Teams List" />
       <div className="dashboard-search-and-add">
+        <SortByList list={sortingList} defaultField="name" />
         <SearchFieldComponent />
         <AddNewLinkComponent href="/dashboard/teams/new" label="Add New Team" />
       </div>
@@ -74,12 +81,8 @@ export default async function DashboardTeamsPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Team Code" fieldName="code" />
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Code</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -92,7 +95,11 @@ export default async function DashboardTeamsPage({
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
+          <DashboardTableFooter
+            totalCount={totalTeamsCount}
+            totalPages={totalPages}
+            colSpan={3}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Teams Found" />

@@ -31,3 +31,9 @@ export enum IsPopularOptions {
   No = "No",
   Yes = "Yes",
 }
+
+export enum FlagFilterOptions {
+  All = "All",
+  Yes = "Yes",
+  No = "No",
+}

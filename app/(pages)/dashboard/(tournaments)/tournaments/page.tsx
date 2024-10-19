@@ -2,7 +2,11 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import {
+  FlagFilterOptions,
+  SortDirectionOptions,
+  TournamentsOrLeaguesTypes,
+} from "@/types/enums";
 
 import {
   Table,
@@ -17,12 +21,11 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
-
-import { Check, X } from "lucide-react";
+import SortByList from "@/components/table-parts/SortByList";
 import PopularSwitcher from "@/components/table-parts/PopularSwitcher";
+import Filters from "@/components/table-parts/filters/Filters";
 
 export default async function DashboardTournamentsPage({
   searchParams,
@@ -31,16 +34,33 @@ export default async function DashboardTournamentsPage({
     page?: string;
     query?: string;
     sortDir?: SortDirectionOptions;
-    sortField?: String;
+    sortField?: string;
+    isPopular?: string;
+    type?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const isPopularCondition = searchParams?.isPopular;
+  const typeCondition = searchParams?.type || "all";
 
   const where = {
     name: { contains: query },
+    ...(isPopularCondition
+      ? {
+          isPopular:
+            isPopularCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(typeCondition !== "all"
+      ? {
+          type: typeCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -66,10 +86,54 @@ export default async function DashboardTournamentsPage({
     orderBy: { ...orderBy },
   });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Type", fieldName: "type" },
+    {
+      label: "Is Popular",
+      fieldName: "isPopular",
+    },
+  ];
+
+  const listFilters = [
+    {
+      title: "Type",
+      fieldName: "type",
+      searchParamName: "type",
+      placeholder: "Choose Type...",
+      options: Object.values(TournamentsOrLeaguesTypes),
+    },
+  ];
+
+  const flagFilters = [
+    {
+      title: "Is Popular",
+      defaultValue: "all",
+      fieldName: "isPopular",
+      searchParamName: "isPopular",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+  ];
+
   return (
     <>
       <PageHeader label="Tournaments List" />
       <div className="dashboard-search-and-add">
+        <SortByList list={sortingList} defaultField="name" />
+        <Filters flagFilters={flagFilters} listFilters={listFilters} />
         <SearchFieldComponent />
         <AddNewLinkComponent
           href="/dashboard/tournaments/new"
@@ -80,14 +144,10 @@ export default async function DashboardTournamentsPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Type</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="type" label="Type" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="isPopular" label="Is Popular" />
+                Is Popular
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -103,7 +163,6 @@ export default async function DashboardTournamentsPage({
                     type="tournaments"
                     isPopular={isPopular}
                   />
-                  {/* {isPopular ? <Check /> : <X />} */}
                 </TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/tournaments/${id}`}
@@ -111,7 +170,11 @@ export default async function DashboardTournamentsPage({
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={4} />
+          <DashboardTableFooter
+            totalCount={totalTournamentsCount}
+            totalPages={totalPages}
+            colSpan={4}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Tournaments Found" />

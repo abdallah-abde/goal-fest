@@ -20,6 +20,7 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
 
 export default async function DashboardGroupsPage({
   searchParams,
@@ -77,10 +78,17 @@ export default async function DashboardGroupsPage({
     },
   });
 
+  const sortingList = [
+    { label: "Tournament", fieldName: "tournament" },
+    { label: "Edition", fieldName: "edition" },
+    { label: "Name", fieldName: "name" },
+  ];
+
   return (
     <>
       <PageHeader label="Groups List" />
       <div className="dashboard-search-and-add">
+        <SortByList list={sortingList} defaultField="tournament" />
         <SearchFieldComponent />
         <AddNewLinkComponent
           href="/dashboard/groups/new"
@@ -92,14 +100,12 @@ export default async function DashboardGroupsPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="tournament" label="Tournament" />
+                Tournament
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="edition" label="Edition" />
+                Edition
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Name" fieldName="name" />
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -117,7 +123,11 @@ export default async function DashboardGroupsPage({
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={4} />
+          <DashboardTableFooter
+            totalCount={totalGroupsCount}
+            totalPages={totalPages}
+            colSpan={4}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Groups Found" />
