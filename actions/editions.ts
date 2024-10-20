@@ -217,10 +217,12 @@ export async function updateTournamentEdition(
 }
 
 export async function updateTournamentEditionCurrentStage(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = CurrentStageSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -246,5 +248,5 @@ export async function updateTournamentEditionCurrentStage(
   });
 
   revalidatePath("/dashboard/editions");
-  redirect("/dashboard/editions");
+  redirect(`/dashboard/editions${searchParams ? `?${searchParams}` : ""}`);
 }

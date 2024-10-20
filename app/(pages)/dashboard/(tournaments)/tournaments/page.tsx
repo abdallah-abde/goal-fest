@@ -16,6 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -134,7 +140,7 @@ export default async function DashboardTournamentsPage({
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
         <Filters flagFilters={flagFilters} listFilters={listFilters} />
-        <SearchFieldComponent />
+        <SearchFieldComponent placeholder="Search by tournament names ..." />
         <AddNewLinkComponent
           href="/dashboard/tournaments/new"
           label="Add New Tournament"
@@ -158,11 +164,20 @@ export default async function DashboardTournamentsPage({
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">{type}</TableCell>
                 <TableCell className="dashboard-table-cell">
-                  <PopularSwitcher
-                    id={id}
-                    type="tournaments"
-                    isPopular={isPopular}
-                  />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <PopularSwitcher
+                          id={id}
+                          type="tournaments"
+                          isPopular={isPopular}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click to update popular status</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/tournaments/${id}`}

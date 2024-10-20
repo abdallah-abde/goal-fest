@@ -7,7 +7,11 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 import { useDebouncedCallback } from "use-debounce";
 
-export default function SearchFieldComponent() {
+export default function SearchFieldComponent({
+  placeholder,
+}: {
+  placeholder?: string | null;
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -36,7 +40,7 @@ export default function SearchFieldComponent() {
       <Input
         id="search"
         name="search"
-        placeholder="Search..."
+        placeholder={placeholder || "Search..."}
         className="px-4 bg-primary/50 placeholder:text-white  text-white"
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get("query")?.toString()}

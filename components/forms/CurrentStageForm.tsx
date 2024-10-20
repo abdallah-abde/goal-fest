@@ -44,7 +44,7 @@ export default function CurrentStageFormForm({
           />
           <datalist id="stages">
             {Object.values(TournamentStages).map((dl) => (
-              <option value={dl}></option>
+              <option key={dl} value={dl}></option>
             ))}
           </datalist>
           <FormFieldError error={error?.currentStage} />

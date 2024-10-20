@@ -1,5 +1,4 @@
 import prisma from "@/lib/db";
-import Link from "next/link";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
@@ -14,19 +13,22 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/filters/Filters";
+import PopoverStageUpdator from "@/components/table-parts/PopoverStageUpdator";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardEditionsPage({
   searchParams,
@@ -51,7 +53,6 @@ export default async function DashboardEditionsPage({
       { year: { contains: query } },
       { winner: { name: { contains: query } } },
       { titleHolder: { name: { contains: query } } },
-      // { currentStage: { contains: query } },
     ],
     ...(stageCondition !== "all"
       ? {
@@ -130,7 +131,7 @@ export default async function DashboardEditionsPage({
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
         <Filters listFilters={listFilters} />
-        <SearchFieldComponent />
+        <SearchFieldComponent placeholder="Search by tournament names, years, winners, title holders ..." />
         <AddNewLinkComponent
           href="/dashboard/editions/new"
           label="Add New Edition"
@@ -166,33 +167,31 @@ export default async function DashboardEditionsPage({
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">{name}</TableCell>
+                  <TableCell className="dashboard-table-cell">{year}</TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {year.toString()}
+                    {winner?.name || <NotProvidedSpan />}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {winner?.name || "..."}
+                    {titleHolder?.name || <NotProvidedSpan />}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {titleHolder?.name || "..."}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {currentStage || "..."}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <PopoverStageUpdator id={id} stage={currentStage}>
+                            <span className="hover:underline">
+                              {currentStage || <NotProvidedSpan hover={true} />}
+                            </span>
+                          </PopoverStageUpdator>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update stage</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">{slug}</TableCell>
-                  <ActionsCellDropDown editHref={`/dashboard/editions/${id}`}>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      asChild
-                      className="items-center justify-center"
-                    >
-                      <Link
-                        href={`/dashboard/editions/${id}/update-current-stage`}
-                        className="w-full cursor-pointer"
-                      >
-                        Update Current Stage
-                      </Link>
-                    </DropdownMenuItem>
-                  </ActionsCellDropDown>
+                  <ActionsCellDropDown editHref={`/dashboard/editions/${id}`} />
                 </TableRow>
               )
             )}

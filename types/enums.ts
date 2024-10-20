@@ -37,3 +37,11 @@ export enum FlagFilterOptions {
   Yes = "Yes",
   No = "No",
 }
+
+export enum MatchStatusOptions {
+  Ended = "Ended",
+  Postponed = "Postponed",
+  Cancelled = "Cancelled",
+  Playing = "Playing",
+  Scheduled = "Scheduled",
+}

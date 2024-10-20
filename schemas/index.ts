@@ -1,3 +1,4 @@
+import { MatchStatusOptions } from "@/types/enums";
 import { z } from "zod";
 
 const _fileSchema = z.instanceof(File, { message: "Required" });
@@ -79,7 +80,7 @@ export const EditionSchema = z.object({
 });
 
 export const CurrentStageSchema = z.object({
-  currentStage: z.string().optional(),
+  currentStage: z.string(),
 });
 
 export const GroupSchema = z.object({
@@ -119,12 +120,12 @@ export const GroupMatchSchema = z.object({
 });
 
 export const GroupMatchScoreSchema = z.object({
-  homeGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
-  awayGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
+  homeGoals: z.coerce.number({ message: "Please enter a valid number" }),
+  awayGoals: z.coerce.number({ message: "Please enter a valid number" }),
+});
+
+export const MatchStatusSchema = z.object({
+  status: z.string().optional(),
 });
 
 export const knockoutMatchSchema = z.object({
@@ -175,12 +176,8 @@ export const knockoutMatchSchema = z.object({
 });
 
 export const knockoutMatchScoreSchema = z.object({
-  homeGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
-  awayGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
+  homeGoals: z.coerce.number({ message: "Please enter a valid number" }),
+  awayGoals: z.coerce.number({ message: "Please enter a valid number" }),
   homeExtraTimeGoals: z.coerce
     .number({ message: "Please enter a valid number" })
     .optional(),

@@ -26,6 +26,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { ChangeEvent } from "react";
 
 interface FlagOptions {
   label: string;
@@ -50,14 +52,22 @@ interface ListFilter {
   selectedOption?: string;
 }
 
+interface Datefilter {
+  title: string;
+  fieldName: string;
+  searchParamName: string;
+}
+
 interface FiltersProps {
   flagFilters?: FlagFilter[];
   listFilters?: ListFilter[];
+  filterByDate?: Datefilter | null;
 }
 
 export default function Filters({
   flagFilters = [],
   listFilters = [],
+  filterByDate,
 }: FiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -87,6 +97,15 @@ export default function Filters({
     replace(`${pathname}?${params.toString()}`);
   };
 
+  const handleDateChanged = (e: ChangeEvent<HTMLInputElement>) => {
+    if (filterByDate) {
+      const params = new URLSearchParams(searchParams);
+      params.set(filterByDate?.fieldName, e.target.value);
+
+      replace(`${pathname}?${params.toString()}`);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -106,7 +125,7 @@ export default function Filters({
 
                     if (fieldParam) {
                       return (
-                        <div className="flex items-center">
+                        <div key={flag.fieldName} className="flex items-center">
                           {fieldParam === "yes" ? (
                             <BadgeCheck className="mr-2" size={15} />
                           ) : (
@@ -125,7 +144,7 @@ export default function Filters({
 
                     if (fieldParam) {
                       return (
-                        <div className="flex items-center">
+                        <div key={list.fieldName} className="flex items-center">
                           <BadgeCheck className="mr-2" size={15} />{" "}
                           <span>
                             {list.title}:
@@ -139,6 +158,18 @@ export default function Filters({
                       return <></>;
                     }
                   })}
+
+                  {filterByDate && searchParams.get(filterByDate.fieldName) && (
+                    <div className="flex items-center">
+                      <BadgeCheck className="mr-2" size={15} />{" "}
+                      <span>
+                        {filterByDate.title}:
+                        <span className="text-muted-foreground ml-1">
+                          {searchParams.get(filterByDate.fieldName)}
+                        </span>
+                      </span>
+                    </div>
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -153,7 +184,7 @@ export default function Filters({
         <div className="space-y-2">
           {flagFilters.length > 0 &&
             flagFilters.map((flag) => (
-              <Card className="p-2">
+              <Card key={flag.fieldName} className="p-2">
                 <CardTitle className="text-sm">{flag.title}</CardTitle>
                 <CardContent className="py-2">
                   <RadioGroup
@@ -209,6 +240,22 @@ export default function Filters({
                 </CardContent>
               </Card>
             ))}
+          {filterByDate && (
+            <Card className="p-2">
+              <CardTitle className="text-sm">{filterByDate.title}</CardTitle>
+              <CardContent className="py-2">
+                <Input
+                  type="date"
+                  id="date"
+                  name="date"
+                  defaultValue={
+                    searchParams.get(filterByDate.fieldName) || undefined
+                  }
+                  onChange={handleDateChanged}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </PopoverContent>
     </Popover>

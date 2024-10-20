@@ -17,10 +17,10 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardTeamsPage({
   searchParams,
@@ -74,7 +74,7 @@ export default async function DashboardTeamsPage({
       <PageHeader label="Teams List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
-        <SearchFieldComponent />
+        <SearchFieldComponent placeholder="Search by team names, codes ..." />
         <AddNewLinkComponent href="/dashboard/teams/new" label="Add New Team" />
       </div>
       {teams.length > 0 ? (
@@ -90,7 +90,9 @@ export default async function DashboardTeamsPage({
             {teams.map(({ id, name, code }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{code}</TableCell>
+                <TableCell className="dashboard-table-cell">
+                  {code || <NotProvidedSpan />}
+                </TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/teams/${id}`} />
               </TableRow>
             ))}

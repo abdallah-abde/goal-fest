@@ -17,7 +17,6 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
@@ -89,7 +88,7 @@ export default async function DashboardGroupsPage({
       <PageHeader label="Groups List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="tournament" />
-        <SearchFieldComponent />
+        <SearchFieldComponent placeholder="Search by tournament names, years, group names ..." />
         <AddNewLinkComponent
           href="/dashboard/groups/new"
           label="Add New Group"

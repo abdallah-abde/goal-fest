@@ -2,7 +2,11 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import {
+  FlagFilterOptions,
+  MatchStatusOptions,
+  SortDirectionOptions,
+} from "@/types/enums";
 
 import {
   Table,
@@ -17,6 +21,7 @@ import {
   getFormattedDate,
   getFormattedDateTime,
   getFormattedTime,
+  getStartAndEndDates,
 } from "@/lib/getFormattedDate";
 
 import PageHeader from "@/components/PageHeader";
@@ -30,6 +35,16 @@ import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
 import { Button } from "@/components/ui/button";
 import PopoverMatchScoreUpdator from "@/components/table-parts/PopoverMatchScoreUpdator";
+import SortByList from "@/components/table-parts/SortByList";
+import Filters from "@/components/table-parts/filters/Filters";
+import PopoverStatusUpdator from "@/components/table-parts/PopoverStatusUpdator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardGroupMatchesPage({
   searchParams,
@@ -38,13 +53,22 @@ export default async function DashboardGroupMatchesPage({
     page?: string;
     query?: string;
     sortDir?: SortDirectionOptions;
-    sortField?: String;
+    sortField?: string;
+    isFeatured?: string;
+    status?: string;
+    date?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "date";
+  const isFeaturedCondition = searchParams?.isFeatured;
+  const statusCondition = searchParams?.status || "all";
+  const dateCondition = searchParams?.date || undefined;
+
+  let startAndEndDates;
+  if (dateCondition) startAndEndDates = getStartAndEndDates(dateCondition);
 
   const where = {
     OR: [
@@ -54,8 +78,28 @@ export default async function DashboardGroupMatchesPage({
       { awayTeam: { name: { contains: query } } },
       { group: { name: { contains: query } } },
       { round: { contains: query } },
-      // { status: { contains: query } },
     ],
+    ...(isFeaturedCondition
+      ? {
+          isFeatured:
+            isFeaturedCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(statusCondition !== "all"
+      ? {
+          status: statusCondition,
+        }
+      : {}),
+    ...(dateCondition
+      ? {
+          date: {
+            gte: startAndEndDates?.startDate,
+            lte: startAndEndDates?.endDate,
+          },
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -105,11 +149,69 @@ export default async function DashboardGroupMatchesPage({
     },
   });
 
+  const sortingList = [
+    { label: "Tournament", fieldName: "tournament" },
+    { label: "Edition", fieldName: "edition" },
+    { label: "Home Team", fieldName: "homeTeam" },
+    { label: "Away Team", fieldName: "awayTeam" },
+    { label: "Group", fieldName: "group" },
+    { label: "Round", fieldName: "round" },
+    {
+      label: "Is Featured",
+      fieldName: "isFeatured",
+    },
+    { label: "Date", fieldName: "date" },
+    { label: "Status", fieldName: "status" },
+  ];
+
+  const flagFilters = [
+    {
+      title: "Is Featured",
+      defaultValue: "all",
+      fieldName: "isFeatured",
+      searchParamName: "isFeatured",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+  ];
+
+  const listFilters = [
+    {
+      title: "status",
+      fieldName: "status",
+      searchParamName: "status",
+      placeholder: "Choose status...",
+      options: Object.values(MatchStatusOptions),
+    },
+  ];
+
   return (
     <>
       <PageHeader label="Matches List" />
       <div className="dashboard-search-and-add">
-        <SearchFieldComponent />
+        <SortByList list={sortingList} defaultField="date" />
+        <Filters
+          flagFilters={flagFilters}
+          listFilters={listFilters}
+          filterByDate={{
+            title: "Date",
+            fieldName: "date",
+            searchParamName: "date",
+          }}
+        />
+        <SearchFieldComponent placeholder="Search by tournamet names, years, group names, rounds, teams ..." />
         <AddNewLinkComponent
           href="/dashboard/matches/new"
           label="Add New Match"
@@ -120,60 +222,76 @@ export default async function DashboardGroupMatchesPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="homeTeam"
                   label="Home Team"
                   labelForSmallerDevices="HT"
-                />
+                /> */}
+                <span className="hidden max-sm:block">HT</span>
+                <span className="hidden sm:block">Home Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="awayTeam"
                   label="Away Team"
                   labelForSmallerDevices="AT"
-                />
+                /> */}
+                <span className="hidden max-sm:block">AT</span>
+                <span className="hidden sm:block">Away Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">Score</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="date"
                   label="Date & Time"
                   labelForSmallerDevices="D&T"
-                />
+                /> */}
+                <span className="hidden max-sm:block">D&T</span>
+                <span className="hidden sm:block">Date & Time</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="group"
                   label="Group"
                   labelForSmallerDevices="Grp"
-                />
+                /> */}
+                <span className="hidden max-sm:block">Grp</span>
+                <span className="hidden sm:block">Group</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="round"
                   label="Round"
                   labelForSmallerDevices="Rnd"
-                />
+                /> */}
+                <span className="hidden max-sm:block">Rnd</span>
+                <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="tournament"
                   label="Tournament"
                   labelForSmallerDevices="Tour"
-                />
+                /> */}
+                <span className="hidden max-sm:block">Tour</span>
+                <span className="hidden sm:block">Tournament</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent
+                {/* <SortComponent
                   fieldName="edition"
                   label="Edition"
                   labelForSmallerDevices="Edi"
-                />
+                /> */}
+                <span className="hidden max-sm:block">Edi</span>
+                <span className="hidden sm:block">Edition</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="isFeatured" label="Is Featured" />
+                {/* <SortComponent fieldName="isFeatured" label="Is Featured" /> */}
+                Is Featured
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="status" label="Status" />
+                {/* <SortComponent fieldName="status" label="Status" /> */}
+                Status
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -203,44 +321,79 @@ export default async function DashboardGroupMatchesPage({
                     <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <PopoverMatchScoreUpdator
-                      id={id}
-                      type="matches"
-                      homeTeamName={homeTeam.name}
-                      awayTeamName={awayTeam.name}
-                      tournamentName={tournamentEdition.tournament.name}
-                      editionName={tournamentEdition.year.toString()}
-                      roundName={round || ""}
-                      date={
-                        date
-                          ? getFormattedDateTime(date.toString())
-                          : "No date information"
-                      }
-                      homeGoals={homeGoals}
-                      awayGoals={awayGoals}
-                    >
-                      <Button variant="ghost">
-                        {homeGoals} - {awayGoals}
-                      </Button>
-                    </PopoverMatchScoreUpdator>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <PopoverMatchScoreUpdator
+                            id={id}
+                            type="matches"
+                            homeTeamName={homeTeam.name}
+                            awayTeamName={awayTeam.name}
+                            tournamentName={tournamentEdition.tournament.name}
+                            editionName={tournamentEdition.year}
+                            roundName={round || ""}
+                            date={
+                              date
+                                ? getFormattedDateTime(date.toString())
+                                : "No date information"
+                            }
+                            homeGoals={homeGoals}
+                            awayGoals={awayGoals}
+                          >
+                            <span className="hover:underline">
+                              {!homeGoals && !awayGoals ? (
+                                <NotProvidedSpan hover={true} />
+                              ) : (
+                                <>
+                                  {homeGoals} - {awayGoals}
+                                </>
+                              )}
+                            </span>
+                          </PopoverMatchScoreUpdator>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update score</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <div className="flex flex-col">
                       <span className="hidden max-sm:block">
-                        {date ? getFormattedDate(date.toString(), true) : ""}
+                        {date ? (
+                          getFormattedDate(date.toString(), true)
+                        ) : (
+                          <NotProvidedSpan>
+                            Date: <span className="italic">#NP</span>
+                          </NotProvidedSpan>
+                        )}
                       </span>
                       <span className="hidden max-sm:block">
-                        {date
-                          ? getFormattedTime(date.toString(), true, false)
-                          : ""}
+                        {date ? (
+                          getFormattedTime(date.toString(), true, false)
+                        ) : (
+                          <NotProvidedSpan>
+                            Time: <span className="italic">#NP</span>
+                          </NotProvidedSpan>
+                        )}
                       </span>
                       <span className="hidden sm:block">
-                        {date ? getFormattedDate(date.toString(), true) : ""}
+                        {date ? (
+                          getFormattedDate(date.toString(), true)
+                        ) : (
+                          <NotProvidedSpan>
+                            Date: <span className="italic">#NP</span>
+                          </NotProvidedSpan>
+                        )}
                       </span>
                       <span className="hidden sm:block">
-                        {date
-                          ? getFormattedTime(date.toString(), false, false)
-                          : ""}
+                        {date ? (
+                          getFormattedTime(date.toString(), false, false)
+                        ) : (
+                          <NotProvidedSpan>
+                            Time: <span className="italic">#NP</span>
+                          </NotProvidedSpan>
+                        )}
                       </span>
                     </div>
                   </TableCell>
@@ -248,7 +401,7 @@ export default async function DashboardGroupMatchesPage({
                     {group.name}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {round}
+                    {round || <NotProvidedSpan />}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {tournamentEdition.tournament.name}
@@ -257,14 +410,36 @@ export default async function DashboardGroupMatchesPage({
                     {tournamentEdition.year.toString()}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <FeaturedSwitcher
-                      id={id}
-                      type="matches"
-                      isFeatured={isFeatured}
-                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FeaturedSwitcher
+                            id={id}
+                            type="matches"
+                            isFeatured={isFeatured}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update featured status</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {status || "..."}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <PopoverStatusUpdator id={id} status={status}>
+                            <span className="hover:underline">
+                              {status || <NotProvidedSpan hover={true} />}
+                            </span>
+                          </PopoverStatusUpdator>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update status</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <ActionsCellDropDown editHref={`/dashboard/matches/${id}`} />
                 </TableRow>
@@ -274,7 +449,7 @@ export default async function DashboardGroupMatchesPage({
           <DashboardTableFooter
             totalCount={totalMatchesCount}
             totalPages={totalPages}
-            colSpan={10}
+            colSpan={11}
           />
         </Table>
       ) : (

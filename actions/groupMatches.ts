@@ -3,7 +3,12 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { GroupMatchSchema, GroupMatchScoreSchema } from "@/schemas";
+import {
+  GroupMatchSchema,
+  GroupMatchScoreSchema,
+  MatchStatusSchema,
+} from "@/schemas";
+import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentGroupMatch(
   prevState: unknown,
@@ -35,6 +40,7 @@ export async function addTournamentGroupMatch(
       groupId: +data.groupId,
       tournamentEditionId: +data.tournamentEditionId,
       round: data.round ? data.round.toString() : null,
+      status: MatchStatusOptions.Scheduled,
     },
   });
 
@@ -138,6 +144,40 @@ export async function updateGroupMatchScore(
     data: {
       homeGoals: homeGoals ? +homeGoals : null,
       awayGoals: awayGoals ? +awayGoals : null,
+    },
+  });
+
+  revalidatePath("/dashboard/matches");
+  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
+}
+
+export async function updateGroupMatchStatus(
+  args: { id: number; searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { id, searchParams } = args;
+
+  const result = MatchStatusSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentMatchEdition = await prisma.match.findUnique({
+    where: { id },
+  });
+
+  if (currentMatchEdition == null) return notFound();
+
+  await prisma.match.update({
+    where: { id },
+    data: {
+      status: data.status,
     },
   });
 

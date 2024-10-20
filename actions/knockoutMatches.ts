@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { knockoutMatchSchema, knockoutMatchScoreSchema } from "@/schemas";
+import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentKnockoutMatch(
   prevState: unknown,
@@ -48,6 +49,7 @@ export async function addTournamentKnockoutMatch(
       awayTeamPlacehlder: data.awayTeamPlacehlder
         ? data.awayTeamPlacehlder.toString()
         : null,
+      status: MatchStatusOptions.Scheduled,
     },
   });
 
