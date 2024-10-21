@@ -3,9 +3,19 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { LeagueMatchSchema, LeagueMatchScoreSchema } from "@/schemas";
+import {
+  LeagueMatchSchema,
+  LeagueMatchScoreSchema,
+  MatchStatusSchema,
+} from "@/schemas";
 
-export async function addLeagueMatch(prevState: unknown, formData: FormData) {
+export async function addLeagueMatch(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -35,14 +45,18 @@ export async function addLeagueMatch(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect("/dashboard/league-matches");
+  redirect(
+    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }
 
 export async function updateLeagueMatch(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -79,7 +93,9 @@ export async function updateLeagueMatch(
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect("/dashboard/league-matches");
+  redirect(
+    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }
 
 export async function updateLeagueMatchFeaturedStatus(
@@ -143,6 +159,42 @@ export async function updateLeagueMatchScore(
 
   // revalidatePath("/dashboard/league-matches");
   // redirect("/dashboard/league-matches");
+
+  revalidatePath("/dashboard/league-matches");
+  redirect(
+    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
+  );
+}
+
+export async function updateLeagueMatchStatus(
+  args: { id: number; searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { id, searchParams } = args;
+
+  const result = MatchStatusSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentMatch = await prisma.leagueMatch.findUnique({
+    where: { id },
+  });
+
+  if (currentMatch == null) return notFound();
+
+  await prisma.leagueMatch.update({
+    where: { id },
+    data: {
+      status: data.status,
+    },
+  });
 
   revalidatePath("/dashboard/league-matches");
   redirect(

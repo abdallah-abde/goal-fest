@@ -6,7 +6,13 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 
-export async function addLeague(prevState: unknown, formData: FormData) {
+export async function addLeague(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = LeagueSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -29,7 +35,7 @@ export async function addLeague(prevState: unknown, formData: FormData) {
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -43,14 +49,16 @@ export async function addLeague(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/leagues");
-  redirect("/dashboard/leagues");
+  redirect(`/dashboard/leagues${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateLeague(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = LeagueSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -79,7 +87,7 @@ export async function updateLeague(
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -94,7 +102,7 @@ export async function updateLeague(
   });
 
   revalidatePath("/dashboard/leagues");
-  redirect("/dashboard/leagues");
+  redirect(`/dashboard/leagues${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateLeaguePopularStatus(

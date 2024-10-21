@@ -11,9 +11,12 @@ import {
 import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentGroupMatch(
+  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { searchParams } = args;
+
   const result = GroupMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -45,14 +48,16 @@ export async function addTournamentGroupMatch(
   });
 
   revalidatePath("/dashboard/matches");
-  redirect("/dashboard/matches");
+  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournamentGroupMatch(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = GroupMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -90,7 +95,7 @@ export async function updateTournamentGroupMatch(
   });
 
   revalidatePath("/dashboard/matches");
-  redirect("/dashboard/matches");
+  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateGroupMatchFeaturedStatus(
@@ -168,11 +173,11 @@ export async function updateGroupMatchStatus(
 
   const data = result.data;
 
-  const currentMatchEdition = await prisma.match.findUnique({
+  const currentMatch = await prisma.match.findUnique({
     where: { id },
   });
 
-  if (currentMatchEdition == null) return notFound();
+  if (currentMatch == null) return notFound();
 
   await prisma.match.update({
     where: { id },

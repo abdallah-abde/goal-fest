@@ -15,11 +15,13 @@ export default function DashboardTableFooter({
       {/* {totalPages > 1 && ( */}
       <TableFooter>
         <TableRow className="border-t-[1px] border-t-primary/10">
-          <TableCell>
-            <p className="text-left py-3">{`Total Rows: ( ${totalCount} )`}</p>
-          </TableCell>
-          <TableCell colSpan={colSpan - 1}>
-            <PaginationComponent totalPages={totalPages} />
+          <TableCell colSpan={colSpan}>
+            <div className="flex items-center justify-between">
+              <p className="text-left py-3 w-1/2">{`Total Rows: ( ${totalCount} )`}</p>
+              <div className="w-1/2">
+                <PaginationComponent totalPages={totalPages} />
+              </div>
+            </div>
           </TableCell>
         </TableRow>
       </TableFooter>

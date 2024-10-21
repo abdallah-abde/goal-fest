@@ -16,7 +16,7 @@ export default function PopularSwitcher({
 }: {
   id: number;
   isPopular: boolean;
-  type: string;
+  type: "leagues" | "tournaments";
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -36,13 +36,11 @@ export default function PopularSwitcher({
                     !isPopular,
                     searchParams.toString()
                   )
-                : type === "tournaments"
-                ? await updateTournamentPopularStatus(
+                : await updateTournamentPopularStatus(
                     id,
                     !isPopular,
                     searchParams.toString()
-                  )
-                : null;
+                  );
 
               router.refresh();
             })

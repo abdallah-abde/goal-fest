@@ -3,13 +3,20 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { knockoutMatchSchema, knockoutMatchScoreSchema } from "@/schemas";
+import {
+  knockoutMatchSchema,
+  knockoutMatchScoreSchema,
+  MatchStatusSchema,
+} from "@/schemas";
 import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentKnockoutMatch(
+  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { searchParams } = args;
+
   const result = knockoutMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -54,14 +61,18 @@ export async function addTournamentKnockoutMatch(
   });
 
   revalidatePath("/dashboard/knockout-matches");
-  redirect("/dashboard/knockout-matches");
+  redirect(
+    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }
 
 export async function updateTournamentKnockoutMatch(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = knockoutMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -112,7 +123,9 @@ export async function updateTournamentKnockoutMatch(
   });
 
   revalidatePath("/dashboard/knockout-matches");
-  redirect("/dashboard/knockout-matches");
+  redirect(
+    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
+  );
 }
 
 export async function updateKnockoutMatchFeaturedStatus(
@@ -176,6 +189,42 @@ export async function updateKnockoutMatchScore(
       awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
       homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
       awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
+    },
+  });
+
+  revalidatePath("/dashboard/knockout-matches");
+  redirect(
+    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
+  );
+}
+
+export async function updateKnockoutMatchStatus(
+  args: { id: number; searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { id, searchParams } = args;
+
+  const result = MatchStatusSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentMatch = await prisma.knockoutMatch.findUnique({
+    where: { id },
+  });
+
+  if (currentMatch == null) return notFound();
+
+  await prisma.knockoutMatch.update({
+    where: { id },
+    data: {
+      status: data.status,
     },
   });
 

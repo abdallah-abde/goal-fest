@@ -2,7 +2,11 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import {
+  FlagFilterOptions,
+  SortDirectionOptions,
+  LeagueTypes,
+} from "@/types/enums";
 
 import {
   Table,
@@ -12,17 +16,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
-
-import { Check, X } from "lucide-react";
+import SortByList from "@/components/table-parts/SortByList";
 import PopularSwitcher from "@/components/table-parts/PopularSwitcher";
+import Filters from "@/components/table-parts/filters/Filters";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardleaguesPage({
   searchParams,
@@ -31,19 +41,36 @@ export default async function DashboardleaguesPage({
     page?: string;
     query?: string;
     sortDir?: SortDirectionOptions;
-    sortField?: String;
+    sortField?: string;
+    isPopular?: string;
+    type?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const isPopularCondition = searchParams?.isPopular;
+  const typeCondition = searchParams?.type || "all";
 
   const where = {
     OR: [
       { name: { contains: query } },
       { country: { name: { contains: query } } },
     ],
+    ...(isPopularCondition
+      ? {
+          isPopular:
+            isPopularCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(typeCondition !== "all"
+      ? {
+          type: typeCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -74,11 +101,56 @@ export default async function DashboardleaguesPage({
     },
   });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Country", fieldName: "country" },
+    { label: "Type", fieldName: "type" },
+    {
+      label: "Is Popular",
+      fieldName: "isPopular",
+    },
+  ];
+
+  const listFilters = [
+    {
+      title: "Type",
+      fieldName: "type",
+      searchParamName: "type",
+      placeholder: "Choose Type...",
+      options: Object.values(LeagueTypes),
+    },
+  ];
+
+  const flagFilters = [
+    {
+      title: "Is Popular",
+      defaultValue: "all",
+      fieldName: "isPopular",
+      searchParamName: "isPopular",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+  ];
+
   return (
     <>
       <PageHeader label="leagues List" />
       <div className="dashboard-search-and-add">
-        <SearchFieldComponent />
+        <SortByList list={sortingList} defaultField="name" />
+        <Filters flagFilters={flagFilters} listFilters={listFilters} />
+        <SearchFieldComponent placeholder="Search by league names, countries ..." />
         <AddNewLinkComponent
           href="/dashboard/leagues/new"
           label="Add New League"
@@ -88,17 +160,13 @@ export default async function DashboardleaguesPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
+                Country
               </TableHead>
+              <TableHead className="dashboard-head-table-cell">Type</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="country" label="Country" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="type" label="Type" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="isPopular" label="Is Popular" />
+                Is Popular
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -108,22 +176,34 @@ export default async function DashboardleaguesPage({
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">
-                  {country?.name || "No Country"}
+                  {country?.name || <NotProvidedSpan />}
                 </TableCell>
                 <TableCell className="dashboard-table-cell">{type}</TableCell>
                 <TableCell className="dashboard-table-cell">
-                  <PopularSwitcher
-                    id={id}
-                    type="leagues"
-                    isPopular={isPopular}
-                  />
-                  {/* {isPopular ? <Check /> : <X />} */}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <PopularSwitcher
+                          id={id}
+                          type="leagues"
+                          isPopular={isPopular}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click to update popular status</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
                 <ActionsCellDropDown editHref={`/dashboard/leagues/${id}`} />
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={5} />
+          <DashboardTableFooter
+            totalCount={totalLeaguesCount}
+            totalPages={totalPages}
+            colSpan={5}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No leagues Found" />

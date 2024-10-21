@@ -3,7 +3,6 @@
 import { useFormState } from "react-dom";
 import { useSearchParams } from "next/navigation";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -22,24 +21,32 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { updateTournamentEditionCurrentStage } from "@/actions/editions";
-import { TournamentStages } from "@/types/enums";
+import { TournamentStages, LeagueStages } from "@/types/enums";
+import { updateLeagueSeasonCurrentStage } from "@/actions/seasons";
 
 export default function PopoverStageUpdator({
   id,
   stage,
+  type,
   children,
 }: {
   id: number;
+  type: "editions" | "seasons";
   stage: string | null;
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
 
   const [error, action] = useFormState(
-    updateTournamentEditionCurrentStage.bind(null, {
-      id,
-      searchParams: searchParams.toString(),
-    }),
+    type === "editions"
+      ? updateTournamentEditionCurrentStage.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        })
+      : updateLeagueSeasonCurrentStage.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        }),
     null
   );
 
@@ -54,21 +61,24 @@ export default function PopoverStageUpdator({
           <form action={action} className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <Label htmlFor="currentStage">Stage</Label>
-              <Select name="status" defaultValue={stage || ""}>
+
+              <Select name="currentStage" defaultValue={stage || ""}>
                 <SelectTrigger className="flex-1">
                   <SelectValue placeholder="Choose Stage" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(TournamentStages).map((opt) => (
+                  {Object.values(
+                    type === "editions" ? TournamentStages : LeagueStages
+                  ).map((opt) => (
                     <SelectItem value={opt} key={opt}>
                       {opt}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-
               <FormFieldError error={error?.currentStage} />
             </div>
+
             <SubmitButton />
           </form>
         </div>

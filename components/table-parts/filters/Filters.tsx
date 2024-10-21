@@ -102,6 +102,8 @@ export default function Filters({
       const params = new URLSearchParams(searchParams);
       params.set(filterByDate?.fieldName, e.target.value);
 
+      if (e.target.value === "") params.delete(filterByDate?.fieldName);
+
       replace(`${pathname}?${params.toString()}`);
     }
   };

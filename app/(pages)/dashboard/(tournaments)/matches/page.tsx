@@ -28,12 +28,10 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
-import { Button } from "@/components/ui/button";
 import PopoverMatchScoreUpdator from "@/components/table-parts/PopoverMatchScoreUpdator";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/filters/Filters";
@@ -407,7 +405,7 @@ export default async function DashboardGroupMatchesPage({
                     {tournamentEdition.tournament.name}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    {tournamentEdition.year.toString()}
+                    {tournamentEdition.year}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     <TooltipProvider>
@@ -429,7 +427,11 @@ export default async function DashboardGroupMatchesPage({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <PopoverStatusUpdator id={id} status={status}>
+                          <PopoverStatusUpdator
+                            id={id}
+                            status={status}
+                            type="matches"
+                          >
                             <span className="hover:underline">
                               {status || <NotProvidedSpan hover={true} />}
                             </span>

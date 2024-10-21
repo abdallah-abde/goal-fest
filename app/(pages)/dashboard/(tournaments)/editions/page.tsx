@@ -178,7 +178,11 @@ export default async function DashboardEditionsPage({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <PopoverStageUpdator id={id} stage={currentStage}>
+                          <PopoverStageUpdator
+                            id={id}
+                            stage={currentStage}
+                            type="editions"
+                          >
                             <span className="hover:underline">
                               {currentStage || <NotProvidedSpan hover={true} />}
                             </span>

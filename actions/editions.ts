@@ -9,9 +9,12 @@ import { TournamentStages } from "@/types/enums";
 import { generateSlug } from "@/lib/generateSlug";
 
 export async function addTournamentEdition(
+  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { searchParams } = args;
+
   const result = EditionSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -59,7 +62,7 @@ export async function addTournamentEdition(
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -111,14 +114,16 @@ export async function addTournamentEdition(
   });
 
   revalidatePath("/dashboard/editions");
-  redirect("/dashboard/editions");
+  redirect(`/dashboard/editions${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournamentEdition(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = EditionSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -128,6 +133,9 @@ export async function updateTournamentEdition(
   }
 
   const data = result.data;
+
+  if (data.endYear < data.startYear)
+    return { startYear: ["Start Year must be equal or less than End Year"] };
 
   const existedEdition = await prisma.tournamentEdition.findFirst({
     where: {
@@ -160,7 +168,7 @@ export async function updateTournamentEdition(
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -213,7 +221,7 @@ export async function updateTournamentEdition(
   });
 
   revalidatePath("/dashboard/editions");
-  redirect("/dashboard/editions");
+  redirect(`/dashboard/editions${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournamentEditionCurrentStage(

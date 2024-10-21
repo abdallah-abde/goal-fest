@@ -4,9 +4,17 @@ import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { SeasonSchema } from "@/schemas";
+import { CurrentStageSchema, SeasonSchema } from "@/schemas";
+import { generateSlug } from "@/lib/generateSlug";
+import { LeagueStages } from "@/types/enums";
 
-export async function addLeagueSeason(prevState: unknown, formData: FormData) {
+export async function addLeagueSeason(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = SeasonSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -30,6 +38,20 @@ export async function addLeagueSeason(prevState: unknown, formData: FormData) {
 
   if (season) return { startYear: ["Season existed"] };
 
+  const league = await prisma.league.findUnique({
+    where: { id: +data.leagueId },
+  });
+
+  if (!league) return { leagueId: ["No League Found"] };
+
+  let slug = generateSlug(league.name.toLowerCase().trim());
+
+  let exists = await prisma.leagueSeason.findUnique({ where: { slug } });
+  while (exists) {
+    slug = generateSlug(league.name.toLowerCase().trim()); // Generate a new slug if the one exists
+    exists = await prisma.leagueSeason.findUnique({ where: { slug } });
+  }
+
   let logoUrlPath = "";
   if (data.logoUrl != null && data.logoUrl.size > 0) {
     logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
@@ -38,7 +60,7 @@ export async function addLeagueSeason(prevState: unknown, formData: FormData) {
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -67,18 +89,22 @@ export async function addLeagueSeason(prevState: unknown, formData: FormData) {
       teams: {
         connect: leagueTeams,
       },
+      currentStage: LeagueStages.Scheduled,
+      slug,
     },
   });
 
   revalidatePath("/dashboard/seasons");
-  redirect("/dashboard/seasons");
+  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateLeagueSeason(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = SeasonSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -121,7 +147,7 @@ export async function updateLeagueSeason(
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -156,5 +182,39 @@ export async function updateLeagueSeason(
   });
 
   revalidatePath("/dashboard/seasons");
-  redirect("/dashboard/seasons");
+  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
+}
+
+export async function updateLeagueSeasonCurrentStage(
+  args: { id: number; searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { id, searchParams } = args;
+
+  const result = CurrentStageSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (result.success === false) {
+    return result.error.formErrors.fieldErrors;
+  }
+
+  const data = result.data;
+
+  const currentLeagueSeason = await prisma.leagueSeason.findUnique({
+    where: { id },
+  });
+
+  if (currentLeagueSeason == null) return notFound();
+
+  await prisma.leagueSeason.update({
+    where: { id },
+    data: {
+      currentStage: data.currentStage,
+    },
+  });
+
+  revalidatePath("/dashboard/seasons");
+  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
 }

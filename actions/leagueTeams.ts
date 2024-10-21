@@ -6,7 +6,13 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { LeagueTeamSchema } from "@/schemas";
 
-export async function addLeagueTeam(prevState: unknown, formData: FormData) {
+export async function addLeagueTeam(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = LeagueTeamSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -29,7 +35,7 @@ export async function addLeagueTeam(prevState: unknown, formData: FormData) {
 
     await fs.writeFile(
       `public${flagUrlPath}`,
-      Buffer.from(await data.flagUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
     );
   }
 
@@ -42,14 +48,16 @@ export async function addLeagueTeam(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/league-teams");
-  redirect("/dashboard/league-teams");
+  redirect(`/dashboard/league-teams${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateLeagueTeam(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = LeagueTeamSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -78,7 +86,7 @@ export async function updateLeagueTeam(
 
     await fs.writeFile(
       `public${flagUrlPath}`,
-      Buffer.from(await data.flagUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
     );
   }
 
@@ -92,5 +100,5 @@ export async function updateLeagueTeam(
   });
 
   revalidatePath("/dashboard/league-teams");
-  redirect("/dashboard/league-teams");
+  redirect(`/dashboard/league-teams${searchParams ? `?${searchParams}` : ""}`);
 }

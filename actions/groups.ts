@@ -6,9 +6,12 @@ import { notFound, redirect } from "next/navigation";
 import { GroupSchema } from "@/schemas";
 
 export async function addTournamentGroup(
+  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { searchParams } = args;
+
   const result = GroupSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -46,14 +49,16 @@ export async function addTournamentGroup(
   });
 
   revalidatePath("/dashboard/groups");
-  redirect("/dashboard/groups");
+  redirect(`/dashboard/groups${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournamentGroup(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = GroupSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -105,5 +110,5 @@ export async function updateTournamentGroup(
   });
 
   revalidatePath("/dashboard/groups");
-  redirect("/dashboard/groups");
+  redirect(`/dashboard/groups${searchParams ? `?${searchParams}` : ""}`);
 }

@@ -22,24 +22,38 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
+import { updateKnockoutMatchStatus } from "@/actions/knockoutMatches";
+import { updateLeagueMatchStatus } from "@/actions/leagueMatches";
 
 export default function PopoverStatusUpdator({
   id,
   status,
+  type,
   children,
 }: {
   id: number;
   status?: string | null;
+  type: "matches" | "knockoutMatches" | "leagueMatches";
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
 
   const [error, action] = useFormState(
-    updateGroupMatchStatus.bind(null, {
-      id,
-      searchParams: searchParams.toString(),
-    }),
+    type === "matches"
+      ? updateGroupMatchStatus.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        })
+      : type === "knockoutMatches"
+      ? updateKnockoutMatchStatus.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        })
+      : updateLeagueMatchStatus.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        }),
     null
   );
 

@@ -362,7 +362,7 @@ export default async function DashboardKnockoutMatchesPage({
                             awayPenaltyGoals={awayPenaltyGoals}
                           >
                             <span className="hover:underline">
-                              {!homeGoals && !awayGoals ? (
+                              {homeGoals === null && awayGoals === null ? (
                                 <NotProvidedSpan hover={true} />
                               ) : (
                                 <>
@@ -410,8 +410,11 @@ export default async function DashboardKnockoutMatchesPage({
                             awayPenaltyGoals={awayPenaltyGoals}
                           >
                             <span className="hover:underline">
-                              {!homeExtraTimeGoals && !awayExtraTimeGoals ? (
-                                <NotProvidedSpan hover={true} />
+                              {homeExtraTimeGoals === null &&
+                              awayExtraTimeGoals === null ? (
+                                <NotProvidedSpan hover={true}>
+                                  #NP
+                                </NotProvidedSpan>
                               ) : (
                                 <>
                                   {homeExtraTimeGoals} - {awayExtraTimeGoals}
@@ -458,8 +461,11 @@ export default async function DashboardKnockoutMatchesPage({
                             awayPenaltyGoals={awayPenaltyGoals}
                           >
                             <span className="hover:underline">
-                              {!homePenaltyGoals && !awayPenaltyGoals ? (
-                                <NotProvidedSpan hover={true} />
+                              {homePenaltyGoals === null &&
+                              awayPenaltyGoals === null ? (
+                                <NotProvidedSpan hover={true}>
+                                  #NP
+                                </NotProvidedSpan>
                               ) : (
                                 <>
                                   {homePenaltyGoals} - {awayPenaltyGoals}
@@ -543,7 +549,11 @@ export default async function DashboardKnockoutMatchesPage({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <PopoverStatusUpdator id={id} status={status}>
+                          <PopoverStatusUpdator
+                            id={id}
+                            status={status}
+                            type="knockoutMatches"
+                          >
                             <span className="hover:underline">
                               {status || <NotProvidedSpan hover={true} />}
                             </span>

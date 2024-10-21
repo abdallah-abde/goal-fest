@@ -22,7 +22,7 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import { useState } from "react";
-import { IsPopularOptions, TournamentsOrLeaguesTypes } from "@/types/enums";
+import { IsPopularOptions, TournamentTypes } from "@/types/enums";
 
 export default function TournamentForm({
   tournament,
@@ -68,8 +68,8 @@ export default function TournamentForm({
             list="tournamentsOrLeaguesTypes"
           />
           <datalist id="tournamentsOrLeaguesTypes">
-            {Object.values(TournamentsOrLeaguesTypes).map((opt) => (
-              <option value={opt}></option>
+            {Object.values(TournamentTypes).map((opt) => (
+              <option key={opt} value={opt}></option>
             ))}
           </datalist>
           <FormFieldError error={error?.type} />

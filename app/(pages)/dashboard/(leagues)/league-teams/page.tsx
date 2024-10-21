@@ -17,9 +17,10 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardLeagueTeamsPage({
   searchParams,
@@ -61,11 +62,17 @@ export default async function DashboardLeagueTeamsPage({
     orderBy: { ...orderBy },
   });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Code", fieldName: "code" },
+  ];
+
   return (
     <>
       <PageHeader label="Leagues Teams List" />
       <div className="dashboard-search-and-add">
-        <SearchFieldComponent />
+        <SortByList list={sortingList} defaultField="name" />
+        <SearchFieldComponent placeholder="Search by team names, codes ..." />
         <AddNewLinkComponent
           href="/dashboard/league-teams/new"
           label="Add New Team"
@@ -75,12 +82,8 @@ export default async function DashboardLeagueTeamsPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Team Code" fieldName="code" />
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Code</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -88,14 +91,20 @@ export default async function DashboardLeagueTeamsPage({
             {LeagueTeams.map(({ id, name, code }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{code}</TableCell>
+                <TableCell className="dashboard-table-cell">
+                  {code || <NotProvidedSpan />}
+                </TableCell>
                 <ActionsCellDropDown
                   editHref={`/dashboard/league-teams/${id}`}
                 />
               </TableRow>
             ))}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
+          <DashboardTableFooter
+            totalCount={totalLeagueTeamsCount}
+            totalPages={totalPages}
+            colSpan={3}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No League Teams Found" />

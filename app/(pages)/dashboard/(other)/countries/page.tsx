@@ -12,14 +12,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
+import CountryForm from "@/components/forms/CountryForm";
+import FormDialog from "@/components/forms/FormDialog";
 
 export default async function DashboardCountriesPage({
   searchParams,
@@ -65,11 +77,17 @@ export default async function DashboardCountriesPage({
   //   setTimeout(() => {}, 300);
   // });
 
+  const sortingList = [
+    { label: "Name", fieldName: "name" },
+    { label: "Code", fieldName: "code" },
+  ];
+
   return (
     <>
       <PageHeader label="Countries List" />
       <div className="dashboard-search-and-add">
-        <SearchFieldComponent />
+        <SortByList list={sortingList} defaultField="name" />
+        <SearchFieldComponent placeholder="Search by country names, codes ..." />
         <AddNewLinkComponent
           href="/dashboard/countries/new"
           label="Add New Country"
@@ -79,25 +97,38 @@ export default async function DashboardCountriesPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
-              </TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Country Code" fieldName="code" />
-              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Code</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {countries.map(({ id, name, code }) => (
-              <TableRow key={id} className="dashboard-table-row">
-                <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{code}</TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
-              </TableRow>
-            ))}
+            {countries.map((country) => {
+              const { id, name, code } = country;
+
+              return (
+                <TableRow key={id} className="dashboard-table-row">
+                  <TableCell className="dashboard-table-cell">{name}</TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {code || <NotProvidedSpan />}
+                  </TableCell>
+                  {/* <ActionsCellDropDown editHref={`/dashboard/countries/${id}`}> */}
+                  <ActionsCellDropDown
+                    editComponent={
+                      <FormDialog>
+                        <CountryForm country={country} />
+                      </FormDialog>
+                    }
+                  />
+                </TableRow>
+              );
+            })}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
+          <DashboardTableFooter
+            totalCount={totalCountriesCount}
+            totalPages={totalPages}
+            colSpan={3}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Countries Found" />

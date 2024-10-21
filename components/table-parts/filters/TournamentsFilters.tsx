@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { IsPopularOptions, TournamentsOrLeaguesTypes } from "@/types/enums";
+import { IsPopularOptions, TournamentTypes } from "@/types/enums";
 
 import { BadgeCheck, BadgeX } from "lucide-react";
 
@@ -154,7 +154,7 @@ export default function TorunamentsFilters() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
-                  {Object.values(TournamentsOrLeaguesTypes).map((opt) => (
+                  {Object.values(TournamentTypes).map((opt) => (
                     <SelectItem value={opt} key={opt}>
                       {opt}
                     </SelectItem>

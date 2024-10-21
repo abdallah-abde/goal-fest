@@ -17,7 +17,24 @@ export enum TournamentStages {
   Finished = "Finished",
 }
 
-export enum TournamentsOrLeaguesTypes {
+export enum LeagueStages {
+  Scheduled = "Scheduled",
+  Running = "Running",
+  Finished = "Finished",
+}
+
+export enum TournamentTypes {
+  International = "International",
+  Europe = "Europe",
+  Asia = "Asia",
+  Africa = "Africa",
+  NorthAmerica = "North America",
+  SouthAmerica = "South America",
+  Oceanosia = "Oceanosia",
+}
+
+export enum LeagueTypes {
+  Domestic = "Domestic",
   International = "International",
   Europe = "Europe",
   Asia = "Asia",

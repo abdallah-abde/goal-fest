@@ -5,7 +5,7 @@ import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 import {
   FlagFilterOptions,
   SortDirectionOptions,
-  TournamentsOrLeaguesTypes,
+  TournamentTypes,
 } from "@/types/enums";
 
 import {
@@ -107,7 +107,7 @@ export default async function DashboardTournamentsPage({
       fieldName: "type",
       searchParamName: "type",
       placeholder: "Choose Type...",
-      options: Object.values(TournamentsOrLeaguesTypes),
+      options: Object.values(TournamentTypes),
     },
   ];
 

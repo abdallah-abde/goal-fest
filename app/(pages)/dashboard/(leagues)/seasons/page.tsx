@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import { LeagueStages, SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -12,14 +12,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
+import SortByList from "@/components/table-parts/SortByList";
+import Filters from "@/components/table-parts/filters/Filters";
+import PopoverStageUpdator from "@/components/table-parts/PopoverStageUpdator";
+import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 export default async function DashboardSeasonsPage({
   searchParams,
@@ -28,26 +37,44 @@ export default async function DashboardSeasonsPage({
     page?: string;
     query?: string;
     sortDir?: SortDirectionOptions;
-    sortField?: String;
+    sortField?: string;
+    stage?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "year";
+  const stageCondition = searchParams?.stage || "all";
 
   const where = {
     OR: [
       { league: { name: { contains: query } } },
+      { league: { country: { name: { contains: query } } } },
       { year: { contains: query } },
+      { winner: { name: { contains: query } } },
+      { titleHolder: { name: { contains: query } } },
     ],
+    ...(stageCondition !== "all"
+      ? {
+          currentStage: stageCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
-    ...(sortField === "name"
+    ...(sortField === "country"
+      ? { league: { country: { name: sortDir } } }
+      : sortField === "name"
       ? { league: { name: sortDir } }
       : sortField === "year"
       ? { year: sortDir }
+      : sortField === "winner"
+      ? { winner: { name: sortDir } }
+      : sortField === "titleHolder"
+      ? { titleHolder: { name: sortDir } }
+      : sortField === "currentStage"
+      ? { currentStage: sortDir }
       : {}),
   };
 
@@ -67,15 +94,51 @@ export default async function DashboardSeasonsPage({
     take: PAGE_RECORDS_COUNT,
     orderBy: { ...orderBy },
     include: {
-      league: true,
+      league: {
+        include: {
+          country: true,
+        },
+      },
+      winner: true,
+      titleHolder: true,
     },
   });
+
+  const sortingList = [
+    { label: "Country", fieldName: "country" },
+    { label: "Name", fieldName: "name" },
+    { label: "Year", fieldName: "year" },
+    {
+      label: "Winner",
+      fieldName: "winner",
+    },
+    {
+      label: "Title Holder",
+      fieldName: "titleHolder",
+    },
+    {
+      label: "Current Stage",
+      fieldName: "currentStage",
+    },
+  ];
+
+  const listFilters = [
+    {
+      title: "Stage",
+      fieldName: "stage",
+      searchParamName: "stage",
+      placeholder: "Choose Stage...",
+      options: Object.values(LeagueStages),
+    },
+  ];
 
   return (
     <>
       <PageHeader label="Leagues Seasons List" />
       <div className="dashboard-search-and-add">
-        <SearchFieldComponent />
+        <SortByList list={sortingList} defaultField="name" />
+        <Filters listFilters={listFilters} />
+        <SearchFieldComponent placeholder="Search by league names, countries, years, winners, title holders ..." />
         <AddNewLinkComponent
           href="/dashboard/seasons/new"
           label="Add New Season"
@@ -86,24 +149,75 @@ export default async function DashboardSeasonsPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent fieldName="name" />
+                Country
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
+              <TableHead className="dashboard-head-table-cell">Year</TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Winner
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <SortComponent label="Year" fieldName="year" />
+                Title Holder
               </TableHead>
+              <TableHead className="dashboard-head-table-cell">Stage</TableHead>
+              <TableHead className="dashboard-head-table-cell">Slug</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {seasons.map(({ id, league: { name }, year }) => (
-              <TableRow key={id} className="dashboard-table-row">
-                <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">{year}</TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/seasons/${id}`} />
-              </TableRow>
-            ))}
+            {seasons.map(
+              ({
+                id,
+                league: { name, country },
+                year,
+                winner,
+                titleHolder,
+                currentStage,
+                slug,
+              }) => (
+                <TableRow key={id} className="dashboard-table-row">
+                  <TableCell className="dashboard-table-cell">
+                    {country?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">{name}</TableCell>
+                  <TableCell className="dashboard-table-cell">{year}</TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {winner?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {titleHolder?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <PopoverStageUpdator
+                            id={id}
+                            stage={currentStage}
+                            type="seasons"
+                          >
+                            <span className="hover:underline">
+                              {currentStage || <NotProvidedSpan hover={true} />}
+                            </span>
+                          </PopoverStageUpdator>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update stage</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">{slug}</TableCell>
+                  <ActionsCellDropDown editHref={`/dashboard/seasons/${id}`} />
+                </TableRow>
+              )
+            )}
           </TableBody>
-          <DashboardTableFooter totalPages={totalPages} colSpan={3} />
+          <DashboardTableFooter
+            totalCount={totalSeasonsCount}
+            totalPages={totalPages}
+            colSpan={8}
+          />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Seasons Found" />

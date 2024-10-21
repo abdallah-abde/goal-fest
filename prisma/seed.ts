@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import { MatchStatusOptions, TournamentStages } from "@/types/enums";
 
 async function main() {
   const teams = await prisma.team.createMany({
@@ -368,6 +369,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 5,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: hungary ? hungary.id : 0,
@@ -378,6 +380,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 1,
         awayGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain ? spain.id : 0,
@@ -388,6 +391,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 3,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: italy ? italy.id : 0,
@@ -398,6 +402,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 2,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: poland ? poland.id : 0,
@@ -408,6 +413,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 1,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: slovenia ? slovenia.id : 0,
@@ -418,6 +424,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: serbia ? serbia.id : 0,
@@ -428,6 +435,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 0,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: romania ? romania.id : 0,
@@ -438,6 +446,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 3,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: belgium ? belgium.id : 0,
@@ -448,6 +457,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 0,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: austria ? austria.id : 0,
@@ -458,6 +468,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 0,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: turkiye ? turkiye.id : 0,
@@ -468,6 +479,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 3,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: portugal ? portugal.id : 0,
@@ -478,6 +490,7 @@ async function main() {
         round: "Round 1",
         homeGoals: 2,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: croatia ? croatia.id : 0,
@@ -488,6 +501,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 2,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: germany ? germany.id : 0,
@@ -498,6 +512,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 2,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: scotland ? scotland.id : 0,
@@ -508,6 +523,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: slovenia ? slovenia.id : 0,
@@ -518,6 +534,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: denmark ? denmark.id : 0,
@@ -528,6 +545,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain ? spain.id : 0,
@@ -538,6 +556,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: slovakia ? slovakia.id : 0,
@@ -548,6 +567,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: poland ? poland.id : 0,
@@ -558,6 +578,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: netherlands ? netherlands.id : 0,
@@ -568,6 +589,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 0,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: georgia ? georgia.id : 0,
@@ -578,6 +600,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: turkiye ? turkiye.id : 0,
@@ -588,6 +611,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 0,
         awayGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: belgium ? belgium.id : 0,
@@ -598,6 +622,7 @@ async function main() {
         round: "Round 2",
         homeGoals: 2,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: switzerland ? switzerland.id : 0,
@@ -608,6 +633,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: scotland ? scotland.id : 0,
@@ -618,6 +644,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 0,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: albania ? albania.id : 0,
@@ -628,6 +655,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 0,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: croatia ? croatia.id : 0,
@@ -638,6 +666,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: netherlands ? netherlands.id : 0,
@@ -648,6 +677,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 2,
         awayGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: france ? france.id : 0,
@@ -658,6 +688,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: england ? england.id : 0,
@@ -668,6 +699,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 0,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: denmark ? denmark.id : 0,
@@ -678,6 +710,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 0,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: slovakia ? slovakia.id : 0,
@@ -688,6 +721,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 1,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: ukraine ? ukraine.id : 0,
@@ -698,6 +732,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 0,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: czechia ? czechia.id : 0,
@@ -708,6 +743,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 1,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: georgia ? georgia.id : 0,
@@ -718,6 +754,7 @@ async function main() {
         round: "Round 3",
         homeGoals: 2,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
     ],
   });
@@ -732,6 +769,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 2,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: germany?.id,
@@ -741,6 +779,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 2,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: england?.id,
@@ -752,6 +791,7 @@ async function main() {
         awayGoals: 1,
         homeExtraTimeGoals: 1,
         awayExtraTimeGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain?.id,
@@ -761,6 +801,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 4,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: france?.id,
@@ -770,6 +811,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 1,
         awayGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: portugal?.id,
@@ -783,6 +825,7 @@ async function main() {
         awayExtraTimeGoals: 0,
         homePenaltyGoals: 3,
         awayPenaltyGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: romania?.id,
@@ -792,6 +835,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 0,
         awayGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: austria?.id,
@@ -801,6 +845,7 @@ async function main() {
         round: "Round of 16",
         homeGoals: 1,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain?.id,
@@ -812,6 +857,7 @@ async function main() {
         awayGoals: 1,
         homeExtraTimeGoals: 1,
         awayExtraTimeGoals: 0,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: portugal?.id,
@@ -825,6 +871,7 @@ async function main() {
         awayExtraTimeGoals: 0,
         homePenaltyGoals: 3,
         awayPenaltyGoals: 5,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: england?.id,
@@ -838,6 +885,7 @@ async function main() {
         awayExtraTimeGoals: 0,
         homePenaltyGoals: 5,
         awayPenaltyGoals: 3,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: netherlands?.id,
@@ -847,6 +895,7 @@ async function main() {
         round: "Quarter Final",
         homeGoals: 2,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain?.id,
@@ -856,6 +905,7 @@ async function main() {
         round: "Semi Final",
         homeGoals: 2,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: netherlands?.id,
@@ -865,6 +915,7 @@ async function main() {
         round: "Semi Final",
         homeGoals: 1,
         awayGoals: 2,
+        status: MatchStatusOptions.Ended,
       },
       {
         homeTeamId: spain?.id,
@@ -874,6 +925,7 @@ async function main() {
         round: "Final",
         homeGoals: 2,
         awayGoals: 1,
+        status: MatchStatusOptions.Ended,
       },
     ],
   });
@@ -1137,7 +1189,7 @@ async function main() {
   const englandCountry = await prisma.country.create({
     data: {
       name: "England",
-      code: "ITA",
+      code: "ENG",
     },
   });
 

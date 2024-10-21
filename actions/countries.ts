@@ -6,7 +6,13 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { CountrySchema } from "@/schemas";
 
-export async function addCountry(prevState: unknown, formData: FormData) {
+export async function addCountry(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = CountrySchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -29,10 +35,12 @@ export async function addCountry(prevState: unknown, formData: FormData) {
       data.flagUrl.name
     }`;
 
-    await fs.writeFile(
-      `public${flagUrlPath}`,
-      Buffer.from(await data.flagUrl.arrayBuffer())
-    );
+    if (data.flagUrl !== null) {
+      await fs.writeFile(
+        `public${flagUrlPath}`,
+        new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
+      );
+    }
   }
 
   await prisma.country.create({
@@ -44,14 +52,16 @@ export async function addCountry(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/countries");
-  redirect("/dashboard/countries");
+  redirect(`/dashboard/countries${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateCountry(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = CountrySchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -82,7 +92,7 @@ export async function updateCountry(
 
     await fs.writeFile(
       `public${flagUrlPath}`,
-      Buffer.from(await data.flagUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
     );
   }
 
@@ -96,5 +106,5 @@ export async function updateCountry(
   });
 
   revalidatePath("/dashboard/countries");
-  redirect("/dashboard/countries");
+  redirect(`/dashboard/countries${searchParams ? `?${searchParams}` : ""}`);
 }

@@ -7,7 +7,13 @@ import { notFound, redirect } from "next/navigation";
 import { TournamentSchema } from "@/schemas";
 import { IsPopularOptions } from "@/types/enums";
 
-export async function addTournament(prevState: unknown, formData: FormData) {
+export async function addTournament(
+  args: { searchParams: string },
+  prevState: unknown,
+  formData: FormData
+) {
+  const { searchParams } = args;
+
   const result = TournamentSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -32,7 +38,7 @@ export async function addTournament(prevState: unknown, formData: FormData) {
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -46,14 +52,16 @@ export async function addTournament(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/tournaments");
-  redirect("/dashboard/tournaments");
+  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournament(
-  id: number,
+  args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
+  const { id, searchParams } = args;
+
   const result = TournamentSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -84,7 +92,7 @@ export async function updateTournament(
 
     await fs.writeFile(
       `public${logoUrlPath}`,
-      Buffer.from(await data.logoUrl.arrayBuffer())
+      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
     );
   }
 
@@ -99,7 +107,7 @@ export async function updateTournament(
   });
 
   revalidatePath("/dashboard/tournaments");
-  redirect("/dashboard/tournaments");
+  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
 }
 
 export async function updateTournamentPopularStatus(
