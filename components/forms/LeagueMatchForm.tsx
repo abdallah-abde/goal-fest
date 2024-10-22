@@ -33,7 +33,7 @@ import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface LeagueMatchProps extends LeagueMatch {
   season: LeagueSeasonProps;
-  group: LeagueGroup;
+  group: LeagueGroup | null;
   homeTeam: LeagueTeam;
   awayTeam: LeagueTeam;
 }
