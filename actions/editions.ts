@@ -9,12 +9,9 @@ import { TournamentStages } from "@/types/enums";
 import { generateSlug } from "@/lib/generateSlug";
 
 export async function addTournamentEdition(
-  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
-  const { searchParams } = args;
-
   const result = EditionSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -46,11 +43,15 @@ export async function addTournamentEdition(
 
   if (!tournament) return { tournamentId: ["No Tournament Found"] };
 
-  let slug = generateSlug(tournament.name.toLowerCase().trim());
+  let slug = generateSlug(
+    tournament.name.toLowerCase().trim().split(" ").join("-")
+  );
 
   let exists = await prisma.tournamentEdition.findUnique({ where: { slug } });
   while (exists) {
-    slug = generateSlug(tournament.name.toLowerCase().trim()); // Generate a new slug if the one exists
+    slug = generateSlug(
+      tournament.name.toLowerCase().trim().split(" ").join("-")
+    ); // Generate a new slug if the one exists
     exists = await prisma.tournamentEdition.findUnique({ where: { slug } });
   }
 
@@ -114,16 +115,14 @@ export async function addTournamentEdition(
   });
 
   revalidatePath("/dashboard/editions");
-  redirect(`/dashboard/editions${searchParams ? `?${searchParams}` : ""}`);
+  redirect("/dashboard/editions");
 }
 
 export async function updateTournamentEdition(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = EditionSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -221,7 +220,7 @@ export async function updateTournamentEdition(
   });
 
   revalidatePath("/dashboard/editions");
-  redirect(`/dashboard/editions${searchParams ? `?${searchParams}` : ""}`);
+  redirect("/dashboard/editions");
 }
 
 export async function updateTournamentEditionCurrentStage(
@@ -230,7 +229,7 @@ export async function updateTournamentEditionCurrentStage(
   formData: FormData
 ) {
   const { id, searchParams } = args;
-
+  
   const result = CurrentStageSchema.safeParse(
     Object.fromEntries(formData.entries())
   );

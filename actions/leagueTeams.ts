@@ -6,13 +6,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { LeagueTeamSchema } from "@/schemas";
 
-export async function addLeagueTeam(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addLeagueTeam(prevState: unknown, formData: FormData) {
   const result = LeagueTeamSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -48,16 +42,14 @@ export async function addLeagueTeam(
   });
 
   revalidatePath("/dashboard/league-teams");
-  redirect(`/dashboard/league-teams${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/league-teams`);
 }
 
 export async function updateLeagueTeam(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = LeagueTeamSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -100,5 +92,5 @@ export async function updateLeagueTeam(
   });
 
   revalidatePath("/dashboard/league-teams");
-  redirect(`/dashboard/league-teams${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/league-teams`);
 }

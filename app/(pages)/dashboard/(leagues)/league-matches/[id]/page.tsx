@@ -14,6 +14,7 @@ export default async function EditLeagueMatchPage({
     include: {
       homeTeam: true,
       awayTeam: true,
+      group: true,
       season: {
         include: { league: true },
       },

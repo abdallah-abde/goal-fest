@@ -11,12 +11,9 @@ import {
 import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentGroupMatch(
-  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
-  const { searchParams } = args;
-
   const result = GroupMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -48,16 +45,14 @@ export async function addTournamentGroupMatch(
   });
 
   revalidatePath("/dashboard/matches");
-  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/matches`);
 }
 
 export async function updateTournamentGroupMatch(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = GroupMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -95,7 +90,7 @@ export async function updateTournamentGroupMatch(
   });
 
   revalidatePath("/dashboard/matches");
-  redirect(`/dashboard/matches${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/matches`);
 }
 
 export async function updateGroupMatchFeaturedStatus(

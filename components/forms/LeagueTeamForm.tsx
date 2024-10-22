@@ -37,7 +37,6 @@ export default function LeagueTeamForm({
             type="text"
             id="name"
             name="name"
-            // required
             defaultValue={leagueTeam?.name || ""}
             autoFocus
           />
@@ -49,7 +48,6 @@ export default function LeagueTeamForm({
             type="text"
             id="code"
             name="code"
-            // required
             defaultValue={leagueTeam?.code || ""}
           />
           <FormFieldError error={error?.code} />
@@ -64,7 +62,8 @@ export default function LeagueTeamForm({
                 src={leagueTeam?.flagUrl || ""}
                 height="100"
                 width="100"
-                alt="Team Flag"
+                alt={`${(leagueTeam && leagueTeam.name) || "League Team"} Logo`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.flagUrl} />
             </div>

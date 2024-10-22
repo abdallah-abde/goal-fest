@@ -140,7 +140,13 @@ export default function SeasonForm({
                 src={leagueSeason?.logoUrl || ""}
                 height="100"
                 width="100"
-                alt="League Season Logo"
+                alt={`${
+                  (leagueSeason &&
+                    leagueSeason.league &&
+                    leagueSeason.league.name + " " + leagueSeason.year) ||
+                  "League Season"
+                } Logo`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.logoUrl} />
             </div>

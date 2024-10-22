@@ -230,6 +230,15 @@ export const LeagueTeamSchema = z.object({
   code: z.string().optional(),
 });
 
+export const LeagueGroupSchema = z.object({
+  name: z.string().min(1, { message: "Name is required!" }),
+  seasonId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Season is required" }),
+  teams: z.string().optional(),
+});
+
 export const LeagueMatchSchema = z.object({
   homeTeamId: z.coerce
     .number()
@@ -251,6 +260,7 @@ export const LeagueMatchSchema = z.object({
     .int()
     .refine((data) => data > 0, { message: "Season is required" }),
   round: z.string().optional(),
+  groupId: z.union([z.coerce.number().optional(), z.string()]),
 });
 
 export const LeagueMatchScoreSchema = z.object({

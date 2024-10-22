@@ -6,13 +6,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { CountrySchema } from "@/schemas";
 
-export async function addCountry(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addCountry(prevState: unknown, formData: FormData) {
   const result = CountrySchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -52,16 +46,14 @@ export async function addCountry(
   });
 
   revalidatePath("/dashboard/countries");
-  redirect(`/dashboard/countries${searchParams ? `?${searchParams}` : ""}`);
+  redirect("/dashboard/countries");
 }
 
 export async function updateCountry(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = CountrySchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -106,5 +98,5 @@ export async function updateCountry(
   });
 
   revalidatePath("/dashboard/countries");
-  redirect(`/dashboard/countries${searchParams ? `?${searchParams}` : ""}`);
+  redirect("/dashboard/countries");
 }

@@ -51,7 +51,6 @@ export default function TournamentForm({
             type="text"
             id="name"
             name="name"
-            // required
             defaultValue={tournament?.name || ""}
             autoFocus
           />
@@ -59,19 +58,18 @@ export default function TournamentForm({
         </FormField>
         <FormField>
           <Label htmlFor="type">Type</Label>
-          <Input
-            type="text"
-            id="type"
-            name="type"
-            // required
-            defaultValue={tournament?.type || ""}
-            list="tournamentsOrLeaguesTypes"
-          />
-          <datalist id="tournamentsOrLeaguesTypes">
-            {Object.values(TournamentTypes).map((opt) => (
-              <option key={opt} value={opt}></option>
-            ))}
-          </datalist>
+          <Select name="type" defaultValue={tournament?.type || ""}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Choose Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(TournamentTypes).map((type) => (
+                <SelectItem value={type} key={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FormFieldError error={error?.type} />
         </FormField>
         <FormField>
@@ -79,11 +77,13 @@ export default function TournamentForm({
           <Input type="file" id="logoUrl" name="logoUrl" />
           {tournament != null && tournament?.logoUrl && (
             <div className="current-flag-wrapper">
+              <Label>Current Logo</Label>
               <Image
                 src={tournament?.logoUrl || ""}
                 height="100"
                 width="100"
-                alt="Tournament Logo"
+                alt={`${(tournament && tournament.name) || "Tournament"} Logo`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.logoUrl} />
             </div>

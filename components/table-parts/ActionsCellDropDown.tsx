@@ -9,16 +9,13 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
 
 export default function ActionsCellDropDown({
-  // editHref,
+  editHref,
   children,
-  editComponent,
 }: {
-  // editHref: string;
+  editHref: string;
   children?: React.ReactNode | null;
-  editComponent?: React.ReactNode | null;
 }) {
   return (
     <TableCell className="text-right">
@@ -27,13 +24,11 @@ export default function ActionsCellDropDown({
           <EllipsisVertical className="h-5 sm:h-6 w-5 sm:w-6" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-24 cursor-pointer" align="end">
-          {/* <Link href={editHref} className='w-full cursor-pointer'>
-              Edit
-            </Link> */}
           <DropdownMenuItem asChild className="items-center justify-center">
-            {editComponent}
+            <Link href={editHref} className="w-full cursor-pointer">
+              Edit
+            </Link>
           </DropdownMenuItem>
-
           <DropdownMenuItem asChild className="items-center justify-center">
             <p className="w-full cursor-pointer">Delete</p>
           </DropdownMenuItem>

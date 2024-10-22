@@ -3,13 +3,12 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { GroupSchema } from "@/schemas";
+import { LeagueGroupSchema } from "@/schemas";
 
-export async function addTournamentGroup(
-  prevState: unknown,
-  formData: FormData
-) {
-  const result = GroupSchema.safeParse(Object.fromEntries(formData.entries()));
+export async function addLeagueGroup(prevState: unknown, formData: FormData) {
+  const result = LeagueGroupSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -17,13 +16,13 @@ export async function addTournamentGroup(
 
   const data = result.data;
 
-  const group = await prisma.group.findFirst({
-    where: { name: data.name, tournamentEditionId: +data.tournamentEditionId },
+  const group = await prisma.leagueGroup.findFirst({
+    where: { name: data.name, seasonId: +data.seasonId },
   });
 
   if (group) return { name: ["Group existed"] };
 
-  const ts = await prisma.team.findMany({
+  const ts = await prisma.leagueTeam.findMany({
     where: {
       id: {
         in: formData
@@ -35,26 +34,28 @@ export async function addTournamentGroup(
     },
   });
 
-  await prisma.group.create({
+  await prisma.leagueGroup.create({
     data: {
       name: data.name.toString(),
-      tournamentEditionId: +data.tournamentEditionId,
+      seasonId: +data.seasonId,
       teams: {
         connect: ts,
       },
     },
   });
 
-  revalidatePath("/dashboard/groups");
-  redirect(`/dashboard/groups`);
+  revalidatePath("/dashboard/league-groups");
+  redirect(`/dashboard/league-groups`);
 }
 
-export async function updateTournamentGroup(
+export async function updateLeagueGroup(
   id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const result = GroupSchema.safeParse(Object.fromEntries(formData.entries()));
+  const result = LeagueGroupSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
 
   if (result.success === false) {
     return result.error.formErrors.fieldErrors;
@@ -62,25 +63,22 @@ export async function updateTournamentGroup(
 
   const data = result.data;
 
-  const group = await prisma.group.findFirst({
+  const group = await prisma.leagueGroup.findFirst({
     where: {
-      AND: [
-        { name: data.name, tournamentEditionId: +data.tournamentEditionId },
-        { id: { not: id } },
-      ],
+      AND: [{ name: data.name, seasonId: +data.seasonId }, { id: { not: id } }],
     },
   });
 
   if (group) return { name: ["Group existed"] };
 
-  const currentGroup = await prisma.group.findUnique({
+  const currentGroup = await prisma.leagueGroup.findUnique({
     where: { id },
     include: { teams: true },
   });
 
   if (currentGroup == null) return notFound();
 
-  const ts = await prisma.team.findMany({
+  const ts = await prisma.leagueTeam.findMany({
     where: {
       id: {
         in: formData
@@ -92,11 +90,11 @@ export async function updateTournamentGroup(
     },
   });
 
-  await prisma.group.update({
+  await prisma.leagueGroup.update({
     where: { id },
     data: {
       name: data.name.toString(),
-      tournamentEditionId: +data.tournamentEditionId,
+      seasonId: +data.seasonId,
       teams: {
         disconnect: currentGroup?.teams,
         connect: ts,
@@ -104,6 +102,6 @@ export async function updateTournamentGroup(
     },
   });
 
-  revalidatePath("/dashboard/groups");
-  redirect(`/dashboard/groups`);
+  revalidatePath("/dashboard/league-groups");
+  redirect(`/dashboard/league-groups`);
 }

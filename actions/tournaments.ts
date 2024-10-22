@@ -7,13 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { TournamentSchema } from "@/schemas";
 import { IsPopularOptions } from "@/types/enums";
 
-export async function addTournament(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addTournament(prevState: unknown, formData: FormData) {
   const result = TournamentSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -52,16 +46,14 @@ export async function addTournament(
   });
 
   revalidatePath("/dashboard/tournaments");
-  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/tournaments`);
 }
 
 export async function updateTournament(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = TournamentSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -107,7 +99,7 @@ export async function updateTournament(
   });
 
   revalidatePath("/dashboard/tournaments");
-  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/tournaments`);
 }
 
 export async function updateTournamentPopularStatus(

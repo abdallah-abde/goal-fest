@@ -14,18 +14,10 @@ import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
-import { useSearchParams } from "next/navigation";
 
 export default function CountryForm({ country }: { country?: Country | null }) {
-  const searchParams = useSearchParams();
-
   const [error, action] = useFormState(
-    country == null
-      ? addCountry.bind(null, { searchParams: searchParams.toString() })
-      : updateCountry.bind(null, {
-          id: country.id,
-          searchParams: searchParams.toString(),
-        }),
+    country == null ? addCountry : updateCountry.bind(null, country.id),
     {}
   );
 
@@ -64,7 +56,7 @@ export default function CountryForm({ country }: { country?: Country | null }) {
                 src={country?.flagUrl || ""}
                 height="100"
                 width="100"
-                alt={`${country?.name || "Country"} Flag`}
+                alt={`${(country && country.name) || "Country"} Flag`}
                 className="w-20 h-20"
               />
               <FormFieldError error={error?.flagUrl} />

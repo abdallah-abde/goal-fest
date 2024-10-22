@@ -11,12 +11,9 @@ import {
 import { MatchStatusOptions } from "@/types/enums";
 
 export async function addTournamentKnockoutMatch(
-  args: { searchParams: string },
   prevState: unknown,
   formData: FormData
 ) {
-  const { searchParams } = args;
-
   const result = knockoutMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -61,18 +58,14 @@ export async function addTournamentKnockoutMatch(
   });
 
   revalidatePath("/dashboard/knockout-matches");
-  redirect(
-    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
-  );
+  redirect(`/dashboard/knockout-matches`);
 }
 
 export async function updateTournamentKnockoutMatch(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = knockoutMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -123,9 +116,7 @@ export async function updateTournamentKnockoutMatch(
   });
 
   revalidatePath("/dashboard/knockout-matches");
-  redirect(
-    `/dashboard/knockout-matches${searchParams ? `?${searchParams}` : ""}`
-  );
+  redirect(`/dashboard/knockout-matches`);
 }
 
 export async function updateKnockoutMatchFeaturedStatus(

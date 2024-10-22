@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/table";
 
 import {
-  getFormattedDate,
   getFormattedDateTime,
-  getFormattedTime,
   getStartAndEndDates,
 } from "@/lib/getFormattedDate";
 
@@ -43,6 +41,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 
 export default async function DashboardGroupMatchesPage({
   searchParams,
@@ -220,75 +219,38 @@ export default async function DashboardGroupMatchesPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="homeTeam"
-                  label="Home Team"
-                  labelForSmallerDevices="HT"
-                /> */}
                 <span className="hidden max-sm:block">HT</span>
                 <span className="hidden sm:block">Home Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="awayTeam"
-                  label="Away Team"
-                  labelForSmallerDevices="AT"
-                /> */}
                 <span className="hidden max-sm:block">AT</span>
                 <span className="hidden sm:block">Away Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">Score</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="date"
-                  label="Date & Time"
-                  labelForSmallerDevices="D&T"
-                /> */}
                 <span className="hidden max-sm:block">D&T</span>
                 <span className="hidden sm:block">Date & Time</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="group"
-                  label="Group"
-                  labelForSmallerDevices="Grp"
-                /> */}
                 <span className="hidden max-sm:block">Grp</span>
                 <span className="hidden sm:block">Group</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="round"
-                  label="Round"
-                  labelForSmallerDevices="Rnd"
-                /> */}
                 <span className="hidden max-sm:block">Rnd</span>
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="tournament"
-                  label="Tournament"
-                  labelForSmallerDevices="Tour"
-                /> */}
                 <span className="hidden max-sm:block">Tour</span>
                 <span className="hidden sm:block">Tournament</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="edition"
-                  label="Edition"
-                  labelForSmallerDevices="Edi"
-                /> */}
                 <span className="hidden max-sm:block">Edi</span>
                 <span className="hidden sm:block">Edition</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="isFeatured" label="Is Featured" /> */}
                 Is Featured
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="status" label="Status" /> */}
                 Status
               </TableHead>
               <TableHead></TableHead>
@@ -311,11 +273,15 @@ export default async function DashboardGroupMatchesPage({
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{homeTeam.code}</span>
+                    <span className="hidden max-sm:block">
+                      {homeTeam.code || homeTeam.name}
+                    </span>
                     <span className="hidden sm:block">{homeTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{awayTeam.code}</span>
+                    <span className="hidden max-sm:block">
+                      {awayTeam.code || awayTeam.name}
+                    </span>
                     <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
@@ -356,44 +322,7 @@ export default async function DashboardGroupMatchesPage({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <div className="flex flex-col">
-                      <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), true, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), false, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                    </div>
+                    <DateTimeTableCell date={date} />
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {group.name}

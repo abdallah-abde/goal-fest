@@ -215,6 +215,7 @@ model LeagueSeason {
   titleHolderId Int?
   currentStage  String?
   slug          String        @unique
+  groups        LeagueGroup[]
 }
 
 model LeagueMatch {
@@ -231,6 +232,8 @@ model LeagueMatch {
   round      String?
   isFeatured Boolean      @default(false)
   status     String?
+  groupId    Int?
+  group      LeagueGroup? @relation(fields: [groupId], references: [id])
 }
 
 model LeagueTeam {
@@ -244,6 +247,16 @@ model LeagueTeam {
   leagueTeamTitleHolders LeagueSeason[] @relation("titleHolderLeagueTeam")
   // standing    Standing[]
   code                   String?
+  groups                 LeagueGroup[]
+}
+
+model LeagueGroup {
+  id       Int           @id @default(autoincrement())
+  name     String
+  seasonId Int
+  season   LeagueSeason  @relation(fields: [seasonId], references: [id])
+  teams    LeagueTeam[]
+  matches  LeagueMatch[]
 }
 
 // model Standing {

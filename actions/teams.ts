@@ -6,13 +6,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { TeamSchema } from "@/schemas";
 
-export async function addTeam(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addTeam(prevState: unknown, formData: FormData) {
   const result = TeamSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -46,16 +40,14 @@ export async function addTeam(
   });
 
   revalidatePath("/dashboard/teams");
-  redirect(`/dashboard/teams${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/teams`);
 }
 
 export async function updateTeam(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = TeamSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -96,5 +88,5 @@ export async function updateTeam(
   });
 
   revalidatePath("/dashboard/teams");
-  redirect(`/dashboard/teams${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/teams`);
 }

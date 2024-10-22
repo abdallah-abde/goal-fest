@@ -24,41 +24,40 @@ export default function TeamForm({ team }: { team?: Team | null }) {
   return (
     <>
       <PageHeader label={team ? "Edit Team" : "Add Team"} />
-      <form action={action} className='form-styles'>
+      <form action={action} className="form-styles">
         <FormField>
-          <Label htmlFor='name'>Name</Label>
+          <Label htmlFor="name">Name</Label>
           <Input
-            type='text'
-            id='name'
-            name='name'
-            // required
+            type="text"
+            id="name"
+            name="name"
             defaultValue={team?.name || ""}
             autoFocus
           />
           <FormFieldError error={error?.name} />
         </FormField>
         <FormField>
-          <Label htmlFor='code'>Team Code</Label>
+          <Label htmlFor="code">Team Code</Label>
           <Input
-            type='text'
-            id='code'
-            name='code'
-            // required
+            type="text"
+            id="code"
+            name="code"
             defaultValue={team?.code || ""}
           />
           <FormFieldError error={error?.code} />
         </FormField>
         <FormField>
-          <Label htmlFor='flagUrl'>Flag</Label>
-          <Input type='file' id='flagUrl' name='flagUrl' />
+          <Label htmlFor="flagUrl">Flag</Label>
+          <Input type="file" id="flagUrl" name="flagUrl" />
           {team != null && team?.flagUrl && (
-            <div className='current-flag-wrapper'>
+            <div className="current-flag-wrapper">
               <Label>Current Flag</Label>
               <Image
                 src={team?.flagUrl || ""}
-                height='100'
-                width='100'
-                alt='Team Flag'
+                height="100"
+                width="100"
+                alt={`${(team && team.name) || "Team"} Flag`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.flagUrl} />
             </div>

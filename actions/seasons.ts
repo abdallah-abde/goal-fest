@@ -8,13 +8,7 @@ import { CurrentStageSchema, SeasonSchema } from "@/schemas";
 import { generateSlug } from "@/lib/generateSlug";
 import { LeagueStages } from "@/types/enums";
 
-export async function addLeagueSeason(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addLeagueSeason(prevState: unknown, formData: FormData) {
   const result = SeasonSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -44,11 +38,13 @@ export async function addLeagueSeason(
 
   if (!league) return { leagueId: ["No League Found"] };
 
-  let slug = generateSlug(league.name.toLowerCase().trim());
+  let slug = generateSlug(
+    league.name.toLowerCase().trim().split(" ").join("-")
+  );
 
   let exists = await prisma.leagueSeason.findUnique({ where: { slug } });
   while (exists) {
-    slug = generateSlug(league.name.toLowerCase().trim()); // Generate a new slug if the one exists
+    slug = generateSlug(league.name.toLowerCase().trim().split(" ").join("-")); // Generate a new slug if the one exists
     exists = await prisma.leagueSeason.findUnique({ where: { slug } });
   }
 
@@ -95,16 +91,14 @@ export async function addLeagueSeason(
   });
 
   revalidatePath("/dashboard/seasons");
-  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/seasons`);
 }
 
 export async function updateLeagueSeason(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = SeasonSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (result.success === false) {
@@ -182,7 +176,7 @@ export async function updateLeagueSeason(
   });
 
   revalidatePath("/dashboard/seasons");
-  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
+  redirect(`/dashboard/seasons`);
 }
 
 export async function updateLeagueSeasonCurrentStage(

@@ -12,15 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
@@ -30,8 +21,6 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
-import CountryForm from "@/components/forms/CountryForm";
-import FormDialog from "@/components/forms/FormDialog";
 
 export default async function DashboardCountriesPage({
   searchParams,
@@ -103,26 +92,15 @@ export default async function DashboardCountriesPage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {countries.map((country) => {
-              const { id, name, code } = country;
-
-              return (
-                <TableRow key={id} className="dashboard-table-row">
-                  <TableCell className="dashboard-table-cell">{name}</TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {code || <NotProvidedSpan />}
-                  </TableCell>
-                  {/* <ActionsCellDropDown editHref={`/dashboard/countries/${id}`}> */}
-                  <ActionsCellDropDown
-                    editComponent={
-                      <FormDialog>
-                        <CountryForm country={country} />
-                      </FormDialog>
-                    }
-                  />
-                </TableRow>
-              );
-            })}
+            {countries.map(({ id, name, code }) => (
+              <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">{name}</TableCell>
+                <TableCell className="dashboard-table-cell">
+                  {code || <NotProvidedSpan />}
+                </TableCell>
+                <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
+              </TableRow>
+            ))}
           </TableBody>
           <DashboardTableFooter
             totalCount={totalCountriesCount}

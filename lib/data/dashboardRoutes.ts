@@ -80,6 +80,12 @@ export const dashboardLeaguesRoutes = [
   },
   {
     id: 5,
+    label: "Groups",
+    href: `/dashboard/league-groups`,
+    Icon: Table2,
+  },
+  {
+    id: 6,
     label: "Matches",
     href: `/dashboard/league-matches`,
     Icon: LandPlot,

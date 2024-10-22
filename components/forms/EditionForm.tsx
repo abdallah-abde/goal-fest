@@ -189,7 +189,15 @@ export default function EditionForm({
                 src={tournamentEdition?.logoUrl || ""}
                 height="100"
                 width="100"
-                alt="Tournament Edition Logo"
+                alt={`${
+                  (tournamentEdition &&
+                    tournamentEdition.tournament &&
+                    tournamentEdition.tournament.name +
+                      " " +
+                      tournamentEdition.year) ||
+                  "Tournament Edition"
+                } Logo`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.logoUrl} />
             </div>

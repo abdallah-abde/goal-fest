@@ -26,6 +26,7 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { Eraser } from "lucide-react";
+import { LeagueTypes } from "@/types/enums";
 
 export default function LeagueForm({
   league,
@@ -54,7 +55,6 @@ export default function LeagueForm({
             type="text"
             id="name"
             name="name"
-            // required
             defaultValue={league?.name || ""}
             autoFocus
           />
@@ -62,13 +62,18 @@ export default function LeagueForm({
         </FormField>
         <FormField>
           <Label htmlFor="type">Type</Label>
-          <Input
-            type="text"
-            id="type"
-            name="type"
-            // required
-            defaultValue={league?.type || ""}
-          />
+          <Select name="type" defaultValue={league?.type || ""}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Choose Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(LeagueTypes).map((type) => (
+                <SelectItem value={type} key={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FormFieldError error={error?.type} />
         </FormField>
         <FormField>
@@ -115,11 +120,13 @@ export default function LeagueForm({
           <Input type="file" id="logoUrl" name="logoUrl" />
           {league != null && league?.logoUrl && (
             <div className="current-flag-wrapper">
+              <Label>Current Flag</Label>
               <Image
                 src={league?.logoUrl || ""}
                 height="100"
                 width="100"
-                alt="League Logo"
+                alt={`${(league && league.name) || "League"} Logo`}
+                className="w-20 h-20"
               />
               <FormFieldError error={error?.logoUrl} />
             </div>

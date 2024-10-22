@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/table";
 
 import {
-  getFormattedDate,
   getFormattedDateTime,
-  getFormattedTime,
   getStartAndEndDates,
 } from "@/lib/getFormattedDate";
 
@@ -43,6 +41,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 
 export default async function DashboardLeagueMatchesPage({
   searchParams,
@@ -74,6 +73,7 @@ export default async function DashboardLeagueMatchesPage({
       { season: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
       { awayTeam: { name: { contains: query } } },
+      { group: { name: { contains: query } } },
       { round: { contains: query } },
     ],
     ...(isFeaturedCondition
@@ -108,6 +108,8 @@ export default async function DashboardLeagueMatchesPage({
       ? { homeTeam: { name: sortDir } }
       : sortField === "awayTeam"
       ? { awayTeam: { name: sortDir } }
+      : sortField === "group"
+      ? { group: { name: sortDir } }
       : sortField === "round"
       ? { round: sortDir }
       : sortField === "isFeatured"
@@ -133,6 +135,7 @@ export default async function DashboardLeagueMatchesPage({
     include: {
       homeTeam: true,
       awayTeam: true,
+      group: true,
       season: {
         include: {
           league: true,
@@ -146,6 +149,7 @@ export default async function DashboardLeagueMatchesPage({
     { label: "Season", fieldName: "season" },
     { label: "Home Team", fieldName: "homeTeam" },
     { label: "Away Team", fieldName: "awayTeam" },
+    { label: "Group", fieldName: "group" },
     { label: "Round", fieldName: "round" },
     {
       label: "Is Featured",
@@ -202,7 +206,7 @@ export default async function DashboardLeagueMatchesPage({
             searchParamName: "date",
           }}
         />
-        <SearchFieldComponent placeholder="Search by league names, years, rounds, teams ..." />
+        <SearchFieldComponent placeholder="Search by league names, years, group names, rounds, teams ..." />
         <AddNewLinkComponent
           href="/dashboard/league-matches/new"
           label="Add New Match"
@@ -213,58 +217,38 @@ export default async function DashboardLeagueMatchesPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="homeTeam"
-                  label="Home Team"
-                  labelForSmallerDevices="HT"
-                /> */}
                 <span className="hidden max-sm:block">HT</span>
                 <span className="hidden sm:block">Home Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="awayTeam"
-                  label="Away Team"
-                  labelForSmallerDevices="AT"
-                /> */}
                 <span className="hidden max-sm:block">AT</span>
                 <span className="hidden sm:block">Away Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">Score</TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="date"
-                  label="Date & Time"
-                  labelForSmallerDevices="D&T"
-                /> */}
                 <span className="hidden max-sm:block">D&T</span>
                 <span className="hidden sm:block">Date & Time</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="round"
-                  label="Round"
-                  labelForSmallerDevices="Rnd"
-                /> */}
+                <span className="hidden max-sm:block">Grp</span>
+                <span className="hidden sm:block">Group</span>
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
                 <span className="hidden max-sm:block">Rnd</span>
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="league" label="League" /> */}
                 <span className="hidden max-sm:block">Leg</span>
                 <span className="hidden sm:block">League</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="season" label="Season" /> */}
-                <span className="hidden max-sm:block">Son</span>
+                <span className="hidden max-sm:block">Szn</span>
                 <span className="hidden sm:block">Season</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="isFeatured" label="Is Featured" /> */}
                 Is Featured
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="status" label="Status" /> */}
                 Status
               </TableHead>
               <TableHead></TableHead>
@@ -278,6 +262,7 @@ export default async function DashboardLeagueMatchesPage({
                 awayTeam,
                 homeGoals,
                 awayGoals,
+                group,
                 round,
                 date,
                 season,
@@ -286,11 +271,15 @@ export default async function DashboardLeagueMatchesPage({
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{homeTeam.code}</span>
+                    <span className="hidden max-sm:block">
+                      {homeTeam.code || homeTeam.name}
+                    </span>
                     <span className="hidden sm:block">{homeTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">{awayTeam.code}</span>
+                    <span className="hidden max-sm:block">
+                      {awayTeam.code || awayTeam.name}
+                    </span>
                     <span className="hidden sm:block">{awayTeam.name}</span>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
@@ -331,44 +320,10 @@ export default async function DashboardLeagueMatchesPage({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
-                    <div className="flex flex-col">
-                      <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), true, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), false, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                    </div>
+                    <DateTimeTableCell date={date} />
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {group?.name || <NotProvidedSpan />}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {round || <NotProvidedSpan />}
@@ -425,7 +380,7 @@ export default async function DashboardLeagueMatchesPage({
           <DashboardTableFooter
             totalCount={totalMatchesCount}
             totalPages={totalPages}
-            colSpan={10}
+            colSpan={11}
           />
         </Table>
       ) : (

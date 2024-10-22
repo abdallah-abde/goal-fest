@@ -74,6 +74,7 @@ export async function calculateTeamStats(teamId: number, groupId: number) {
 export async function calculateLeagueTeamStats(teamId: number, slug: string) {
   const homeMatches = await prisma.leagueMatch.findMany({
     where: {
+      season: { slug },
       homeTeamId: teamId,
       homeGoals: { not: null },
       awayGoals: { not: null },
@@ -82,6 +83,7 @@ export async function calculateLeagueTeamStats(teamId: number, slug: string) {
 
   const awayMatches = await prisma.leagueMatch.findMany({
     where: {
+      season: { slug },
       awayTeamId: teamId,
       homeGoals: { not: null },
       awayGoals: { not: null },

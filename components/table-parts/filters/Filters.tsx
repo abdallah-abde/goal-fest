@@ -122,12 +122,12 @@ export default function Filters({
                   variant="ghost"
                   className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:border-background/0 focus-visible:border-2 space-x-0 *:border-r *:border-muted-foreground last:*:border-r-0 *:pr-2 last:*:pr-0 *:pl-2 first:*:pl-0 min-w-28"
                 >
-                  {flagFilters.map((flag) => {
+                  {flagFilters.map((flag, idx) => {
                     const fieldParam = searchParams.get(flag.fieldName);
 
                     if (fieldParam) {
                       return (
-                        <div key={flag.fieldName} className="flex items-center">
+                        <div key={idx} className="flex items-center">
                           {fieldParam === "yes" ? (
                             <BadgeCheck className="mr-2" size={15} />
                           ) : (
@@ -141,12 +141,12 @@ export default function Filters({
                     }
                   })}
 
-                  {listFilters.map((list) => {
+                  {listFilters.map((list, idx) => {
                     const fieldParam = searchParams.get(list.fieldName);
 
                     if (fieldParam) {
                       return (
-                        <div key={list.fieldName} className="flex items-center">
+                        <div key={idx} className="flex items-center">
                           <BadgeCheck className="mr-2" size={15} />{" "}
                           <span>
                             {list.title}:
@@ -185,8 +185,8 @@ export default function Filters({
         <p className="text-muted-foreground pb-1">Filters</p>
         <div className="space-y-2">
           {flagFilters.length > 0 &&
-            flagFilters.map((flag) => (
-              <Card key={flag.fieldName} className="p-2">
+            flagFilters.map((flag, idx) => (
+              <Card key={idx} className="p-2">
                 <CardTitle className="text-sm">{flag.title}</CardTitle>
                 <CardContent className="py-2">
                   <RadioGroup

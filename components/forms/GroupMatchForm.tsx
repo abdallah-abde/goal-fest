@@ -36,13 +36,9 @@ import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface MatchProps extends Match {
   tournamentEdition: TournamentEditionProps;
-  group: GroupProps;
+  group: Group;
   homeTeam: Team;
   awayTeam: Team;
-}
-
-interface GroupProps extends Group {
-  // tournamentEdition: TournamentEditionProps;
 }
 
 interface TournamentEditionProps extends TournamentEdition {
@@ -123,7 +119,7 @@ export default function GroupMatchForm({
 
       if (tournamentEditionId) {
         const res = await fetch("/api/groups/" + tournamentEditionId);
-        const data: GroupProps[] = await res.json();
+        const data: Group[] = await res.json();
 
         setGroups(data);
         if (data.length > 0 && !match) setGroupId(data[0].id.toString());
@@ -376,12 +372,13 @@ export default function GroupMatchForm({
             tournaments.length <= 0 ||
             isEditionsLoading ||
             !tournamentsEditions ||
-            tournamentsEditions.length < 1 ||
+            tournamentsEditions.length <= 0 ||
             isGroupsLoading ||
             !groups ||
-            groups.length < 1 ||
+            groups.length <= 0 ||
+            isTeamsLoading ||
             !groupTeams ||
-            groupTeams.length < 1
+            groupTeams.length <= 0
           }
         />
       </form>

@@ -8,14 +8,9 @@ import {
   LeagueMatchScoreSchema,
   MatchStatusSchema,
 } from "@/schemas";
+import { MatchStatusOptions } from "@/types/enums";
 
-export async function addLeagueMatch(
-  args: { searchParams: string },
-  prevState: unknown,
-  formData: FormData
-) {
-  const { searchParams } = args;
-
+export async function addLeagueMatch(prevState: unknown, formData: FormData) {
   const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -41,22 +36,20 @@ export async function addLeagueMatch(
       date: data.date ? new Date(data.date.toString()) : null,
       seasonId: +data.seasonId,
       round: data.round ? data.round.toString() : null,
+      status: MatchStatusOptions.Scheduled,
+      groupId: data.groupId ? +data.groupId : null,
     },
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect(
-    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
-  );
+  redirect(`/dashboard/league-matches`);
 }
 
 export async function updateLeagueMatch(
-  args: { id: number; searchParams: string },
+  id: number,
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
-
   const result = LeagueMatchSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -89,13 +82,12 @@ export async function updateLeagueMatch(
       date: data.date ? new Date(data.date.toString()) : null,
       seasonId: +data.seasonId,
       round: data.round ? data.round.toString() : null,
+      groupId: data.groupId ? +data.groupId : null,
     },
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect(
-    `/dashboard/league-matches${searchParams ? `?${searchParams}` : ""}`
-  );
+  redirect(`/dashboard/league-matches`);
 }
 
 export async function updateLeagueMatchFeaturedStatus(
@@ -126,7 +118,6 @@ export async function updateLeagueMatchScore(
   args: { id: number; searchParams: string },
   prevState: unknown,
   formData: FormData
-  // searchParams: string
 ) {
   const { id, searchParams } = args;
 
@@ -156,9 +147,6 @@ export async function updateLeagueMatchScore(
       awayGoals: awayGoals ? +awayGoals : null,
     },
   });
-
-  // revalidatePath("/dashboard/league-matches");
-  // redirect("/dashboard/league-matches");
 
   revalidatePath("/dashboard/league-matches");
   redirect(

@@ -28,14 +28,11 @@ import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
-import SortComponent from "@/components/table-parts/SortComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-import { Check, X } from "lucide-react";
 import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
 import PopoverKnockoutMatchScoreUpdator from "@/components/table-parts/PopoverKnockoutMatchScoreUpdator";
-import { Button } from "@/components/ui/button";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/filters/Filters";
 import {
@@ -46,6 +43,7 @@ import {
 } from "@/components/ui/tooltip";
 import PopoverStatusUpdator from "@/components/table-parts/PopoverStatusUpdator";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 
 export default async function DashboardKnockoutMatchesPage({
   searchParams,
@@ -217,20 +215,10 @@ export default async function DashboardKnockoutMatchesPage({
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="homeTeam"
-                  label="Home Team"
-                  labelForSmallerDevices="HT"
-                /> */}
                 <span className="hidden max-sm:block">HT</span>
                 <span className="hidden sm:block">Home Team</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="awayTeam"
-                  label="Away Team"
-                  labelForSmallerDevices="AT"
-                /> */}
                 <span className="hidden max-sm:block">AT</span>
                 <span className="hidden sm:block">Away Team</span>
               </TableHead>
@@ -247,47 +235,25 @@ export default async function DashboardKnockoutMatchesPage({
                 <span className="hidden sm:block">Penalties</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="date"
-                  label="Date & Time"
-                  labelForSmallerDevices="D&T"
-                /> */}
                 <span className="hidden max-sm:block">D&T</span>
                 <span className="hidden sm:block">Date & Time</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="round"
-                  label="Round"
-                  labelForSmallerDevices="Rnd"
-                /> */}
                 <span className="hidden max-sm:block">Rnd</span>
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="tournament"
-                  label="Tournament"
-                  labelForSmallerDevices="Tour"
-                /> */}
                 <span className="hidden max-sm:block">Tour</span>
                 <span className="hidden sm:block">Tournament</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent
-                  fieldName="edition"
-                  label="Edition"
-                  labelForSmallerDevices="Edi"
-                /> */}
                 <span className="hidden max-sm:block">Edi</span>
                 <span className="hidden sm:block">Edition</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="isFeatured" label="Is Featured" /> */}
                 Is Featured
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                {/* <SortComponent fieldName="status" label="Status" /> */}
                 Status
               </TableHead>
               <TableHead></TableHead>
@@ -312,264 +278,148 @@ export default async function DashboardKnockoutMatchesPage({
                 tournamentEdition,
                 isFeatured,
                 status,
-              }) => (
-                <TableRow key={id} className="dashboard-table-row">
-                  <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">
-                      {homeTeam ? homeTeam.code : homeTeamPlacehlder}
-                    </span>
-                    <span className="hidden sm:block">
-                      {homeTeam ? homeTeam.name : homeTeamPlacehlder}
-                    </span>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <span className="hidden max-sm:block">
-                      {awayTeam ? awayTeam.code : awayTeamPlacehlder}
-                    </span>
-                    <span className="hidden sm:block">
-                      {awayTeam ? awayTeam.name : awayTeamPlacehlder}
-                    </span>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <PopoverKnockoutMatchScoreUpdator
-                            id={id}
-                            homeTeamName={
-                              homeTeam
-                                ? homeTeam.name
-                                : homeTeamPlacehlder || ""
-                            }
-                            awayTeamName={
-                              awayTeam
-                                ? awayTeam.name
-                                : awayTeamPlacehlder || ""
-                            }
-                            tournamentName={tournamentEdition.tournament.name}
-                            editionName={tournamentEdition.year.toString()}
-                            roundName={round || ""}
-                            date={
-                              date
-                                ? getFormattedDateTime(date.toString())
-                                : "No date information"
-                            }
-                            homeGoals={homeGoals}
-                            awayGoals={awayGoals}
-                            homeExtraTimeGoals={homeExtraTimeGoals}
-                            awayExtraTimeGoals={awayExtraTimeGoals}
-                            homePenaltyGoals={homePenaltyGoals}
-                            awayPenaltyGoals={awayPenaltyGoals}
-                          >
-                            <span className="hover:underline">
-                              {homeGoals === null && awayGoals === null ? (
-                                <NotProvidedSpan hover={true} />
-                              ) : (
-                                <>
-                                  {homeGoals} - {awayGoals}
-                                </>
-                              )}
-                            </span>
-                          </PopoverKnockoutMatchScoreUpdator>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Click to update score</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <PopoverKnockoutMatchScoreUpdator
-                            id={id}
-                            homeTeamName={
-                              homeTeam
-                                ? homeTeam.name
-                                : homeTeamPlacehlder || ""
-                            }
-                            awayTeamName={
-                              awayTeam
-                                ? awayTeam.name
-                                : awayTeamPlacehlder || ""
-                            }
-                            tournamentName={tournamentEdition.tournament.name}
-                            editionName={tournamentEdition.year.toString()}
-                            roundName={round || ""}
-                            date={
-                              date
-                                ? getFormattedDateTime(date.toString())
-                                : "No date information"
-                            }
-                            homeGoals={homeGoals}
-                            awayGoals={awayGoals}
-                            homeExtraTimeGoals={homeExtraTimeGoals}
-                            awayExtraTimeGoals={awayExtraTimeGoals}
-                            homePenaltyGoals={homePenaltyGoals}
-                            awayPenaltyGoals={awayPenaltyGoals}
-                          >
-                            <span className="hover:underline">
-                              {homeExtraTimeGoals === null &&
-                              awayExtraTimeGoals === null ? (
-                                <NotProvidedSpan hover={true}>
-                                  #NP
-                                </NotProvidedSpan>
-                              ) : (
-                                <>
-                                  {homeExtraTimeGoals} - {awayExtraTimeGoals}
-                                </>
-                              )}
-                            </span>
-                          </PopoverKnockoutMatchScoreUpdator>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Click to update score</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <PopoverKnockoutMatchScoreUpdator
-                            id={id}
-                            homeTeamName={
-                              homeTeam
-                                ? homeTeam.name
-                                : homeTeamPlacehlder || ""
-                            }
-                            awayTeamName={
-                              awayTeam
-                                ? awayTeam.name
-                                : awayTeamPlacehlder || ""
-                            }
-                            tournamentName={tournamentEdition.tournament.name}
-                            editionName={tournamentEdition.year.toString()}
-                            roundName={round || ""}
-                            date={
-                              date
-                                ? getFormattedDateTime(date.toString())
-                                : "No date information"
-                            }
-                            homeGoals={homeGoals}
-                            awayGoals={awayGoals}
-                            homeExtraTimeGoals={homeExtraTimeGoals}
-                            awayExtraTimeGoals={awayExtraTimeGoals}
-                            homePenaltyGoals={homePenaltyGoals}
-                            awayPenaltyGoals={awayPenaltyGoals}
-                          >
-                            <span className="hover:underline">
-                              {homePenaltyGoals === null &&
-                              awayPenaltyGoals === null ? (
-                                <NotProvidedSpan hover={true}>
-                                  #NP
-                                </NotProvidedSpan>
-                              ) : (
-                                <>
-                                  {homePenaltyGoals} - {awayPenaltyGoals}
-                                </>
-                              )}
-                            </span>
-                          </PopoverKnockoutMatchScoreUpdator>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Click to update score</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <div className="flex flex-col">
+              }) => {
+                const homeTeamName = homeTeam
+                  ? homeTeam.name
+                  : homeTeamPlacehlder;
+                const homeTeamCode = homeTeam
+                  ? homeTeam.code
+                  : homeTeamPlacehlder;
+                const awayTeamName = awayTeam
+                  ? awayTeam.name
+                  : awayTeamPlacehlder;
+                const awayTeamCode = awayTeam
+                  ? awayTeam.code
+                  : awayTeamPlacehlder;
+                const tournamentName = tournamentEdition.tournament.name;
+                const editionName = tournamentEdition.year;
+                const roundName = round;
+                const matchDate = date
+                  ? getFormattedDateTime(date.toString())
+                  : "No date information";
+
+                return (
+                  <TableRow key={id} className="dashboard-table-row">
+                    <TableCell className="dashboard-table-cell">
                       <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
+                        {homeTeamCode}
                       </span>
+                      <span className="hidden sm:block">{homeTeamName}</span>
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
                       <span className="hidden max-sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), true, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
+                        {awayTeamCode}
                       </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedDate(date.toString(), true)
-                        ) : (
-                          <NotProvidedSpan>
-                            Date: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                      <span className="hidden sm:block">
-                        {date ? (
-                          getFormattedTime(date.toString(), false, false)
-                        ) : (
-                          <NotProvidedSpan>
-                            Time: <span className="italic">#NP</span>
-                          </NotProvidedSpan>
-                        )}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {round || <NotProvidedSpan />}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {tournamentEdition.tournament.name}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {tournamentEdition.year.toString()}
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <FeaturedSwitcher
-                            id={id}
-                            type="knockoutMatches"
-                            isFeatured={isFeatured}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Click to update featured status</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <PopoverStatusUpdator
-                            id={id}
-                            status={status}
-                            type="knockoutMatches"
-                          >
-                            <span className="hover:underline">
-                              {status || <NotProvidedSpan hover={true} />}
-                            </span>
-                          </PopoverStatusUpdator>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Click to update status</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <ActionsCellDropDown
-                    editHref={`/dashboard/knockout-matches/${id}`}
-                  />
-                </TableRow>
-              )
+                      <span className="hidden sm:block">{awayTeamName}</span>
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <ScoreTableCell
+                        id={id}
+                        homeTeamName={homeTeamName || ""}
+                        awayTeamName={awayTeamName || ""}
+                        tournamentName={tournamentName}
+                        editionName={editionName}
+                        roundName={roundName || ""}
+                        date={matchDate}
+                        homeGoals={homeGoals}
+                        awayGoals={awayGoals}
+                        homeExtraTimeGoals={homeExtraTimeGoals}
+                        awayExtraTimeGoals={awayExtraTimeGoals}
+                        homePenaltyGoals={homePenaltyGoals}
+                        awayPenaltyGoals={awayPenaltyGoals}
+                        type="MT"
+                      />
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <ScoreTableCell
+                        id={id}
+                        homeTeamName={homeTeamName || ""}
+                        awayTeamName={awayTeamName || ""}
+                        tournamentName={tournamentName}
+                        editionName={editionName}
+                        roundName={roundName || ""}
+                        date={matchDate}
+                        homeGoals={homeGoals}
+                        awayGoals={awayGoals}
+                        homeExtraTimeGoals={homeExtraTimeGoals}
+                        awayExtraTimeGoals={awayExtraTimeGoals}
+                        homePenaltyGoals={homePenaltyGoals}
+                        awayPenaltyGoals={awayPenaltyGoals}
+                        type="ET"
+                      />
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <ScoreTableCell
+                        id={id}
+                        homeTeamName={homeTeamName || ""}
+                        awayTeamName={awayTeamName || ""}
+                        tournamentName={tournamentName}
+                        editionName={editionName}
+                        roundName={roundName || ""}
+                        date={matchDate}
+                        homeGoals={homeGoals}
+                        awayGoals={awayGoals}
+                        homeExtraTimeGoals={homeExtraTimeGoals}
+                        awayExtraTimeGoals={awayExtraTimeGoals}
+                        homePenaltyGoals={homePenaltyGoals}
+                        awayPenaltyGoals={awayPenaltyGoals}
+                        type="PT"
+                      />
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <DateTimeTableCell date={date} />
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      {round || <NotProvidedSpan />}
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      {tournamentEdition.tournament.name}
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      {tournamentEdition.year}
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <FeaturedSwitcher
+                              id={id}
+                              type="knockoutMatches"
+                              isFeatured={isFeatured}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Click to update featured status</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <PopoverStatusUpdator
+                              id={id}
+                              status={status}
+                              type="knockoutMatches"
+                            >
+                              <span className="hover:underline">
+                                {status || <NotProvidedSpan hover={true} />}
+                              </span>
+                            </PopoverStatusUpdator>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Click to update status</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <ActionsCellDropDown
+                      editHref={`/dashboard/knockout-matches/${id}`}
+                    />
+                  </TableRow>
+                );
+              }
             )}
           </TableBody>
           <DashboardTableFooter
@@ -582,5 +432,86 @@ export default async function DashboardKnockoutMatchesPage({
         <NoDataFoundComponent message="No Knockout Matches Found" />
       )}
     </>
+  );
+}
+
+function ScoreTableCell({
+  id,
+  homeTeamName,
+  awayTeamName,
+  tournamentName,
+  editionName,
+  roundName,
+  date,
+  homeGoals,
+  awayGoals,
+  homeExtraTimeGoals,
+  awayExtraTimeGoals,
+  homePenaltyGoals,
+  awayPenaltyGoals,
+  type,
+}: {
+  id: number;
+  homeTeamName: string;
+  awayTeamName: string;
+  tournamentName: string;
+  editionName: string;
+  roundName: string;
+  date: string;
+  homeGoals: number | null;
+  awayGoals: number | null;
+  homeExtraTimeGoals?: number | null;
+  awayExtraTimeGoals?: number | null;
+  homePenaltyGoals?: number | null;
+  awayPenaltyGoals?: number | null;
+  type: "MT" | "ET" | "PT";
+}) {
+  const condition =
+    type === "MT"
+      ? homeGoals === null && awayGoals === null
+      : type === "ET"
+      ? homeExtraTimeGoals === null && awayExtraTimeGoals === null
+      : homePenaltyGoals === null && awayPenaltyGoals === null;
+
+  const score =
+    type === "MT"
+      ? `${homeGoals} - ${awayGoals}`
+      : type === "ET"
+      ? `${homeExtraTimeGoals} - ${awayExtraTimeGoals}`
+      : `${homePenaltyGoals} - ${awayPenaltyGoals}`;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <PopoverKnockoutMatchScoreUpdator
+            id={id}
+            homeTeamName={homeTeamName || ""}
+            awayTeamName={awayTeamName || ""}
+            tournamentName={tournamentName}
+            editionName={editionName}
+            roundName={roundName || ""}
+            date={date}
+            homeGoals={homeGoals}
+            awayGoals={awayGoals}
+            homeExtraTimeGoals={homeExtraTimeGoals}
+            awayExtraTimeGoals={awayExtraTimeGoals}
+            homePenaltyGoals={homePenaltyGoals}
+            awayPenaltyGoals={awayPenaltyGoals}
+          >
+            <span className="hover:underline">
+              {condition ? (
+                <NotProvidedSpan hover={true}>#NP</NotProvidedSpan>
+              ) : (
+                <>{score}</>
+              )}
+            </span>
+          </PopoverKnockoutMatchScoreUpdator>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Click to update score</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

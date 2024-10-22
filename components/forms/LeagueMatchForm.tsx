@@ -10,7 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { LeagueMatch, LeagueTeam, League, LeagueSeason } from "@prisma/client";
+import {
+  LeagueMatch,
+  LeagueTeam,
+  League,
+  LeagueSeason,
+  LeagueGroup,
+} from "@prisma/client";
 
 import { useFormState } from "react-dom";
 import { addLeagueMatch, updateLeagueMatch } from "@/actions/leagueMatches";
@@ -27,6 +33,7 @@ import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface LeagueMatchProps extends LeagueMatch {
   season: LeagueSeasonProps;
+  group: LeagueGroup;
   homeTeam: LeagueTeam;
   awayTeam: LeagueTeam;
 }
@@ -35,7 +42,7 @@ interface LeagueSeasonProps extends LeagueSeason {
   league: League;
 }
 
-export default function GroupMatchForm({
+export default function LeagueMatchForm({
   leagueMatch,
   // teams,
   leagues,
@@ -67,6 +74,18 @@ export default function GroupMatchForm({
       null
   );
 
+  const [groups, setGroups] = useState<LeagueGroup[] | null>(null);
+
+  const [isGroupsLoading, setIsGroupsLoading] = useState(false);
+
+  const [groupId, setGroupId] = useState<string | null>(
+    leagueMatch?.groupId?.toString() ||
+      (groups && groups.length > 0 && groups[0].id.toString()) ||
+      null
+  );
+
+  const [groupTeams, setGroupTeams] = useState<LeagueTeam[] | null>(null);
+
   const [seasonTeams, setSeasonTeams] = useState<LeagueTeam[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
@@ -88,6 +107,23 @@ export default function GroupMatchForm({
 
     getSeasons();
   }, [leagueId]);
+
+  useEffect(() => {
+    async function getGroups() {
+      setIsGroupsLoading(true);
+
+      if (seasonId) {
+        const res = await fetch("/api/league-groups/" + seasonId);
+        const data: LeagueGroup[] = await res.json();
+
+        setGroups(data);
+        if (data.length > 0 && !leagueMatch) setGroupId(data[0].id.toString());
+      }
+      setIsGroupsLoading(false);
+    }
+
+    getGroups();
+  }, [seasonId]);
 
   useEffect(() => {
     async function getTeams() {
@@ -176,6 +212,39 @@ export default function GroupMatchForm({
             isLoading={isSeasonsLoading}
             label="Loading Seasons..."
             notFoundText="There is no seasons, add some!"
+          />
+        )}
+        {groups && groups.length > 0 && !isGroupsLoading ? (
+          <FormField>
+            <Label htmlFor="groupId">Group</Label>
+            <Select
+              name="groupId"
+              defaultValue={
+                leagueMatch?.groupId?.toString() ||
+                groupId ||
+                groups[0].id.toString() ||
+                undefined
+              }
+              onValueChange={(value) => setGroupId(value)}
+            >
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Group" />
+              </SelectTrigger>
+              <SelectContent>
+                {groups.map(({ id, name }) => (
+                  <SelectItem value={id.toString()} key={id}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormFieldError error={error?.groupId} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={isGroupsLoading}
+            label="Loading Groups..."
+            notFoundText="There is no groups, add some!"
           />
         )}
         <FormField>
@@ -305,6 +374,9 @@ export default function GroupMatchForm({
             isSeasonsLoading ||
             !seasons ||
             seasons.length <= 0 ||
+            isGroupsLoading ||
+            !groups ||
+            groups.length <= 0 ||
             isTeamsLoading ||
             !seasonTeams ||
             seasonTeams.length <= 0

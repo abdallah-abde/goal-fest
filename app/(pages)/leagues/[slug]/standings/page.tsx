@@ -32,8 +32,6 @@ export default async function LeaguesStandingsPage({
     }))
   );
 
-  console.log(standings);
-
   return (
     <LeagueStandingsTables leagueSeason={leagueSeason} standings={standings} />
   );
