@@ -6,7 +6,16 @@ export async function GET(
 ) {
   const data = await prisma.leagueSeason.findUnique({
     where: { id: +params.id },
-    select: { teams: true },
+    select: {
+      teams: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          country: true,
+        },
+      },
+    },
   });
 
   return Response.json(data);

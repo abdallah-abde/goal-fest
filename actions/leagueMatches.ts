@@ -42,7 +42,7 @@ export async function addLeagueMatch(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect(`/dashboard/league-matches`);
+  // redirect(`/dashboard/league-matches`);
 }
 
 export async function updateLeagueMatch(
@@ -87,7 +87,7 @@ export async function updateLeagueMatch(
   });
 
   revalidatePath("/dashboard/league-matches");
-  redirect(`/dashboard/league-matches`);
+  // redirect(`/dashboard/league-matches`);
 }
 
 export async function updateLeagueMatchFeaturedStatus(

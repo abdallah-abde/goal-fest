@@ -251,7 +251,7 @@ export default function GroupMatchForm({
           />
         )}
         <FormField>
-          <div className="flex items-baseline gap-4">
+          <div className="flex items-baseline gap-4 mt-2">
             <Label htmlFor="date">Date</Label>
             <span className="text-xs text-gray-500 font-semibold">
               Enter date-time in your local time

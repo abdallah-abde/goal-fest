@@ -7,6 +7,7 @@ import {
   LeagueSeason,
   League,
   LeagueTeam,
+  LeagueGroup,
 } from "@prisma/client";
 
 // export interface Tournament {
@@ -121,6 +122,14 @@ export interface TeamWithStats extends Team {
 
 export interface GroupWithTeams extends Group {
   teams: TeamWithStats[];
+}
+
+export interface LeagueTeamWithStats extends LeagueTeam {
+  stats: TeamStats;
+}
+
+export interface LeagueGroupWithTeams extends LeagueGroup {
+  teams: LeagueTeamWithStats[];
 }
 
 export interface StandingTeams extends LeagueTeam {

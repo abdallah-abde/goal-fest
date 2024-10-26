@@ -97,7 +97,7 @@ export default async function DashboardLeagueGroupsPage({
       <PageHeader label="Leagues Groups List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="league" />
-        <SearchFieldComponent placeholder="Search by league names, years, group names ..." />
+        <SearchFieldComponent placeholder="Search by league names, years, countries, group names ..." />
         <AddNewLinkComponent
           href="/dashboard/league-groups/new"
           label="Add New Group"

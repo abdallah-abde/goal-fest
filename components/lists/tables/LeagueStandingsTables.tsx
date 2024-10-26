@@ -3,26 +3,23 @@ import Image from "next/image";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
-import { cn } from "@/lib/utils";
-
-import { GroupWithTeams, StandingTeams } from "@/types";
+import { StandingTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import GroupsFilterDialog from "@/components/lists/tables/GroupsFilterDialog";
 
-import { Group, League, LeagueSeason } from "@prisma/client";
+import { LeagueGroup, League, LeagueSeason } from "@prisma/client";
 
 interface LeagueSeasonProps extends LeagueSeason {
   league: League;
+  groups: LeagueGroup[];
 }
 
 export default function LeagueStandingsTables({
@@ -39,7 +36,6 @@ export default function LeagueStandingsTables({
       />
 
       {standings.length > 0 ? (
-        // standings.map((group) => (
         <div className="mb-8 last:mb-0">
           <Table className="dark:border-primary/10 border">
             <TableHeader>

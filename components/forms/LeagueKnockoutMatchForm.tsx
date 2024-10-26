@@ -14,17 +14,18 @@ import { Button } from "@/components/ui/button";
 import { Eraser } from "lucide-react";
 
 import {
-  KnockoutMatch,
-  Team,
-  Tournament,
-  TournamentEdition,
+  LeagueKnockoutMatch,
+  LeagueTeam,
+  League,
+  LeagueSeason,
+  Country,
 } from "@prisma/client";
 
 import { useFormState } from "react-dom";
 import {
-  addTournamentKnockoutMatch,
-  updateTournamentKnockoutMatch,
-} from "@/actions/knockoutMatches";
+  addLeagueKnockoutMatch,
+  updateLeagueKnockoutMatch,
+} from "@/actions/leagueKnockoutMatches";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
@@ -35,89 +36,93 @@ import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingStat
 import { useEffect, useState } from "react";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
+import { Badge } from "@/components/ui/badge";
 
-interface MatchProps extends KnockoutMatch {
-  tournamentEdition: TournamentEditionProps;
+interface MatchProps extends LeagueKnockoutMatch {
+  season: LeagueSeasonProps;
 }
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
+interface LeagueSeasonProps extends LeagueSeason {
+  league: LeagueProps;
 }
 
-export default function KnockoutMatchForm({
+interface LeagueProps extends League {
+  country: Country | null;
+}
+
+interface LeagueTeamProps extends LeagueTeam {
+  country: Country | null;
+}
+
+export default function LeagueKnockoutMatchForm({
   match,
   // teams,
-  tournaments,
+  leagues,
 }: {
   match?: MatchProps | null;
-  // teams: Team[];
-  tournaments: Tournament[];
+  // teams: LeagueTeam[];
+  leagues: League[];
 }) {
   const [error, action] = useFormState(
     match == null
-      ? addTournamentKnockoutMatch
-      : updateTournamentKnockoutMatch.bind(null, match.id),
+      ? addLeagueKnockoutMatch
+      : updateLeagueKnockoutMatch.bind(null, match.id),
     {}
   );
 
-  const [tournamentId, setTournamentId] = useState<string | null>(
-    match?.tournamentEdition.tournamentId.toString() ||
-      (tournaments && tournaments.length > 0 && tournaments[0].id.toString()) ||
+  const [leagueId, setLeagueId] = useState<string | null>(
+    match?.season.leagueId.toString() ||
+      (leagues && leagues.length > 0 && leagues[0].id.toString()) ||
       null
   );
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [tournamentsEditions, setTournamentsEditions] = useState<
-    TournamentEditionProps[] | null
-  >(null);
+  const [seasons, setSeasons] = useState<LeagueSeasonProps[] | null>(null);
 
-  const [tournamentEditionId, setTournamentEditionId] = useState<string | null>(
-    match?.tournamentEditionId.toString() ||
-      (tournamentsEditions &&
-        tournamentsEditions.length > 0 &&
-        tournamentsEditions[0].id.toString()) ||
+  const [seasonId, setSeasonId] = useState<string | null>(
+    match?.seasonId.toString() ||
+      (seasons && seasons.length > 0 && seasons[0].id.toString()) ||
       null
   );
 
-  const [groupTeams, setGroupTeams] = useState<Team[] | null>(null);
+  const [teams, setTeams] = useState<LeagueTeamProps[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
   useEffect(() => {
-    async function getEditions() {
+    async function getSeasons() {
       setIsLoading(true);
 
-      if (tournamentId) {
-        const res = await fetch("/api/tournaments-editions/" + tournamentId);
+      if (leagueId) {
+        const res = await fetch("/api/leagues-seasons/" + leagueId);
         const data = await res.json();
 
-        setTournamentsEditions(data);
+        setSeasons(data);
 
-        if (data.length > 0 && !match)
-          setTournamentEditionId(data[0].id.toString());
+        if (data.length > 0 && !match) setSeasonId(data[0].id.toString());
       }
       setIsLoading(false);
     }
 
-    getEditions();
-  }, [tournamentId]);
+    getSeasons();
+  }, [leagueId]);
 
   useEffect(() => {
-    async function getTeams() {
+    async function getLeagueTeams() {
       setIsTeamsLoading(true);
 
-      if (tournamentEditionId) {
-        const res = await fetch("/api/editions-teams/" + tournamentEditionId);
+      if (seasonId) {
+        const res = await fetch("/api/seasons-teams/" + seasonId);
         const data = await res.json();
 
-        setGroupTeams(data.teams);
+        setTeams(data.teams);
       }
       setIsTeamsLoading(false);
     }
 
-    getTeams();
-  }, [tournamentEditionId]);
+    getLeagueTeams();
+  }, [seasonId]);
 
   const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
     match?.homeTeamId || undefined
@@ -132,27 +137,29 @@ export default function KnockoutMatchForm({
   return (
     <>
       <PageHeader
-        label={match ? "Edit Knockout Match" : "Add Knockout Match"}
+        label={
+          match ? "Edit League Knockout Match" : "Add League Knockout Match"
+        }
       />
       <form action={action} className="form-styles">
-        {tournaments && tournaments.length > 0 ? (
+        {leagues && leagues.length > 0 ? (
           <FormField>
-            <Label htmlFor="tournamentId">Tournament</Label>
+            <Label htmlFor="leagueId">League</Label>
             <Select
-              name="tournamentId"
+              name="leagueId"
               defaultValue={
-                match?.tournamentEdition.tournamentId.toString() ||
-                tournamentId ||
-                tournaments[0].id.toString() ||
+                match?.season.leagueId.toString() ||
+                leagueId ||
+                leagues[0].id.toString() ||
                 undefined
               }
-              onValueChange={(value) => setTournamentId(value)}
+              onValueChange={(value) => setLeagueId(value)}
             >
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament" />
+                <SelectValue placeholder="Choose League" />
               </SelectTrigger>
               <SelectContent>
-                {tournaments.map(({ id, name }) => (
+                {leagues.map(({ id, name }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {name}
                   </SelectItem>
@@ -164,42 +171,42 @@ export default function KnockoutMatchForm({
           <FormFieldLoadingState
             isLoading={false}
             label=""
-            notFoundText="There is no tournaments, add some!"
+            notFoundText="There is no leagues, add some!"
           />
         )}
-        {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
+        {seasons && seasons.length > 0 && !isLoading ? (
           <FormField>
-            <Label htmlFor="tournamentEditionId">Tournament Edition</Label>
+            <Label htmlFor="seasonId">League Season</Label>
             <Select
-              name="tournamentEditionId"
+              name="seasonId"
               defaultValue={
-                match?.tournamentEditionId.toString() ||
-                tournamentEditionId ||
-                tournamentsEditions[0].id.toString() ||
+                match?.seasonId.toString() ||
+                seasonId ||
+                seasons[0].id.toString() ||
                 undefined
               }
             >
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament Edition" />
+                <SelectValue placeholder="Choose Season" />
               </SelectTrigger>
               <SelectContent>
-                {tournamentsEditions.map(({ id, tournament, year }) => (
+                {seasons.map(({ id, league, year }) => (
                   <SelectItem value={id.toString()} key={id}>
-                    {`${tournament.name} ${year.toString()}`}
+                    {`${league.name} ${year}`}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.tournamentEditionId} />
+            <FormFieldError error={error?.seasonId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
             isLoading={isLoading}
-            label="Loading Editions..."
-            notFoundText="There is no editions, add some!"
+            label="Loading Seasons..."
+            notFoundText="There is no seasons, add some!"
           />
         )}
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="homeTeamId">Home Team</Label>
             <div>
@@ -210,19 +217,24 @@ export default function KnockoutMatchForm({
                   defaultValue={
                     (homeTeamValue && homeTeamValue.toString()) || undefined
                   }
-                  // defaultValue={
-                  //   (match?.homeTeamId && match?.homeTeamId.toString()) ||
-                  //   teams[0].id.toString() ||
-                  //   undefined
-                  // }
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose Home Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groupTeams.map(({ id, name }) => (
+                    {teams.map(({ id, name, country }) => (
                       <SelectItem value={id.toString()} key={id}>
-                        {name}
+                        {name}{" "}
+                        {country ? (
+                          <Badge
+                            variant="secondary"
+                            className="text-muted-foreground text-xs ml-2"
+                          >
+                            {`${country.name}`}
+                          </Badge>
+                        ) : (
+                          ""
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -251,7 +263,7 @@ export default function KnockoutMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="awayTeamId">Away Team</Label>
             <div>
@@ -267,9 +279,19 @@ export default function KnockoutMatchForm({
                     <SelectValue placeholder="Choose Away Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groupTeams.map(({ id, name }) => (
+                    {teams.map(({ id, name, country }) => (
                       <SelectItem value={id.toString()} key={id}>
-                        {name}
+                        {name}{" "}
+                        {country ? (
+                          <Badge
+                            variant="secondary"
+                            className="text-muted-foreground text-xs ml-2"
+                          >
+                            {`${country.name}`}
+                          </Badge>
+                        ) : (
+                          ""
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -432,9 +454,7 @@ export default function KnockoutMatchForm({
           <FormFieldError error={error?.awayTeamPlacehlder} />
         </FormField>
         <SubmitButton
-          isDisabled={
-            isLoading || !tournamentsEditions || tournamentsEditions.length < 1
-          }
+          isDisabled={isLoading || !seasons || seasons.length < 1}
         />
       </form>
     </>

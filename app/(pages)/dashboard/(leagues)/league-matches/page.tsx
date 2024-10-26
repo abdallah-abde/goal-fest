@@ -69,6 +69,7 @@ export default async function DashboardLeagueMatchesPage({
 
   const where = {
     OR: [
+      { season: { league: { country: { name: { contains: query } } } } },
       { season: { league: { name: { contains: query } } } },
       { season: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
@@ -100,7 +101,9 @@ export default async function DashboardLeagueMatchesPage({
   };
 
   const orderBy = {
-    ...(sortField === "league"
+    ...(sortField === "country"
+      ? { season: { league: { country: { name: sortDir } } } }
+      : sortField === "league"
       ? { season: { league: { name: sortDir } } }
       : sortField === "season"
       ? { season: { year: sortDir } }
@@ -138,13 +141,18 @@ export default async function DashboardLeagueMatchesPage({
       group: true,
       season: {
         include: {
-          league: true,
+          league: {
+            include: {
+              country: true,
+            },
+          },
         },
       },
     },
   });
 
   const sortingList = [
+    { label: "Country", fieldName: "country" },
     { label: "League", fieldName: "league" },
     { label: "Season", fieldName: "season" },
     { label: "Home Team", fieldName: "homeTeam" },
@@ -238,6 +246,10 @@ export default async function DashboardLeagueMatchesPage({
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
+                <span className="hidden max-sm:block">Cou</span>
+                <span className="hidden sm:block">Country</span>
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
                 <span className="hidden max-sm:block">Leg</span>
                 <span className="hidden sm:block">League</span>
               </TableHead>
@@ -329,6 +341,9 @@ export default async function DashboardLeagueMatchesPage({
                     {round || <NotProvidedSpan />}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
+                    {season.league.country?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
                     {season.league.name}
                   </TableCell>
                   <TableCell className="dashboard-table-cell">
@@ -380,7 +395,7 @@ export default async function DashboardLeagueMatchesPage({
           <DashboardTableFooter
             totalCount={totalMatchesCount}
             totalPages={totalPages}
-            colSpan={11}
+            colSpan={12}
           />
         </Table>
       ) : (

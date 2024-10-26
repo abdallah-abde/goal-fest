@@ -38,11 +38,17 @@ export default async function DashboardLeagueTeamsPage({
   const sortField = searchParams?.sortField || "name";
 
   const where = {
-    OR: [{ name: { contains: query } }, { code: { contains: query } }],
+    OR: [
+      { country: { name: { contains: query } } },
+      { name: { contains: query } },
+      { code: { contains: query } },
+    ],
   };
 
   const orderBy = {
-    ...(sortField === "name"
+    ...(sortField === "country"
+      ? { country: { name: sortDir } }
+      : sortField === "name"
       ? { name: sortDir }
       : sortField === "code"
       ? { code: sortDir }
@@ -60,9 +66,11 @@ export default async function DashboardLeagueTeamsPage({
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
     orderBy: { ...orderBy },
+    include: { country: true },
   });
 
   const sortingList = [
+    { label: "Country", fieldName: "country" },
     { label: "Name", fieldName: "name" },
     { label: "Code", fieldName: "code" },
   ];
@@ -82,14 +90,20 @@ export default async function DashboardLeagueTeamsPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                Country
+              </TableHead>
               <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">Code</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {LeagueTeams.map(({ id, name, code }) => (
+            {LeagueTeams.map(({ id, name, code, country }) => (
               <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">
+                  {country?.name || <NotProvidedSpan />}
+                </TableCell>
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">
                   {code || <NotProvidedSpan />}
@@ -103,7 +117,7 @@ export default async function DashboardLeagueTeamsPage({
           <DashboardTableFooter
             totalCount={totalLeagueTeamsCount}
             totalPages={totalPages}
-            colSpan={3}
+            colSpan={4}
           />
         </Table>
       ) : (

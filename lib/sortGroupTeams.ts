@@ -1,7 +1,10 @@
-import { NeutralMatch, TeamWithStats } from "@/types";
+import { LeagueTeamWithStats, NeutralMatch, TeamWithStats } from "@/types";
 // import { Standing } from "@prisma/client";
 
-export function sortGroupTeams(a: TeamWithStats, b: TeamWithStats) {
+export function sortGroupTeams(
+  a: TeamWithStats | LeagueTeamWithStats,
+  b: TeamWithStats | LeagueTeamWithStats
+) {
   if (a.stats.points > b.stats.points) {
     return -1;
   } else if (a.stats.points < b.stats.points) {

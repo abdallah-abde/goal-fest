@@ -16,6 +16,7 @@ import {
   League,
   LeagueSeason,
   LeagueGroup,
+  Country,
 } from "@prisma/client";
 
 import { useFormState } from "react-dom";
@@ -27,9 +28,10 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
+import { Badge } from "@/components/ui/badge";
 
 interface LeagueMatchProps extends LeagueMatch {
   season: LeagueSeasonProps;
@@ -40,6 +42,10 @@ interface LeagueMatchProps extends LeagueMatch {
 
 interface LeagueSeasonProps extends LeagueSeason {
   league: League;
+}
+
+interface LeagueTeamProps extends LeagueTeam {
+  country: Country | null;
 }
 
 export default function LeagueMatchForm({
@@ -84,11 +90,27 @@ export default function LeagueMatchForm({
       null
   );
 
-  const [groupTeams, setGroupTeams] = useState<LeagueTeam[] | null>(null);
+  // const [groupTeams, setGroupTeams] = useState<LeagueTeamProps[] | null>(null);
 
-  const [seasonTeams, setSeasonTeams] = useState<LeagueTeam[] | null>(null);
+  // const [isGroupTeamsLoading, setIsGroupTeamsLoading] = useState(false);
+
+  const [seasonTeams, setSeasonTeams] = useState<LeagueTeamProps[] | null>(
+    null
+  );
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
+  const [homeTeamId, setHomeTeamId] = useState<string | null>(
+    leagueMatch?.homeTeamId?.toString() ||
+      (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
+      null
+  );
+
+  const [awayTeamId, setAwayTeamId] = useState<string | null>(
+    leagueMatch?.awayTeamId?.toString() ||
+      (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
+      null
+  );
 
   useEffect(() => {
     async function getSeasons() {
@@ -118,6 +140,7 @@ export default function LeagueMatchForm({
 
         setGroups(data);
         if (data.length > 0 && !leagueMatch) setGroupId(data[0].id.toString());
+        else setGroupId(null);
       }
       setIsGroupsLoading(false);
     }
@@ -134,6 +157,14 @@ export default function LeagueMatchForm({
         const data = await res.json();
 
         setSeasonTeams(data.teams);
+
+        if (data.length > 0 && !leagueMatch) {
+          setHomeTeamId(data[0].id.toString());
+          setAwayTeamId(data[0].id.toString());
+        } else {
+          setHomeTeamId(null);
+          setAwayTeamId(null);
+        }
       } else {
         setSeasonTeams([]);
       }
@@ -143,12 +174,50 @@ export default function LeagueMatchForm({
     getTeams();
   }, [seasonId]);
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // useEffect(() => {
+  //   console.log("USE EFFECT");
+
+  //   if (!error) {
+  //     formRef.current?.reset();
+  //   }
+  // }, [error]);
+
+  useEffect(() => {
+    async function getGroupTeams() {
+      setIsTeamsLoading(true);
+
+      if (groupId) {
+        const res = await fetch("/api/league-groups-teams/" + groupId);
+        const data = await res.json();
+
+        setSeasonTeams(data.teams);
+
+        if (data.teams.length > 0) {
+          if (data.length > 0 && !leagueMatch) {
+            setHomeTeamId(data[0].id.toString());
+            setAwayTeamId(data[0].id.toString());
+          } else {
+            setHomeTeamId(null);
+            setAwayTeamId(null);
+          }
+        }
+      } else {
+        setSeasonTeams([]);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getGroupTeams();
+  }, [groupId]);
+
   return (
     <>
       <PageHeader
         label={leagueMatch ? "Edit League Match" : "Add League Match"}
       />
-      <form action={action} className="form-styles">
+      <form action={action} className="form-styles" ref={formRef}>
         {leagues && leagues.length > 0 ? (
           <FormField>
             <Label htmlFor="leagueId">League</Label>
@@ -200,7 +269,7 @@ export default function LeagueMatchForm({
               <SelectContent>
                 {seasons.map(({ id, league, year }) => (
                   <SelectItem value={id.toString()} key={id}>
-                    {`${league.name} ${year.toString()}`}
+                    {`${league.name} ${year}`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -266,14 +335,16 @@ export default function LeagueMatchForm({
           />
           <FormFieldError error={error?.date} />
         </FormField>
+
         {seasonTeams && seasonTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="homeTeamId">Home Team</Label>
             <Select
               name="homeTeamId"
               defaultValue={
-                (leagueMatch && leagueMatch?.homeTeamId.toString()) ||
-                (seasonTeams && seasonTeams[0].id.toString()) ||
+                leagueMatch?.homeTeamId?.toString() ||
+                homeTeamId ||
+                seasonTeams[0].id.toString() ||
                 undefined
               }
             >
@@ -281,9 +352,19 @@ export default function LeagueMatchForm({
                 <SelectValue placeholder="Choose Home Team" />
               </SelectTrigger>
               <SelectContent>
-                {seasonTeams.map(({ id, name }) => (
+                {seasonTeams.map(({ id, name, country }) => (
                   <SelectItem value={id.toString()} key={id}>
-                    {name}
+                    {name}{" "}
+                    {country ? (
+                      <Badge
+                        variant="secondary"
+                        className="text-muted-foreground text-xs ml-2"
+                      >
+                        {`${country.name}`}
+                      </Badge>
+                    ) : (
+                      ""
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -297,13 +378,15 @@ export default function LeagueMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         {seasonTeams && seasonTeams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="awayTeamId">Away Team</Label>
             <Select
               name="awayTeamId"
               defaultValue={
-                leagueMatch?.awayTeamId.toString() ||
+                leagueMatch?.awayTeamId?.toString() ||
+                awayTeamId ||
                 seasonTeams[0].id.toString() ||
                 undefined
               }
@@ -312,9 +395,19 @@ export default function LeagueMatchForm({
                 <SelectValue placeholder="Choose Away Team" />
               </SelectTrigger>
               <SelectContent>
-                {seasonTeams.map(({ id, name }) => (
+                {seasonTeams.map(({ id, name, country }) => (
                   <SelectItem value={id.toString()} key={id}>
-                    {name}
+                    {name}{" "}
+                    {country ? (
+                      <Badge
+                        variant="secondary"
+                        className="text-muted-foreground text-xs ml-2"
+                      >
+                        {`${country.name}`}
+                      </Badge>
+                    ) : (
+                      ""
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -328,6 +421,7 @@ export default function LeagueMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         <FormField>
           <Label htmlFor="homeGoals">Home Goals</Label>
           <Input

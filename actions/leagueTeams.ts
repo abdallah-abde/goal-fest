@@ -38,6 +38,7 @@ export async function addLeagueTeam(prevState: unknown, formData: FormData) {
       name: data.name.toString(),
       code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
+      countryId: data.countryId ? +data.countryId : null,
     },
   });
 
@@ -88,6 +89,7 @@ export async function updateLeagueTeam(
       name: data.name.toString(),
       code: data.code ? data.code.toString() : null,
       flagUrl: flagUrlPath,
+      countryId: data.countryId ? +data.countryId : null,
     },
   });
 

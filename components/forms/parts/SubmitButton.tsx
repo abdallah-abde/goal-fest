@@ -10,15 +10,15 @@ export default function SubmitButton({
   const { pending } = useFormStatus();
 
   return (
-    <div className='col-span-2'>
+    <div className="col-span-2">
       <Button
-        type='submit'
+        type="submit"
         disabled={pending || (isDisabled ? isDisabled : pending)}
-        className='font-bold w-fit'
+        className="font-bold w-fit"
       >
         {pending ? (
           <>
-            <LoadingSpinner /> <span className='ml-2'>Saving...</span>
+            <LoadingSpinner /> <span className="ml-2">Saving...</span>
           </>
         ) : (
           "Save"

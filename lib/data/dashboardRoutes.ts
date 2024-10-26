@@ -90,6 +90,12 @@ export const dashboardLeaguesRoutes = [
     href: `/dashboard/league-matches`,
     Icon: LandPlot,
   },
+  {
+    id: 7,
+    label: "Knockout Matches",
+    href: `/dashboard/league-knockout-matches`,
+    Icon: LandPlot,
+  },
 ];
 
 export const dashboardOtherRoutes = [

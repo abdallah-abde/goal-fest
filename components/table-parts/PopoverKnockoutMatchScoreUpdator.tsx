@@ -18,6 +18,7 @@ import FormFieldError from "@/components/forms/parts/FormFieldError";
 import { X } from "lucide-react";
 
 import { updateKnockoutMatchScore } from "@/actions/knockoutMatches";
+import { updateLeagueKnockoutMatchScore } from "@/actions/leagueKnockoutMatches";
 
 export default function PopoverKnockoutMatchScoreUpdator({
   id,
@@ -33,6 +34,7 @@ export default function PopoverKnockoutMatchScoreUpdator({
   awayExtraTimeGoals,
   homePenaltyGoals,
   awayPenaltyGoals,
+  type,
   children,
 }: {
   id: number;
@@ -48,15 +50,21 @@ export default function PopoverKnockoutMatchScoreUpdator({
   awayExtraTimeGoals?: number | null;
   homePenaltyGoals?: number | null;
   awayPenaltyGoals?: number | null;
+  type: "knockoutMatches" | "leagueKnockoutMatches";
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
 
   const [error, action] = useFormState(
-    updateKnockoutMatchScore.bind(null, {
-      id,
-      searchParams: searchParams.toString(),
-    }),
+    type === "knockoutMatches"
+      ? updateKnockoutMatchScore.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        })
+      : updateLeagueKnockoutMatchScore.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        }),
     null
   );
 

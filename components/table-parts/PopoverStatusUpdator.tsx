@@ -3,7 +3,6 @@
 import { useFormState } from "react-dom";
 import { useSearchParams } from "next/navigation";
 
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
@@ -15,7 +14,6 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { MatchStatusOptions } from "@/types/enums";
-import { updateGroupMatchStatus } from "@/actions/groupMatches";
 import {
   Select,
   SelectContent,
@@ -23,8 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateGroupMatchStatus } from "@/actions/groupMatches";
 import { updateKnockoutMatchStatus } from "@/actions/knockoutMatches";
 import { updateLeagueMatchStatus } from "@/actions/leagueMatches";
+import { updateLeagueKnockoutMatchStatus } from "@/actions/leagueKnockoutMatches";
 
 export default function PopoverStatusUpdator({
   id,
@@ -34,7 +34,11 @@ export default function PopoverStatusUpdator({
 }: {
   id: number;
   status?: string | null;
-  type: "matches" | "knockoutMatches" | "leagueMatches";
+  type:
+    | "matches"
+    | "knockoutMatches"
+    | "leagueMatches"
+    | "leagueKnockoutMatches";
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
@@ -50,7 +54,12 @@ export default function PopoverStatusUpdator({
           id,
           searchParams: searchParams.toString(),
         })
-      : updateLeagueMatchStatus.bind(null, {
+      : type === "leagueMatches"
+      ? updateLeagueMatchStatus.bind(null, {
+          id,
+          searchParams: searchParams.toString(),
+        })
+      : updateLeagueKnockoutMatchStatus.bind(null, {
           id,
           searchParams: searchParams.toString(),
         }),

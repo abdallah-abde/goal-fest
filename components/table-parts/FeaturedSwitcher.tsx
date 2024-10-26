@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { updateGroupMatchFeaturedStatus } from "@/actions/groupMatches";
 import { updateKnockoutMatchFeaturedStatus } from "@/actions/knockoutMatches";
 import { updateLeagueMatchFeaturedStatus } from "@/actions/leagueMatches";
+import { updateLeagueKnockoutMatchFeaturedStatus } from "@/actions/leagueKnockoutMatches";
 
 import { Switch } from "@/components/ui/switch";
 import { LoadingSpinner } from "@/components/LoadingComponents";
@@ -17,7 +18,11 @@ export default function FeaturedSwitcher({
 }: {
   id: number;
   isFeatured: boolean;
-  type: string;
+  type:
+    | "matches"
+    | "knockoutMatches"
+    | "leagueMatches"
+    | "leagueKnockoutMatches";
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -45,6 +50,12 @@ export default function FeaturedSwitcher({
                   )
                 : type === "leagueMatches"
                 ? await updateLeagueMatchFeaturedStatus(
+                    id,
+                    !isFeatured,
+                    searchParams.toString()
+                  )
+                : type === "leagueKnockoutMatches"
+                ? await updateLeagueKnockoutMatchFeaturedStatus(
                     id,
                     !isFeatured,
                     searchParams.toString()

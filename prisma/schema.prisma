@@ -69,7 +69,8 @@ model Country {
   name               String
   flagUrl            String?
   tournamentEditions TournamentEdition[]
-  Leagues            League[]
+  leagues            League[]
+  leagueTeams        LeagueTeam[]
   code               String?
 }
 
@@ -199,23 +200,23 @@ model League {
 }
 
 model LeagueSeason {
-  id            Int           @id @default(autoincrement())
-  startYear     Int
-  endYear       Int
-  year          String
-  logoUrl       String?
-  leagueId      Int
-  league        League        @relation(fields: [leagueId], references: [id])
-  teams         LeagueTeam[]
-  matches       LeagueMatch[]
-  // standings Standing[]
-  winner        LeagueTeam?   @relation("winnerLeagueTeam", fields: [winnerId], references: [id])
-  winnerId      Int?
-  titleHolder   LeagueTeam?   @relation("titleHolderLeagueTeam", fields: [titleHolderId], references: [id])
-  titleHolderId Int?
-  currentStage  String?
-  slug          String        @unique
-  groups        LeagueGroup[]
+  id              Int                   @id @default(autoincrement())
+  startYear       Int
+  endYear         Int
+  year            String
+  logoUrl         String?
+  leagueId        Int
+  league          League                @relation(fields: [leagueId], references: [id])
+  teams           LeagueTeam[]
+  matches         LeagueMatch[]
+  winner          LeagueTeam?           @relation("winnerLeagueTeam", fields: [winnerId], references: [id])
+  winnerId        Int?
+  titleHolder     LeagueTeam?           @relation("titleHolderLeagueTeam", fields: [titleHolderId], references: [id])
+  titleHolderId   Int?
+  currentStage    String?
+  slug            String                @unique
+  groups          LeagueGroup[]
+  knockoutMatches LeagueKnockoutMatch[]
 }
 
 model LeagueMatch {
@@ -236,18 +237,43 @@ model LeagueMatch {
   group      LeagueGroup? @relation(fields: [groupId], references: [id])
 }
 
+model LeagueKnockoutMatch {
+  id                 Int          @id @default(autoincrement())
+  homeTeam           LeagueTeam?  @relation("homeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId         Int?
+  awayTeam           LeagueTeam?  @relation("awayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId         Int?
+  homeGoals          Int?
+  awayGoals          Int?
+  homeExtraTimeGoals Int?
+  awayExtraTimeGoals Int?
+  homePenaltyGoals   Int?
+  awayPenaltyGoals   Int?
+  date               DateTime?
+  seasonId           Int
+  season             LeagueSeason @relation(fields: [seasonId], references: [id])
+  round              String?
+  homeTeamPlacehlder String?
+  awayTeamPlacehlder String?
+  isFeatured         Boolean      @default(false)
+  status             String?
+}
+
 model LeagueTeam {
-  id                     Int            @id @default(autoincrement())
+  id                     Int                   @id @default(autoincrement())
   name                   String
   flagUrl                String?
   seasons                LeagueSeason[]
-  matchesHome            LeagueMatch[]  @relation("homeTeam")
-  matchesAway            LeagueMatch[]  @relation("awayTeam")
-  leagueTeamWinners      LeagueSeason[] @relation("winnerLeagueTeam")
-  leagueTeamTitleHolders LeagueSeason[] @relation("titleHolderLeagueTeam")
-  // standing    Standing[]
+  matchesHome            LeagueMatch[]         @relation("homeTeam")
+  matchesAway            LeagueMatch[]         @relation("awayTeam")
+  leagueTeamWinners      LeagueSeason[]        @relation("winnerLeagueTeam")
+  leagueTeamTitleHolders LeagueSeason[]        @relation("titleHolderLeagueTeam")
+  knockoutMatchesHome    LeagueKnockoutMatch[] @relation("homeTeam")
+  knockoutMatchesAway    LeagueKnockoutMatch[] @relation("awayTeam")
   code                   String?
   groups                 LeagueGroup[]
+  countryId              Int?
+  country                Country?              @relation(fields: [countryId], references: [id])
 }
 
 model LeagueGroup {
@@ -258,18 +284,3 @@ model LeagueGroup {
   teams    LeagueTeam[]
   matches  LeagueMatch[]
 }
-
-// model Standing {
-//   id           Int          @id @default(autoincrement())
-//   teamId       Int
-//   team         LeagueTeam   @relation(fields: [teamId], references: [id])
-//   seasonId     Int
-//   season       LeagueSeason @relation(fields: [seasonId], references: [id])
-//   played       Int          @default(0)
-//   won          Int          @default(0)
-//   lost         Int          @default(0)
-//   drawn        Int          @default(0)
-//   goalsFor     Int          @default(0)
-//   goalsAgainst Int          @default(0)
-//   points       Int          @default(0)
-// }

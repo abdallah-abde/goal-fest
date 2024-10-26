@@ -30,7 +30,6 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
 import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
-import PopoverKnockoutMatchScoreUpdator from "@/components/table-parts/PopoverKnockoutMatchScoreUpdator";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/filters/Filters";
 import {
@@ -44,7 +43,7 @@ import NotProvidedSpan from "@/components/NotProvidedSpan";
 import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 import KnockoutScoreTableCell from "@/components/table-parts/KnockoutScoreTableCell";
 
-export default async function DashboardKnockoutMatchesPage({
+export default async function DashboardLeagueKnockoutMatchesPage({
   searchParams,
 }: {
   searchParams: {
@@ -70,8 +69,9 @@ export default async function DashboardKnockoutMatchesPage({
 
   const where = {
     OR: [
-      { tournamentEdition: { tournament: { name: { contains: query } } } },
-      { tournamentEdition: { year: { contains: query } } },
+      { season: { league: { country: { name: { contains: query } } } } },
+      { season: { league: { name: { contains: query } } } },
+      { season: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
       { awayTeam: { name: { contains: query } } },
       { round: { contains: query } },
@@ -100,10 +100,12 @@ export default async function DashboardKnockoutMatchesPage({
   };
 
   const orderBy = {
-    ...(sortField === "tournament"
-      ? { tournamentEdition: { tournament: { name: sortDir } } }
-      : sortField === "edition"
-      ? { tournamentEdition: { year: sortDir } }
+    ...(sortField === "country"
+      ? { season: { league: { country: { name: sortDir } } } }
+      : sortField === "league"
+      ? { season: { league: { name: sortDir } } }
+      : sortField === "season"
+      ? { season: { year: sortDir } }
       : sortField === "homeTeam"
       ? { homeTeam: { name: sortDir } }
       : sortField === "awayTeam"
@@ -117,7 +119,7 @@ export default async function DashboardKnockoutMatchesPage({
       : {}),
   };
 
-  const totalMatchesCount = await prisma.knockoutMatch.count({
+  const totalMatchesCount = await prisma.leagueKnockoutMatch.count({
     where: {
       ...where,
     },
@@ -125,7 +127,7 @@ export default async function DashboardKnockoutMatchesPage({
 
   const totalPages = Math.ceil(totalMatchesCount / PAGE_RECORDS_COUNT);
 
-  const matches = await prisma.knockoutMatch.findMany({
+  const matches = await prisma.leagueKnockoutMatch.findMany({
     where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
@@ -133,17 +135,20 @@ export default async function DashboardKnockoutMatchesPage({
     include: {
       homeTeam: true,
       awayTeam: true,
-      tournamentEdition: {
+      season: {
         include: {
-          tournament: true,
+          league: {
+            include: { country: true },
+          },
         },
       },
     },
   });
 
   const sortingList = [
-    { label: "Tournament", fieldName: "tournament" },
-    { label: "Edition", fieldName: "edition" },
+    { label: "Country", fieldName: "country" },
+    { label: "League", fieldName: "league" },
+    { label: "Season", fieldName: "season" },
     { label: "Home Team", fieldName: "homeTeam" },
     { label: "Away Team", fieldName: "awayTeam" },
     { label: "Round", fieldName: "round" },
@@ -190,7 +195,7 @@ export default async function DashboardKnockoutMatchesPage({
 
   return (
     <>
-      <PageHeader label="Knockout Matches List" />
+      <PageHeader label="Leagues Knockout Matches List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="date" />
         <Filters
@@ -202,10 +207,10 @@ export default async function DashboardKnockoutMatchesPage({
             searchParamName: "date",
           }}
         />
-        <SearchFieldComponent placeholder="Search by tournamet names, years, rounds, teams ..." />
+        <SearchFieldComponent placeholder="Search by league names, years, countries, rounds, teams ..." />
         <AddNewLinkComponent
-          href="/dashboard/knockout-matches/new"
-          label="Add New Match"
+          href="/dashboard/league-knockout-matches/new"
+          label="Add New Knockout Match"
         />
       </div>
 
@@ -242,12 +247,16 @@ export default async function DashboardKnockoutMatchesPage({
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <span className="hidden max-sm:block">Tour</span>
-                <span className="hidden sm:block">Tournament</span>
+                <span className="hidden max-sm:block">Cou</span>
+                <span className="hidden sm:block">Country</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
-                <span className="hidden max-sm:block">Edi</span>
-                <span className="hidden sm:block">Edition</span>
+                <span className="hidden max-sm:block">Leg</span>
+                <span className="hidden sm:block">League</span>
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                <span className="hidden max-sm:block">Szn</span>
+                <span className="hidden sm:block">Season</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
                 Is Featured
@@ -274,7 +283,7 @@ export default async function DashboardKnockoutMatchesPage({
                 awayPenaltyGoals,
                 date,
                 round,
-                tournamentEdition,
+                season,
                 isFeatured,
                 status,
               }) => {
@@ -290,8 +299,8 @@ export default async function DashboardKnockoutMatchesPage({
                 const awayTeamCode = awayTeam
                   ? awayTeam.code
                   : awayTeamPlacehlder;
-                const tournamentName = tournamentEdition.tournament.name;
-                const editionName = tournamentEdition.year;
+                const leagueName = season.league.name;
+                const seasonName = season.year;
                 const roundName = round;
                 const matchDate = date
                   ? getFormattedDateTime(date.toString())
@@ -316,8 +325,8 @@ export default async function DashboardKnockoutMatchesPage({
                         id={id}
                         homeTeamName={homeTeamName || ""}
                         awayTeamName={awayTeamName || ""}
-                        tournamentName={tournamentName}
-                        editionName={editionName}
+                        tournamentName={leagueName}
+                        editionName={seasonName}
                         roundName={roundName || ""}
                         date={matchDate}
                         homeGoals={homeGoals}
@@ -327,7 +336,7 @@ export default async function DashboardKnockoutMatchesPage({
                         homePenaltyGoals={homePenaltyGoals}
                         awayPenaltyGoals={awayPenaltyGoals}
                         scoreTime="MT"
-                        type="knockoutMatches"
+                        type="leagueKnockoutMatches"
                       />
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
@@ -335,8 +344,8 @@ export default async function DashboardKnockoutMatchesPage({
                         id={id}
                         homeTeamName={homeTeamName || ""}
                         awayTeamName={awayTeamName || ""}
-                        tournamentName={tournamentName}
-                        editionName={editionName}
+                        tournamentName={leagueName}
+                        editionName={seasonName}
                         roundName={roundName || ""}
                         date={matchDate}
                         homeGoals={homeGoals}
@@ -346,7 +355,7 @@ export default async function DashboardKnockoutMatchesPage({
                         homePenaltyGoals={homePenaltyGoals}
                         awayPenaltyGoals={awayPenaltyGoals}
                         scoreTime="ET"
-                        type="knockoutMatches"
+                        type="leagueKnockoutMatches"
                       />
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
@@ -354,8 +363,8 @@ export default async function DashboardKnockoutMatchesPage({
                         id={id}
                         homeTeamName={homeTeamName || ""}
                         awayTeamName={awayTeamName || ""}
-                        tournamentName={tournamentName}
-                        editionName={editionName}
+                        tournamentName={leagueName}
+                        editionName={seasonName}
                         roundName={roundName || ""}
                         date={matchDate}
                         homeGoals={homeGoals}
@@ -365,7 +374,7 @@ export default async function DashboardKnockoutMatchesPage({
                         homePenaltyGoals={homePenaltyGoals}
                         awayPenaltyGoals={awayPenaltyGoals}
                         scoreTime="PT"
-                        type="knockoutMatches"
+                        type="leagueKnockoutMatches"
                       />
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
@@ -375,10 +384,13 @@ export default async function DashboardKnockoutMatchesPage({
                       {round || <NotProvidedSpan />}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {tournamentEdition.tournament.name}
+                      {season.league.country?.name || <NotProvidedSpan />}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {tournamentEdition.year}
+                      {season.league.name}
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      {season.year}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
                       <TooltipProvider>
@@ -386,7 +398,7 @@ export default async function DashboardKnockoutMatchesPage({
                           <TooltipTrigger>
                             <FeaturedSwitcher
                               id={id}
-                              type="knockoutMatches"
+                              type="leagueKnockoutMatches"
                               isFeatured={isFeatured}
                             />
                           </TooltipTrigger>
@@ -403,7 +415,7 @@ export default async function DashboardKnockoutMatchesPage({
                             <PopoverStatusUpdator
                               id={id}
                               status={status}
-                              type="knockoutMatches"
+                              type="leagueKnockoutMatches"
                             >
                               <span className="hover:underline">
                                 {status || <NotProvidedSpan hover={true} />}
@@ -417,7 +429,7 @@ export default async function DashboardKnockoutMatchesPage({
                       </TooltipProvider>
                     </TableCell>
                     <ActionsCellDropDown
-                      editHref={`/dashboard/knockout-matches/${id}`}
+                      editHref={`/dashboard/league-knockout-matches/${id}`}
                     />
                   </TableRow>
                 );
@@ -427,7 +439,7 @@ export default async function DashboardKnockoutMatchesPage({
           <DashboardTableFooter
             totalCount={totalMatchesCount}
             totalPages={totalPages}
-            colSpan={12}
+            colSpan={13}
           />
         </Table>
       ) : (

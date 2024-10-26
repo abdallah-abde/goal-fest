@@ -45,7 +45,7 @@ export async function addLeagueGroup(prevState: unknown, formData: FormData) {
   });
 
   revalidatePath("/dashboard/league-groups");
-  redirect(`/dashboard/league-groups`);
+  // redirect(`/dashboard/league-groups`);
 }
 
 export async function updateLeagueGroup(
