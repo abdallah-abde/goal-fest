@@ -12,36 +12,58 @@ import {
 
 import { cn } from "@/lib/utils";
 
-import { GroupWithTeams } from "@/types";
+import { GroupWithTeams, LeagueGroupWithTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import GroupsFilterDialog from "@/components/lists/tables/GroupsFilterDialog";
 
-import { Group, Tournament, TournamentEdition } from "@prisma/client";
+import {
+  Group,
+  Tournament,
+  TournamentEdition,
+  LeagueGroup,
+  League,
+  LeagueSeason,
+} from "@prisma/client";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
   groups: Group[];
 }
 
+interface LeagueSeasonProps extends LeagueSeason {
+  league: League;
+  groups: LeagueGroup[];
+}
+
 export default function GroupsTables({
-  tournamentEdition,
+  editionOrSeason,
   groupsWithTeams,
+  type,
 }: {
-  tournamentEdition: TournamentEditionProps;
-  groupsWithTeams: GroupWithTeams[];
+  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
+  groupsWithTeams?: GroupWithTeams[] | LeagueGroupWithTeams[];
+  type: "tournaments" | "leagues";
 }) {
   return (
     <>
       <PageHeader
-        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.year} Groups`}
+        label={
+          type === "tournaments"
+            ? `${
+                (editionOrSeason as TournamentEditionProps)?.tournament.name
+              } ${editionOrSeason?.year} Groups`
+            : `${(editionOrSeason as LeagueSeasonProps)?.league.name} ${
+                editionOrSeason?.year
+              } Groups`
+        }
       />
       <div className="flex justify-end pb-2">
-        <GroupsFilterDialog groups={tournamentEdition.groups} />
+        <GroupsFilterDialog groups={editionOrSeason.groups} />
       </div>
-      {groupsWithTeams.length > 0 ? (
+      {groupsWithTeams && groupsWithTeams.length > 1 ? (
         groupsWithTeams.map((group) => (
           <div key={group.id} className="mb-8 last:mb-0">
             <Table className="dark:border-primary/10 border">

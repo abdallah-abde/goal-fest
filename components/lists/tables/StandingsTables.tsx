@@ -9,30 +9,52 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { StandingTeams } from "@/types";
+import { StandingTeams, StandingLeagueTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 
-import { LeagueGroup, League, LeagueSeason } from "@prisma/client";
+import {
+  LeagueGroup,
+  League,
+  LeagueSeason,
+  TournamentEdition,
+  Tournament,
+  Group,
+} from "@prisma/client";
+
+interface TournamentEditionProps extends TournamentEdition {
+  tournament: Tournament;
+  groups: Group[];
+}
 
 interface LeagueSeasonProps extends LeagueSeason {
   league: League;
   groups: LeagueGroup[];
 }
 
-export default function LeagueStandingsTables({
-  leagueSeason,
+export default function StandingsTables({
+  editionOrSeason,
   standings,
+  type,
 }: {
-  leagueSeason: LeagueSeasonProps;
+  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
   standings: StandingTeams[];
+  type: "tournaments" | "leagues";
 }) {
   return (
     <>
       <PageHeader
-        label={`${leagueSeason?.league.name} ${leagueSeason?.year} Standings`}
+        label={
+          type === "tournaments"
+            ? `${
+                (editionOrSeason as TournamentEditionProps)?.tournament.name
+              } ${editionOrSeason?.year} Standings`
+            : `${(editionOrSeason as LeagueSeasonProps)?.league.name} ${
+                editionOrSeason?.year
+              } Standings`
+        }
       />
 
       {standings.length > 0 ? (

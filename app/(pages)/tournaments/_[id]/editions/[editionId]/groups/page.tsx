@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 
-import { calculateTeamStats } from "@/lib/calculateTeamStats";
+import { calculateTeamStatsByGroup } from "@/lib/calculateTeamStats";
 
 import GroupsTable from "@/components/lists/tables/GroupsTables";
 
@@ -49,7 +49,11 @@ export default async function GroupsPage({
       teams: await Promise.all(
         group.teams.map(async (team) => ({
           ...team,
-          stats: await calculateTeamStats(team.id, group.id),
+          stats: await calculateTeamStatsByGroup(
+            team.id,
+            group.id,
+            "tournaments"
+          ),
         }))
       ),
     }))
@@ -57,8 +61,9 @@ export default async function GroupsPage({
 
   return (
     <GroupsTable
-      tournamentEdition={tournamentEdition}
+      editionOrSeason={tournamentEdition}
       groupsWithTeams={groupsWithTeams}
+      type="tournaments"
     />
   );
 }

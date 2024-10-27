@@ -1,8 +1,12 @@
 import prisma from "@/lib/db";
 
-import { calculateTeamStats } from "@/lib/calculateTeamStats";
+import {
+  calculateTeamStatsByGroup,
+  calculateTeamStatsBySlug,
+} from "@/lib/calculateTeamStats";
 
 import GroupsTable from "@/components/lists/tables/GroupsTables";
+import StandingsTables from "@/components/lists/tables/StandingsTables";
 
 export default async function GroupsPage({
   params,
@@ -17,15 +21,40 @@ export default async function GroupsPage({
 
   const groupId = searchParams?.groupId || "all";
 
-  const [tournamentEdition, groups] = await Promise.all([
-    prisma.tournamentEdition.findUnique({
-      where: { slug },
-      include: {
-        tournament: true,
-        groups: true,
-      },
-    }),
-    prisma.group.findMany({
+  const tournamentEdition = await prisma.tournamentEdition.findUnique({
+    where: { slug },
+    include: {
+      tournament: true,
+      teams: true,
+      groups: true,
+    },
+  });
+
+  if (!tournamentEdition) throw new Error("Something went wrong");
+
+  let standings;
+
+  if (
+    !tournamentEdition.groups ||
+    tournamentEdition.groups.length === 0 ||
+    tournamentEdition.groups.length === 1
+  ) {
+    standings = await Promise.all(
+      tournamentEdition.teams.map(async (team) => ({
+        ...team,
+        stats: await calculateTeamStatsBySlug(team.id, slug, "tournaments"),
+      }))
+    );
+
+    return (
+      <StandingsTables
+        editionOrSeason={tournamentEdition}
+        standings={standings}
+        type="tournaments"
+      />
+    );
+  } else {
+    const groups = await prisma.group.findMany({
       where: {
         tournamentEdition: {
           slug,
@@ -39,27 +68,30 @@ export default async function GroupsPage({
         tournamentEditionId: true,
         teams: true,
       },
-    }),
-  ]);
+    });
 
-  if (!tournamentEdition) throw new Error("Something went wrong");
+    const standings = await Promise.all(
+      groups.map(async (group) => ({
+        ...group,
+        teams: await Promise.all(
+          group.teams.map(async (team) => ({
+            ...team,
+            stats: await calculateTeamStatsByGroup(
+              team.id,
+              group.id,
+              "tournaments"
+            ),
+          }))
+        ),
+      }))
+    );
 
-  const groupsWithTeams = await Promise.all(
-    groups.map(async (group) => ({
-      ...group,
-      teams: await Promise.all(
-        group.teams.map(async (team) => ({
-          ...team,
-          stats: await calculateTeamStats(team.id, group.id),
-        }))
-      ),
-    }))
-  );
-
-  return (
-    <GroupsTable
-      tournamentEdition={tournamentEdition}
-      groupsWithTeams={groupsWithTeams}
-    />
-  );
+    return (
+      <GroupsTable
+        editionOrSeason={tournamentEdition}
+        groupsWithTeams={standings}
+        type="tournaments"
+      />
+    );
+  }
 }

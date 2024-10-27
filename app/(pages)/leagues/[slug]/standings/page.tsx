@@ -1,12 +1,12 @@
 import prisma from "@/lib/db";
 
 import {
-  calculateLeagueGroupTeamStats,
-  calculateLeagueTeamStats,
+  calculateTeamStatsByGroup,
+  calculateTeamStatsBySlug,
 } from "@/lib/calculateTeamStats";
 
-import LeagueStandingsTables from "@/components/lists/tables/LeagueStandingsTables";
-import LeagueGroupsTables from "@/components/lists/tables/LeagueGroupsTables";
+import GroupsTables from "@/components/lists/tables/GroupsTables";
+import StandingsTables from "@/components/lists/tables/StandingsTables";
 
 export default async function LeaguesStandingsPage({
   params,
@@ -42,14 +42,15 @@ export default async function LeaguesStandingsPage({
     standings = await Promise.all(
       leagueSeason.teams.map(async (team) => ({
         ...team,
-        stats: await calculateLeagueTeamStats(team.id, slug),
+        stats: await calculateTeamStatsBySlug(team.id, slug, "leagues"),
       }))
     );
 
     return (
-      <LeagueStandingsTables
-        leagueSeason={leagueSeason}
+      <StandingsTables
+        editionOrSeason={leagueSeason}
         standings={standings}
+        type="leagues"
       />
     );
   } else {
@@ -75,14 +76,22 @@ export default async function LeaguesStandingsPage({
         teams: await Promise.all(
           group.teams.map(async (team) => ({
             ...team,
-            stats: await calculateLeagueGroupTeamStats(team.id, group.id),
+            stats: await calculateTeamStatsByGroup(
+              team.id,
+              group.id,
+              "leagues"
+            ),
           }))
         ),
       }))
     );
 
     return (
-      <LeagueGroupsTables season={leagueSeason} groupsWithTeams={standings} />
+      <GroupsTables
+        editionOrSeason={leagueSeason}
+        groupsWithTeams={standings}
+        type="leagues"
+      />
     );
   }
 }

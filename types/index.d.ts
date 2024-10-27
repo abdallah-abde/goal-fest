@@ -132,7 +132,11 @@ export interface LeagueGroupWithTeams extends LeagueGroup {
   teams: LeagueTeamWithStats[];
 }
 
-export interface StandingTeams extends LeagueTeam {
+export interface StandingLeagueTeams extends LeagueTeam {
+  stats: TeamStats;
+}
+
+export interface StandingTeams extends Team {
   stats: TeamStats;
 }
 
