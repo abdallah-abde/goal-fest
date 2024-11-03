@@ -25,8 +25,8 @@ export function getSidebarRoutes(
       },
       {
         id: 2,
-        label: "Groups",
-        href: `/${source}/${slug}/groups`,
+        label: "Standings",
+        href: `/${source}/${slug}/standings`,
         Icon: Table2Icon,
       },
       {

@@ -15,6 +15,12 @@ import {
 } from "@/components/ui/sheet";
 
 import { getSidebarRoutes } from "@/lib/data/sidebarRoutes";
+import {
+  dashboardTournamentsRoutes,
+  dashboardLeaguesRoutes,
+  dashboardOtherRoutes,
+} from "@/lib/data/dashboardRoutes";
+
 import { Menu } from "lucide-react";
 
 export default function Sidebar({
@@ -23,13 +29,39 @@ export default function Sidebar({
   source,
 }: {
   logoUrl?: string | null;
-  name: string;
-  source: "tournaments" | "leagues";
+  name?: string | null;
+  source:
+    | "tournaments"
+    | "leagues"
+    | "dashboard_tournaments"
+    | "dashboard_leagues"
+    | "dashboard_others";
 }) {
   const params = useParams();
   const pathname = usePathname();
 
-  const routes = getSidebarRoutes(params, source);
+  // const routes = getSidebarRoutes(params, source);
+
+  const routes =
+    source === "dashboard_tournaments"
+      ? dashboardTournamentsRoutes
+      : source === "dashboard_leagues"
+      ? dashboardLeaguesRoutes
+      : source === "dashboard_others"
+      ? dashboardOtherRoutes
+      : source === "tournaments"
+      ? getSidebarRoutes(params, source)
+      : source === "leagues"
+      ? getSidebarRoutes(params, source)
+      : null;
+
+  const isDashboardRoute = [
+    "dashboard_tournaments",
+    "dashboard_leagues",
+    "dashboard_others",
+  ].includes(source);
+
+  if (!routes) return;
 
   return (
     <div className="flex flex-col 2md:border-r-2 border-primary/10 2md:pr-4 w-full 2md:min-w-52 2md:max-w-52">
@@ -38,7 +70,7 @@ export default function Sidebar({
           <Image
             fill
             src={logoUrl}
-            alt={name + " Logo"}
+            alt={name + " Logo" || "Logo"}
             className="mx-auto object-contain"
           />
         </div>
@@ -49,7 +81,13 @@ export default function Sidebar({
             key={id}
             className={cn(
               `m-1 px-2 flex items-center gap-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center`,
-              pathname === href && "bg-primary/10"
+              isDashboardRoute
+                ? pathname === href
+                  ? "bg-primary/10"
+                  : pathname.includes(href) && href !== "/dashboard"
+                  ? "bg-primary/10"
+                  : ""
+                : pathname === href && "bg-primary/10"
             )}
             href={href}
           >
@@ -72,7 +110,13 @@ export default function Sidebar({
                 <Link
                   className={cn(
                     `m-1 px-2 flex items-center gap-x-4 text-sm text-primary rounded hover:bg-primary/10 transition duration-300 cursor-pointer py-2 text-center`,
-                    pathname === href && "bg-primary/10"
+                    isDashboardRoute
+                      ? pathname === href
+                        ? "bg-primary/10"
+                        : pathname.includes(href) && href !== "/dashboard"
+                        ? "bg-primary/10"
+                        : ""
+                      : pathname === href && "bg-primary/10"
                   )}
                   href={href}
                 >

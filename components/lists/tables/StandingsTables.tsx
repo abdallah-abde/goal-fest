@@ -1,15 +1,8 @@
 import Image from "next/image";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import { StandingTeams, StandingLeagueTeams } from "@/types";
+import { StandingTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import PageHeader from "@/components/PageHeader";
@@ -23,6 +16,8 @@ import {
   Tournament,
   Group,
 } from "@prisma/client";
+import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
+import { standingsHeaders } from "@/lib/data/standingsHeaders";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
@@ -60,39 +55,7 @@ export default function StandingsTables({
       {standings.length > 0 ? (
         <div className="mb-8 last:mb-0">
           <Table className="dark:border-primary/10 border">
-            <TableHeader>
-              <TableRow className="dashboard-head-table-row">
-                <TableHead className="dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]">
-                  <span>Team</span>
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3 text-center">
-                  <span className="hidden max-xs:block">P</span>
-                  <span className="hidden xs:block">Played</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>W</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>L</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>D</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>GF</span>
-                </TableHead>
-                <TableHead className="w-1/12 hidden sm:table-cell">
-                  <span>GA</span>
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3">
-                  <span>+/-</span>
-                </TableHead>
-                <TableHead className="w-1/12 max-xs:w-1/6 max-sm:w-1/3">
-                  <span className="hidden max-xs:block">Pts</span>
-                  <span className="hidden xs:block">Points</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+            <StandingTableHeader values={standingsHeaders} />
             <TableBody>
               {standings.sort(sortGroupTeams).map((team) => (
                 <TableRow key={team.id} className="dashboard-table-row">

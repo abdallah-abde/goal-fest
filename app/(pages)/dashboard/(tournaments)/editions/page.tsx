@@ -26,7 +26,7 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
-import Filters from "@/components/table-parts/filters/Filters";
+import Filters from "@/components/table-parts/Filters";
 import PopoverStageUpdator from "@/components/table-parts/PopoverStageUpdator";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 
@@ -181,7 +181,7 @@ export default async function DashboardEditionsPage({
                           <PopoverStageUpdator
                             id={id}
                             stage={currentStage}
-                            type="editions"
+                            type="tournaments"
                           >
                             <span className="hover:underline">
                               {currentStage || <NotProvidedSpan hover={true} />}

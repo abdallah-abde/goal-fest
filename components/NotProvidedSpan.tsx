@@ -15,7 +15,7 @@ export default function NotProvidedSpan({
         hover ? "hover:underline" : ""
       } text-muted-foreground text-xs`}
     >
-      {children || "Not Provided"}
+      {children || "#NP"}
     </span>
   );
 }

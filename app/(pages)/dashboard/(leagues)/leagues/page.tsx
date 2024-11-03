@@ -30,9 +30,9 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
-import PopularSwitcher from "@/components/table-parts/PopularSwitcher";
-import Filters from "@/components/table-parts/filters/Filters";
+import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 
 export default async function DashboardleaguesPage({
   searchParams,
@@ -183,10 +183,10 @@ export default async function DashboardleaguesPage({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <PopularSwitcher
+                        <FieldSwitcher
                           id={id}
                           type="leagues"
-                          isPopular={isPopular}
+                          value={isPopular}
                         />
                       </TooltipTrigger>
                       <TooltipContent>

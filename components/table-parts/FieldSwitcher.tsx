@@ -7,22 +7,26 @@ import { updateGroupMatchFeaturedStatus } from "@/actions/groupMatches";
 import { updateKnockoutMatchFeaturedStatus } from "@/actions/knockoutMatches";
 import { updateLeagueMatchFeaturedStatus } from "@/actions/leagueMatches";
 import { updateLeagueKnockoutMatchFeaturedStatus } from "@/actions/leagueKnockoutMatches";
+import { updateLeaguePopularStatus } from "@/actions/leagues";
+import { updateTournamentPopularStatus } from "@/actions/tournaments";
 
 import { Switch } from "@/components/ui/switch";
 import { LoadingSpinner } from "@/components/LoadingComponents";
 
-export default function FeaturedSwitcher({
+export default function FieldSwitcher({
   id,
-  isFeatured,
+  value,
   type,
 }: {
   id: number;
-  isFeatured: boolean;
+  value: boolean;
   type:
     | "matches"
     | "knockoutMatches"
     | "leagueMatches"
-    | "leagueKnockoutMatches";
+    | "leagueKnockoutMatches"
+    | "leagues"
+    | "tournaments";
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -33,34 +37,44 @@ export default function FeaturedSwitcher({
       {!isPending ? (
         <Switch
           disabled={isPending}
-          checked={isFeatured}
+          checked={value}
           onCheckedChange={async (value) =>
             startTransition(async () => {
               type === "matches"
                 ? await updateGroupMatchFeaturedStatus(
                     id,
-                    !isFeatured,
+                    !value,
                     searchParams.toString()
                   )
                 : type === "knockoutMatches"
                 ? await updateKnockoutMatchFeaturedStatus(
                     id,
-                    !isFeatured,
+                    !value,
                     searchParams.toString()
                   )
                 : type === "leagueMatches"
                 ? await updateLeagueMatchFeaturedStatus(
                     id,
-                    !isFeatured,
+                    !value,
                     searchParams.toString()
                   )
                 : type === "leagueKnockoutMatches"
                 ? await updateLeagueKnockoutMatchFeaturedStatus(
                     id,
-                    !isFeatured,
+                    !value,
                     searchParams.toString()
                   )
-                : null;
+                : type === "leagues"
+                ? await updateLeaguePopularStatus(
+                    id,
+                    !value,
+                    searchParams.toString()
+                  )
+                : await updateTournamentPopularStatus(
+                    id,
+                    !value,
+                    searchParams.toString()
+                  );
 
               router.refresh();
             })

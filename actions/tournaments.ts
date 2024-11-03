@@ -116,7 +116,7 @@ export async function updateTournamentPopularStatus(
   await prisma.tournament.update({
     where: { id },
     data: {
-      isPopular,
+      isPopular: !isPopular,
     },
   });
 

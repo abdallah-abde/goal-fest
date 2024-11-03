@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 
 import FormField from "@/components/forms/parts/FormField";
-import { Group, Team } from "@prisma/client";
+import { Group, Team, LeagueGroup, LeagueTeam } from "@prisma/client";
 import { ChangeEvent } from "react";
 
 export default function MatchesFilterDialog({
@@ -31,8 +31,8 @@ export default function MatchesFilterDialog({
   groups,
   rounds,
 }: {
-  teams: Team[];
-  groups: Group[];
+  teams: Team[] | LeagueTeam[];
+  groups: Group[] | LeagueGroup[];
   rounds: string[];
 }) {
   const searchParams = useSearchParams();
@@ -66,29 +66,29 @@ export default function MatchesFilterDialog({
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant='outline'
-          className='flex gap-2 border-2 border-secondary hover:border-primary/10'
+          variant="outline"
+          className="flex gap-2 border-2 border-secondary hover:border-primary/10"
         >
           <Filter /> Filter Options
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Options</DialogTitle>
         </DialogHeader>
-        <div className='form-styles py-4'>
+        <div className="form-styles py-4">
           <FormField>
-            <Label htmlFor='teamId'>Teams</Label>
+            <Label htmlFor="teamId">Teams</Label>
             <Select
-              name='teamId'
+              name="teamId"
               value={teamId}
               onValueChange={(value) => handleParamChange(value, "teamId")}
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Team' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Team" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Teams</SelectItem>
+                <SelectItem value="all">All Teams</SelectItem>
                 {teams.map((team) => (
                   <SelectItem key={team.id} value={team.id.toString()}>
                     {team.name}
@@ -98,17 +98,17 @@ export default function MatchesFilterDialog({
             </Select>
           </FormField>
           <FormField>
-            <Label htmlFor='groupId'>Groups</Label>
+            <Label htmlFor="groupId">Groups</Label>
             <Select
-              name='groupId'
+              name="groupId"
               value={groupId}
               onValueChange={(value) => handleParamChange(value, "groupId")}
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Group' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Group" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Groups</SelectItem>
+                <SelectItem value="all">All Groups</SelectItem>
                 {groups.map((group) => (
                   <SelectItem key={group.id} value={group.id.toString()}>
                     {group.name}
@@ -118,17 +118,17 @@ export default function MatchesFilterDialog({
             </Select>
           </FormField>
           <FormField>
-            <Label htmlFor='round'>Round</Label>
+            <Label htmlFor="round">Round</Label>
             <Select
-              name='round'
+              name="round"
               value={round}
               onValueChange={(value) => handleParamChange(value, "round")}
             >
-              <SelectTrigger className='flex-1'>
-                <SelectValue placeholder='Choose Round' />
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Choose Round" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Rounds</SelectItem>
+                <SelectItem value="all">All Rounds</SelectItem>
                 {rounds.map((round) => (
                   <SelectItem key={round} value={round}>
                     {round}
@@ -138,10 +138,10 @@ export default function MatchesFilterDialog({
             </Select>
           </FormField>
           <FormField>
-            <Label htmlFor='date'>Date</Label>
+            <Label htmlFor="date">Date</Label>
             <Input
-              type='date'
-              name='date'
+              type="date"
+              name="date"
               onChange={handleDateChange}
               value={date}
             />

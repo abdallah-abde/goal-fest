@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
@@ -28,6 +29,7 @@ export default function PopoverMatchScoreUpdator({
   tournamentName,
   editionName,
   roundName,
+  groupName,
   date,
   homeGoals,
   awayGoals,
@@ -40,6 +42,7 @@ export default function PopoverMatchScoreUpdator({
   tournamentName: string;
   editionName: string;
   roundName: string;
+  groupName: string;
   date: string;
   homeGoals: number | null;
   awayGoals: number | null;
@@ -60,6 +63,8 @@ export default function PopoverMatchScoreUpdator({
     null
   );
 
+  const [onlyDate, onlyTime] = date.split(";");
+
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -70,8 +75,8 @@ export default function PopoverMatchScoreUpdator({
               Update Score
             </h4>
             <div className="flex flex-col gap-2">
-              <div className="flex gap-2 items-center justify-between border-b pb-2">
-                <div className="flex flex-col items-start">
+              <div className="flex gap-2 items-start justify-between border-b pb-2">
+                <div className="flex flex-col items-center justify-center">
                   <span className="text-[16px] text-muted-background">
                     {tournamentName}
                   </span>
@@ -79,11 +84,28 @@ export default function PopoverMatchScoreUpdator({
                     ({editionName})
                   </span>
                 </div>
-                {roundName && (
-                  <span className="text-sm text-muted-foreground">
-                    {roundName}
-                  </span>
-                )}
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Badge variant="destructive" className="hover:bg-destructive">
+                    {onlyDate}
+                  </Badge>
+                  {onlyTime && (
+                    <Badge variant="outline" className="pt-1">
+                      {onlyTime}
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  {groupName && (
+                    <span className="text-[16px] text-muted-background">
+                      {groupName}
+                    </span>
+                  )}
+                  {roundName && (
+                    <span className="text-[12px] text-muted-foreground">
+                      {roundName}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2 items-center justify-between">
                 <span className="text-sm text-muted-foreground flex-1">

@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 
 import { Ban } from "lucide-react";
 
-import DashboardSidebar from "@/components/menus/DashboardSidebar";
+import Sidebar from "@/components/menus/Sidebar";
 
 export default async function DashboardLeaguesLayout({
   children,
@@ -22,7 +22,7 @@ export default async function DashboardLeaguesLayout({
 
   return (
     <div className="h-screen flex flex-col md:flex-row gap-4 py-24">
-      <DashboardSidebar source="leagues" />
+      <Sidebar source="dashboard_leagues" />
       <div className="md:overflow-auto grow pl-1 md:pr-2 pb-24 md:pb-0 mt-8 md:mt-0">
         {children}
       </div>

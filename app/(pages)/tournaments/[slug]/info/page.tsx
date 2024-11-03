@@ -1,14 +1,11 @@
 import prisma from "@/lib/db";
-import { Prisma } from "@prisma/client";
 
-import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
-
-import TournamentsInfoCards from "@/components/lists/cards/edition-info-cards/TournamentsInfoCards";
+import InfoCards from "@/components/lists/cards/edition-info-cards/InfoCards";
 
 import {
-  getTournamentTeamsGoalsAgainst,
-  getTournamentTeamsGoalsScored,
-  getTournamentTeamsCleanSheets,
+  getTeamsGoalsAgainst,
+  getTeamsGoalsScored,
+  getTeamsCleanSheets,
 } from "@/lib/data/queries";
 
 export default async function TournamentsInfoPage({
@@ -18,55 +15,47 @@ export default async function TournamentsInfoPage({
 }) {
   const { slug } = params;
 
-  const [
-    tournamentEdition,
-    teamsGoalsScored,
-    teamsGoalsAgainst,
-    teamsCleanSheets,
-  ] = await Promise.all([
-    prisma.tournamentEdition.findUnique({
-      where: {
-        slug,
-      },
-      include: {
-        tournament: true,
-        teams: true,
-        winner: true,
-        titleHolder: true,
-        hostingCountries: true,
-        matches: {
-          include: {
-            group: true,
-            homeTeam: true,
-            awayTeam: true,
-            tournamentEdition: true,
+  const [edition, teamsGoalsScored, teamsGoalsAgainst, teamsCleanSheets] =
+    await Promise.all([
+      prisma.tournamentEdition.findUnique({
+        where: {
+          slug,
+        },
+        include: {
+          tournament: true,
+          teams: true,
+          groups: true,
+          winner: true,
+          titleHolder: true,
+          hostingCountries: true,
+          matches: {
+            include: {
+              group: true,
+              homeTeam: true,
+              awayTeam: true,
+              tournamentEdition: true,
+            },
+          },
+          knockoutMatches: {
+            include: {
+              awayTeam: true,
+              homeTeam: true,
+              tournamentEdition: true,
+            },
           },
         },
-        knockoutMatches: {
-          include: {
-            awayTeam: true,
-            homeTeam: true,
-            tournamentEdition: true,
-          },
-        },
-      },
-    }),
-    await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-      getTournamentTeamsGoalsScored(slug, 5)
-    )}`,
-    await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-      getTournamentTeamsGoalsAgainst(slug, 5)
-    )}`,
-    await prisma.$queryRaw<TotalCleanSheetsProps[]>`${Prisma.raw(
-      getTournamentTeamsCleanSheets(slug, 5)
-    )}`,
-  ]);
+      }),
+      getTeamsGoalsScored(slug, 5, "tournaments"),
+      getTeamsGoalsAgainst(slug, 5, "tournaments"),
+      getTeamsCleanSheets(slug, 5, "tournaments"),
+    ]);
 
-  if (!tournamentEdition) throw new Error("Something went wrong");
+  if (!edition) throw new Error("Something went wrong");
 
   return (
-    <TournamentsInfoCards
-      tournamentEdition={tournamentEdition}
+    <InfoCards
+      type="tournaments"
+      editionOrSeason={edition}
       teamsGoalsScored={teamsGoalsScored}
       teamsGoalsAgainst={teamsGoalsAgainst}
       teamsCleanSheets={teamsCleanSheets}

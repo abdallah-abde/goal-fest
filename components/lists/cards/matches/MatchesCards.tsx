@@ -8,6 +8,12 @@ import {
   TournamentEdition,
   Tournament,
   Country,
+  LeagueMatch,
+  LeagueGroup,
+  LeagueTeam,
+  LeagueSeason,
+  League,
+  LeagueKnockoutMatch,
 } from "@prisma/client";
 
 import { useState } from "react";
@@ -28,8 +34,10 @@ import { NeutralMatch } from "@/types";
 import { GroupByOptions } from "@/types/enums";
 
 import {
-  switchGroupMatchesToNeutralMatches,
-  switchKnockoutMatchesToNeutralMatches,
+  switchTournamentMatchesToNeutralMatches,
+  switchTournamentKnockoutMatchesToNeutralMatches,
+  switchLeagueMatchesToNeutralMatches,
+  switchLeagueKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
 import { sortMatches } from "@/lib/sortGroupTeams";
 
@@ -45,30 +53,68 @@ interface TournamentEditionProps extends TournamentEdition {
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
   awayTeam: Team | null;
-  tournamentEdition: TournamentEdition;
+  tournamentEdition: TournamentEditionProps;
 }
 
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEdition;
+  tournamentEdition: TournamentEditionProps;
+}
+
+interface LeagueProps extends League {
+  country: Country | null;
+}
+
+interface LeagueSeasonProps extends LeagueSeason {
+  league: LeagueProps;
+  teams: LeagueTeam[];
+  groups: LeagueGroup[];
+  winner: LeagueTeam | null;
+  titleHolder: LeagueTeam | null;
+}
+
+interface LeagueMatchProps extends LeagueMatch {
+  group: LeagueGroup | null;
+  homeTeam: LeagueTeam;
+  awayTeam: LeagueTeam;
+  season: LeagueSeasonProps;
+}
+
+interface LeagueKnockoutMatchProps extends LeagueKnockoutMatch {
+  homeTeam: LeagueTeam | null;
+  awayTeam: LeagueTeam | null;
+  season: LeagueSeasonProps;
 }
 
 export default function MatchesCards({
-  tournamentEdition,
+  editionOrseason,
   matches,
   knockoutMatches,
   rounds,
+  type,
 }: {
-  tournamentEdition: TournamentEditionProps;
-  matches: MatchProps[];
-  knockoutMatches: KnockoutMatchProps[];
+  editionOrseason: TournamentEditionProps | LeagueSeasonProps;
+  matches: MatchProps[] | LeagueMatchProps[];
+  knockoutMatches: KnockoutMatchProps[] | LeagueKnockoutMatchProps[];
   rounds: string[];
+  type: "tournaments" | "leagues";
 }) {
-  const allMatches: NeutralMatch[] = switchGroupMatchesToNeutralMatches(
-    matches
-  ).concat(switchKnockoutMatchesToNeutralMatches(knockoutMatches));
+  const allMatches: NeutralMatch[] =
+    type === "tournaments"
+      ? switchTournamentMatchesToNeutralMatches(matches as MatchProps[]).concat(
+          switchTournamentKnockoutMatchesToNeutralMatches(
+            knockoutMatches as KnockoutMatchProps[]
+          )
+        )
+      : switchLeagueMatchesToNeutralMatches(
+          matches as LeagueMatchProps[]
+        ).concat(
+          switchLeagueKnockoutMatchesToNeutralMatches(
+            knockoutMatches as LeagueKnockoutMatchProps[]
+          )
+        );
 
   const [groupBy, setGroupBy] = useState<GroupByOptions>(
     GroupByOptions.ONLYDATE
@@ -80,7 +126,11 @@ export default function MatchesCards({
   return (
     <>
       <PageHeader
-        label={`${tournamentEdition?.tournament.name} ${tournamentEdition?.year} Matches`}
+        label={`${
+          type === "tournaments"
+            ? (editionOrseason as TournamentEditionProps).tournament.name
+            : (editionOrseason as LeagueSeasonProps).league.name
+        } ${editionOrseason.year} Matches`}
       />
       <div className="flex justify-end pb-2">
         <Button
@@ -105,8 +155,8 @@ export default function MatchesCards({
           )}
         </Button>
         <MatchesFilterDialog
-          teams={tournamentEdition.teams}
-          groups={tournamentEdition.groups}
+          teams={editionOrseason.teams}
+          groups={editionOrseason.groups}
           rounds={rounds}
         />
       </div>

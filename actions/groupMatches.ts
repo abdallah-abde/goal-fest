@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import {
   GroupMatchSchema,
-  GroupMatchScoreSchema,
+  MatchScoreSchema,
   MatchStatusSchema,
 } from "@/schemas";
 import { MatchStatusOptions } from "@/types/enums";
@@ -107,7 +107,7 @@ export async function updateGroupMatchFeaturedStatus(
   await prisma.match.update({
     where: { id },
     data: {
-      isFeatured,
+      isFeatured: !isFeatured,
     },
   });
 
@@ -122,7 +122,7 @@ export async function updateGroupMatchScore(
 ) {
   const { id, searchParams } = args;
 
-  const result = GroupMatchScoreSchema.safeParse(
+  const result = MatchScoreSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 

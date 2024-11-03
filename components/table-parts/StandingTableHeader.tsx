@@ -1,9 +1,6 @@
 import { TableHeader, TableRow, TableHead } from "@/components/ui/table";
 
-interface TableHeadProps {
-  labels: Array<{ name: string; className?: string | null }>;
-  className: string;
-}
+import { TableHeadProps } from "@/types";
 
 export default function StandingTableHeader({
   values,

@@ -11,20 +11,20 @@ export default async function LeaguesLayout({
 }) {
   const slug = params.slug;
 
-  const leagueSeason = await prisma.leagueSeason.findUnique({
+  const season = await prisma.leagueSeason.findUnique({
     where: { slug },
     include: { league: true },
   });
 
   return (
     <div className="h-screen flex flex-col 2md:flex-row gap-4 py-24">
-      {leagueSeason && (
+      {season && (
         <Sidebar
           source="leagues"
-          logoUrl={leagueSeason?.logoUrl || null}
+          logoUrl={season?.logoUrl || null}
           name={
-            leagueSeason?.logoUrl
-              ? `${leagueSeason?.league?.name} ${leagueSeason?.year}`
+            season?.logoUrl
+              ? `${season?.league?.name} ${season?.year}`
               : "Tournament Logo"
           }
         />

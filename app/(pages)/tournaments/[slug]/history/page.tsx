@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 
 import TournamentsHistory from "@/components/lists/TournamentsHistory";
+import { TournamentStages } from "@/types/enums";
 
 export default async function TournamentsHistoryPage({
   params,
@@ -9,19 +10,19 @@ export default async function TournamentsHistoryPage({
 }) {
   const { slug } = params;
 
-  const tournamentEdition = await prisma.tournamentEdition.findFirst({
+  const edition = await prisma.tournamentEdition.findUnique({
     where: { slug },
-    select: { tournament: true },
+    include: { tournament: true },
   });
 
-  const tournament = tournamentEdition?.tournament;
+  if (!edition) throw new Error("Something went wrong");
 
   const editions = await prisma.tournamentEdition.findMany({
     where: {
       tournament: {
-        id: tournament?.id,
+        id: edition.tournament.id,
       },
-      currentStage: "Finished",
+      currentStage: TournamentStages.Finished,
     },
     include: {
       tournament: true,
@@ -31,40 +32,11 @@ export default async function TournamentsHistoryPage({
     },
   });
 
-  // const [tournamentEdition, matches] = await Promise.all([
-  //   prisma.tournamentEdition.findUnique({
-  //     where: { slug },
-  //     select: { league: true },
-  //   }),
-  //   prisma.knockoutMatch.findMany({
-  //     where: {
-  //       round: "Final",
-  //       tournamentEdition: {
-  //         tournamentId: +params.id,
-  //         currentStage: "Finished",
-  //       },
-  //     },
-  //     include: {
-  //       homeTeam: true,
-  //       awayTeam: true,
-  //       tournamentEdition: {
-  //         include: {
-  //           hostingCountries: true,
-  //           winner: true,
-  //           tournament: true,
-  //         },
-  //       },
-  //     },
-  //     orderBy: {
-  //       tournamentEdition: {
-  //         year: "desc",
-  //       },
-  //     },
-  //   }),
-  // ]);
-
-  if (!tournament || !tournamentEdition)
-    throw new Error("Something went wrong");
-
-  return <TournamentsHistory tournament={tournament} editions={editions} />;
+  return (
+    <TournamentsHistory
+      type="tournaments"
+      tournamentOrLeague={edition.tournament}
+      editionsOrSeasons={editions}
+    />
+  );
 }

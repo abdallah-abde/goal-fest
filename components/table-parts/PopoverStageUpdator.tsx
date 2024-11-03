@@ -20,8 +20,9 @@ import {
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { updateTournamentEditionCurrentStage } from "@/actions/editions";
 import { TournamentStages, LeagueStages } from "@/types/enums";
+
+import { updateTournamentEditionCurrentStage } from "@/actions/editions";
 import { updateLeagueSeasonCurrentStage } from "@/actions/seasons";
 
 export default function PopoverStageUpdator({
@@ -31,14 +32,14 @@ export default function PopoverStageUpdator({
   children,
 }: {
   id: number;
-  type: "editions" | "seasons";
-  stage: string | null;
+  type: "tournaments" | "leagues";
+  stage?: string | null;
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
 
   const [error, action] = useFormState(
-    type === "editions"
+    type === "tournaments"
       ? updateTournamentEditionCurrentStage.bind(null, {
           id,
           searchParams: searchParams.toString(),
@@ -68,7 +69,7 @@ export default function PopoverStageUpdator({
                 </SelectTrigger>
                 <SelectContent>
                   {Object.values(
-                    type === "editions" ? TournamentStages : LeagueStages
+                    type === "tournaments" ? TournamentStages : LeagueStages
                   ).map((opt) => (
                     <SelectItem value={opt} key={opt}>
                       {opt}

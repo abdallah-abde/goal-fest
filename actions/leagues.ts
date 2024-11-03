@@ -102,6 +102,8 @@ export async function updateLeaguePopularStatus(
   isPopular: boolean,
   searchParams: string
 ) {
+  console.log("IS_POPULAR", isPopular);
+
   const currentLeague = await prisma.league.findUnique({
     where: { id },
   });
@@ -111,7 +113,7 @@ export async function updateLeaguePopularStatus(
   await prisma.league.update({
     where: { id },
     data: {
-      isPopular,
+      isPopular: !isPopular,
     },
   });
 

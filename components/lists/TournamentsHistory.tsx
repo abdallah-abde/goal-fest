@@ -2,11 +2,20 @@ import prisma from "@/lib/db";
 
 import Image from "next/image";
 
-import { Country, Team, Tournament, TournamentEdition } from "@prisma/client";
+import {
+  Country,
+  Team,
+  Tournament,
+  TournamentEdition,
+  League,
+  LeagueSeason,
+  LeagueTeam,
+} from "@prisma/client";
 
 import PageHeader from "@/components/PageHeader";
 
 import { Badge } from "@/components/ui/badge";
+import { EmptyImageUrls } from "@/types/enums";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
@@ -15,12 +24,24 @@ interface TournamentEditionProps extends TournamentEdition {
   hostingCountries: Country[];
 }
 
+interface LeagueSeasonProps extends LeagueSeason {
+  league: LeagueProps;
+  winner: LeagueTeam | null;
+  titleHolder: LeagueTeam | null;
+}
+
+interface LeagueProps extends League {
+  country: Country | null;
+}
+
 export default async function TournamentsHistory({
-  tournament,
-  editions,
+  tournamentOrLeague,
+  editionsOrSeasons,
+  type,
 }: {
-  tournament: Tournament;
-  editions: TournamentEditionProps[];
+  tournamentOrLeague: Tournament | League;
+  editionsOrSeasons: TournamentEditionProps[] | LeagueSeasonProps[];
+  type: "tournaments" | "leagues";
 }) {
   async function getScore(edition: TournamentEditionProps) {
     const finalMatch = await prisma.knockoutMatch.findFirst({
@@ -84,85 +105,93 @@ export default async function TournamentsHistory({
 
   return (
     <>
-      <PageHeader label={`${tournament?.name} History`} />
-      {editions.map((edition) => (
-        <div
-          key={edition.id}
-          className="flex items-end py-4 gap-4 border-b border-primary/10 last:border-0"
-        >
-          {edition.logoUrl && (
+      <PageHeader label={`${tournamentOrLeague.name} History`} />
+      {editionsOrSeasons.map((editionOrSeason) => {
+        const { id, year, logoUrl, winner } = editionOrSeason;
+        const hostingCountries =
+          type === "tournaments"
+            ? (editionOrSeason as TournamentEditionProps).hostingCountries
+            : null;
+
+        return (
+          <div
+            key={id}
+            className="flex items-end py-4 gap-4 border-b border-primary/10 last:border-0"
+          >
             <Image
               width={125}
               height={125}
-              src={edition.logoUrl}
-              alt={`${edition?.tournament?.name} ${edition?.year} Logo`}
-              className="hidden sm:block"
+              src={logoUrl || EmptyImageUrls.Tournament}
+              alt={`${tournamentOrLeague.name} ${year} Logo`}
+              className="aspect-video object-contain"
             />
-          )}
-          <div className="flex flex-col gap-2 flex-1">
-            <Badge variant="outline" className="text-[16px] sm:text-lg w-fit">
-              {edition?.year}
-            </Badge>
-            <div className="grid grid-cols-[100px_1fr] grid-rows-2 gap-2 items-center">
-              <span className="col-start-1 row-start-1 text-sm sm:text-[16px]">
-                Hosted by
-              </span>
-              <div className="col-start-2 row-start-1 flex flex-wrap gap-2">
-                {edition.hostingCountries.map((country) => (
-                  <div key={country.id} className="flex items-center gap-2">
-                    <Badge
-                      key={country.id}
-                      variant="secondary"
-                      className="flex gap-2 items-center text-[16px] sm:text-lg"
-                    >
-                      {country.flagUrl && (
-                        <Image
-                          width={30}
-                          height={30}
-                          src={country.flagUrl}
-                          alt={country.name + " Flag"}
-                          className="w-6 sm:w-8 h-6 sm:h-8"
-                        />
-                      )}
-                      {country.name}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-              <span className="col-start-1 row-start-2 text-sm sm:text-[16px]">
-                Winner
-              </span>
-              <div className="col-start-2 row-start-2 flex gap-2 items-center justify-start">
-                {edition.winner && (
-                  <div className="flex flex-col xs:flex-row gap-2">
-                    <Badge
-                      variant="green"
-                      className="flex gap-2 items-center text-[16px] sm:text-lg"
-                    >
-                      {edition.winner.flagUrl && (
-                        <Image
-                          width={30}
-                          height={30}
-                          src={edition.winner.flagUrl}
-                          alt={edition.winner.name + " Flag"}
-                          className="w-6 sm:w-8 h-6 sm:h-8"
-                        />
-                      )}
-                      {edition.winner.name}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="border-0 text-[12px] sm:text-sm text-ring"
-                    >
-                      {getScore(edition)}
-                    </Badge>
-                  </div>
+            <div className="flex flex-col gap-2 flex-1">
+              <Badge variant="outline" className="text-[16px] sm:text-lg w-fit">
+                {year}
+              </Badge>
+              <div className="grid grid-cols-[100px_1fr] grid-rows-2 gap-2 items-center">
+                {hostingCountries && (
+                  <>
+                    <span className="col-start-1 row-start-1 text-sm sm:text-[16px]">
+                      Hosted by
+                    </span>
+                    <div className="col-start-2 row-start-1 flex flex-wrap gap-2">
+                      {hostingCountries.map(({ id, flagUrl, name }) => (
+                        <div key={id} className="flex items-center gap-2">
+                          <Badge
+                            key={id}
+                            variant="secondary"
+                            className="flex gap-2 items-center text-[16px] sm:text-lg"
+                          >
+                            <Image
+                              width={30}
+                              height={30}
+                              src={flagUrl || EmptyImageUrls.Country}
+                              alt={name + " Flag"}
+                              className="aspect-video object-contain"
+                            />
+                            {name}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
+
+                <span className="col-start-1 row-start-2 text-sm sm:text-[16px]">
+                  Winner
+                </span>
+                <div className="col-start-2 row-start-2 flex gap-2 items-center justify-start">
+                  {winner && (
+                    <div className="flex flex-col xs:flex-row gap-2">
+                      <Badge
+                        variant="green"
+                        className="flex gap-2 items-center text-[16px] sm:text-lg"
+                      >
+                        <Image
+                          width={30}
+                          height={30}
+                          src={winner.flagUrl || EmptyImageUrls.Team}
+                          alt={winner.name + " Flag"}
+                          className="aspect-video object-contain"
+                        />
+                        {winner.name}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="border-0 text-[12px] sm:text-sm text-ring"
+                      >
+                        {type === "tournaments" &&
+                          getScore(editionOrSeason as TournamentEditionProps)}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }

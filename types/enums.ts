@@ -62,3 +62,9 @@ export enum MatchStatusOptions {
   Playing = "Playing",
   Scheduled = "Scheduled",
 }
+
+export enum EmptyImageUrls {
+  Team = "/images/teams/team-empty-logo.png",
+  Country = "/images/countries/empty-flag.png",
+  Tournament = "/images/tournaments/tournament-empty-logo.png",
+}

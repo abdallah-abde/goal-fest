@@ -29,9 +29,9 @@ import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent"
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 
-import FeaturedSwitcher from "@/components/table-parts/FeaturedSwitcher";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import SortByList from "@/components/table-parts/SortByList";
-import Filters from "@/components/table-parts/filters/Filters";
+import Filters from "@/components/table-parts/Filters";
 import {
   Tooltip,
   TooltipContent,
@@ -301,6 +301,7 @@ export default async function DashboardLeagueKnockoutMatchesPage({
                   : awayTeamPlacehlder;
                 const leagueName = season.league.name;
                 const seasonName = season.year;
+                const countryName = season.league.country?.name;
                 const roundName = round;
                 const matchDate = date
                   ? getFormattedDateTime(date.toString())
@@ -320,86 +321,57 @@ export default async function DashboardLeagueKnockoutMatchesPage({
                       </span>
                       <span className="hidden sm:block">{awayTeamName}</span>
                     </TableCell>
-                    <TableCell className="dashboard-table-cell">
-                      <KnockoutScoreTableCell
-                        id={id}
-                        homeTeamName={homeTeamName || ""}
-                        awayTeamName={awayTeamName || ""}
-                        tournamentName={leagueName}
-                        editionName={seasonName}
-                        roundName={roundName || ""}
-                        date={matchDate}
-                        homeGoals={homeGoals}
-                        awayGoals={awayGoals}
-                        homeExtraTimeGoals={homeExtraTimeGoals}
-                        awayExtraTimeGoals={awayExtraTimeGoals}
-                        homePenaltyGoals={homePenaltyGoals}
-                        awayPenaltyGoals={awayPenaltyGoals}
-                        scoreTime="MT"
-                        type="leagueKnockoutMatches"
-                      />
-                    </TableCell>
-                    <TableCell className="dashboard-table-cell">
-                      <KnockoutScoreTableCell
-                        id={id}
-                        homeTeamName={homeTeamName || ""}
-                        awayTeamName={awayTeamName || ""}
-                        tournamentName={leagueName}
-                        editionName={seasonName}
-                        roundName={roundName || ""}
-                        date={matchDate}
-                        homeGoals={homeGoals}
-                        awayGoals={awayGoals}
-                        homeExtraTimeGoals={homeExtraTimeGoals}
-                        awayExtraTimeGoals={awayExtraTimeGoals}
-                        homePenaltyGoals={homePenaltyGoals}
-                        awayPenaltyGoals={awayPenaltyGoals}
-                        scoreTime="ET"
-                        type="leagueKnockoutMatches"
-                      />
-                    </TableCell>
-                    <TableCell className="dashboard-table-cell">
-                      <KnockoutScoreTableCell
-                        id={id}
-                        homeTeamName={homeTeamName || ""}
-                        awayTeamName={awayTeamName || ""}
-                        tournamentName={leagueName}
-                        editionName={seasonName}
-                        roundName={roundName || ""}
-                        date={matchDate}
-                        homeGoals={homeGoals}
-                        awayGoals={awayGoals}
-                        homeExtraTimeGoals={homeExtraTimeGoals}
-                        awayExtraTimeGoals={awayExtraTimeGoals}
-                        homePenaltyGoals={homePenaltyGoals}
-                        awayPenaltyGoals={awayPenaltyGoals}
-                        scoreTime="PT"
-                        type="leagueKnockoutMatches"
-                      />
-                    </TableCell>
+
+                    {["MT", "ET", "PT"].map((tc) => {
+                      const scoreTime =
+                        tc === "MT" ? "MT" : tc === "ET" ? "ET" : "PT";
+
+                      return (
+                        <TableCell className="dashboard-table-cell">
+                          <KnockoutScoreTableCell
+                            id={id}
+                            homeTeamName={homeTeamName || ""}
+                            awayTeamName={awayTeamName || ""}
+                            tournamentName={leagueName}
+                            editionName={seasonName}
+                            roundName={roundName || ""}
+                            date={matchDate}
+                            homeGoals={homeGoals}
+                            awayGoals={awayGoals}
+                            homeExtraTimeGoals={homeExtraTimeGoals}
+                            awayExtraTimeGoals={awayExtraTimeGoals}
+                            homePenaltyGoals={homePenaltyGoals}
+                            awayPenaltyGoals={awayPenaltyGoals}
+                            scoreTime={scoreTime}
+                            type="leagueKnockoutMatches"
+                          />
+                        </TableCell>
+                      );
+                    })}
+
                     <TableCell className="dashboard-table-cell">
                       <DateTimeTableCell date={date} />
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {round || <NotProvidedSpan />}
+                      {roundName || <NotProvidedSpan />}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {season.league.country?.name || <NotProvidedSpan />}
+                      {countryName || <NotProvidedSpan />}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {season.league.name}
+                      {leagueName}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
-                      {season.year}
+                      {seasonName}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <FeaturedSwitcher
+                            <FieldSwitcher
                               id={id}
                               type="leagueKnockoutMatches"
-                              isFeatured={isFeatured}
+                              value={isFeatured}
                             />
                           </TooltipTrigger>
                           <TooltipContent>

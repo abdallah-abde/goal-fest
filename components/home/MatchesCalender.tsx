@@ -25,10 +25,6 @@ export default function MatchesCalender() {
     router.push(`${pathname}?${newParams.toString()}`);
   }
 
-  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    changeParamsAndPush(e.target.value);
-  };
-
   const dateRef = useRef<HTMLInputElement>(null);
 
   function changeDate(isNext: boolean) {
@@ -54,7 +50,9 @@ export default function MatchesCalender() {
       <Input
         type="date"
         name="date"
-        onChange={handleDateChange}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          changeParamsAndPush(e.target.value);
+        }}
         value={date}
         className="bg-transparent border-none text-center cursor-pointer w-fit"
         ref={dateRef}

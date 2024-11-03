@@ -159,13 +159,20 @@ interface LeagueSeasonProps extends LeagueSeason {
 export interface NeutralMatch {
   dbId: number;
   id: string;
-  type: "GROUP" | "KNOCKOUT" | "LEAGUE";
-  tournamentEdition: TournamentEditionProps | null;
-  season: LeagueSeasonProps | null;
-  tournamentOrLeagueName: String;
-  tournamentOrLeagueYear: String;
-  country: String;
-  fullTournamentName: String;
+  type:
+    | "TOURNAMENT_MATCH"
+    | "TOURNAMENT_KNOCKOUT_MATCH"
+    | "LEAGUE_MATCH"
+    | "LEAGUE_KNOCKOUT_MATCH";
+  editionOrSeason: TournamentEditionProps | LeagueSeasonProps | null;
+  // season: LeagueSeasonProps | null;
+  editionOrSeasonLogoUrl: string;
+  editionOrSeasonSlug: string;
+  tournamentOrLeagueName: string;
+  tournamentOrLeagueYear: string;
+  country: string;
+  countryflagUrl: string | null;
+  fullTournamentName: string;
   homeTeam?: Team | LeagueTeam | null; // Not null in matches just in knockout
   awayTeam?: Team | LeagueTeam | null; // Not null in matches just in knockout
   homeGoals?: number | null;
@@ -179,10 +186,16 @@ export interface NeutralMatch {
   localDate?: string | null;
   localTime?: string | null;
   localDateOnlyDate?: string | null;
-  group?: Group | null; // Not existed in knockout just in matches
+  group?: Group | LeagueGroup | null; // Not existed in knockout just in matches
   round?: string | null;
   homeTeamPlaceholder?: string | null; // Not existed in matches just in knockout
   awayTeamPlaceholder?: string | null; // Not existed in matches just in knockout
   stage: string; // Not existed in matches or knockout
   status: string | null;
+  matchOf: "tournaments" | "leagues";
+}
+
+export interface TableHeadProps {
+  labels: Array<{ name: string; className?: string | null }>;
+  className: string;
 }

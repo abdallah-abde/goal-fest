@@ -8,7 +8,7 @@ import {
 import GroupsTable from "@/components/lists/tables/GroupsTables";
 import StandingsTables from "@/components/lists/tables/StandingsTables";
 
-export default async function GroupsPage({
+export default async function TournamentsStandingsPage({
   params,
   searchParams,
 }: {
@@ -70,7 +70,7 @@ export default async function GroupsPage({
       },
     });
 
-    const standings = await Promise.all(
+    standings = await Promise.all(
       groups.map(async (group) => ({
         ...group,
         teams: await Promise.all(

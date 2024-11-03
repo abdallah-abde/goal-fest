@@ -7,7 +7,7 @@ import {
 } from "@/lib/getAllMatchesRounds";
 import { getStartAndEndDates } from "@/lib/getFormattedDate";
 
-export default async function MatchesPage({
+export default async function TournamentMatchesPage({
   params,
   searchParams,
 }: {
@@ -107,7 +107,6 @@ export default async function MatchesPage({
             include: {
               homeTeam: true,
               awayTeam: true,
-              // tournamentEdition: true,
               tournamentEdition: {
                 include: {
                   tournament: true,
@@ -128,10 +127,11 @@ export default async function MatchesPage({
 
   return (
     <MatchesCards
-      tournamentEdition={tournamentEdition}
+      editionOrseason={tournamentEdition}
       matches={matches}
       knockoutMatches={knockoutMatches}
       rounds={rounds}
+      type="tournaments"
     />
   );
 }

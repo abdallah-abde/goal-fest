@@ -133,7 +133,7 @@ export async function updateKnockoutMatchFeaturedStatus(
   await prisma.knockoutMatch.update({
     where: { id },
     data: {
-      isFeatured,
+      isFeatured: !isFeatured,
     },
   });
 

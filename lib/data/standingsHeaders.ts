@@ -1,4 +1,4 @@
-export const homePageStandingsHeaders = new Array(
+export const standingsHeaders = new Array(
   {
     labels: [{ name: "Team" }],
     className: "dashboard-head-table-cell min-w-[150px] max-2xs:min-w-[100px]",

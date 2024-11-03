@@ -15,7 +15,10 @@ import {
 
 import PartsTitle from "@/components/home/PartsTitle";
 import CategorizedMatchesByTournamentOrLeague from "@/components/home/CategorizedMatchesByTournamentOrLeague";
+
 import { LoadingSpinner } from "@/components/LoadingComponents";
+import Image from "next/image";
+import { EmptyImageUrls } from "@/types/enums";
 
 export default function CountriesMatches({ date }: { date: string }) {
   const [allMatches, setAllMatches] = useState<Array<NeutralMatch>>([]);
@@ -23,6 +26,7 @@ export default function CountriesMatches({ date }: { date: string }) {
 
   useEffect(() => {
     async function getMatches() {
+      setIsLoading(true);
       try {
         const res = await fetch(`/api/matches/all/${date}`);
         const data = await res.json();
@@ -39,7 +43,13 @@ export default function CountriesMatches({ date }: { date: string }) {
     getMatches();
   }, [date]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading)
+    return (
+      <div className="flex gap-2 items-center">
+        <LoadingSpinner />
+        <span>Loading Matches By Countries</span>
+      </div>
+    );
 
   if (allMatches.length === 0) return;
 
@@ -52,7 +62,17 @@ export default function CountriesMatches({ date }: { date: string }) {
         {results.map(([countryName, list], idx) => (
           <AccordionItem key={idx} value={countryName}>
             <AccordionTrigger className="px-4 hover:no-underline">
-              {countryName}
+            <div className="flex gap-2 items-center">
+                <Image
+                  width={25}
+                  height={25}
+                  src={
+                    list[0].countryflagUrl || EmptyImageUrls.Country
+                  }
+                  alt={`${countryName} Flag`}
+                />
+                <p>{countryName}</p>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-0">
               <CategorizedMatchesByTournamentOrLeague matches={list} />

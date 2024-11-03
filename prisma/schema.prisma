@@ -62,6 +62,7 @@ model Team {
   knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
   groups                        Group[]
   code                          String?
+  isPopular                     Boolean             @default(false)
 }
 
 model Country {
@@ -274,6 +275,7 @@ model LeagueTeam {
   groups                 LeagueGroup[]
   countryId              Int?
   country                Country?              @relation(fields: [countryId], references: [id])
+  isPopular              Boolean               @default(false)
 }
 
 model LeagueGroup {

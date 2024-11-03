@@ -1,6 +1,11 @@
 import Image from "next/image";
 
-import { Tournament, TournamentEdition } from "@prisma/client";
+import {
+  Tournament,
+  TournamentEdition,
+  League,
+  LeagueSeason,
+} from "@prisma/client";
 
 import * as _ from "lodash";
 
@@ -12,6 +17,10 @@ interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
 }
 
+interface LeagueSeasonProps extends LeagueSeason {
+  league: League;
+}
+
 interface WinnerProps {
   winnerId: number;
   teamName: string;
@@ -20,13 +29,15 @@ interface WinnerProps {
 }
 
 export default function TournamentsTitleHolders({
-  tournamentEdition,
-  tournamentWinners,
+  editionOrSeason,
+  winners,
+  type,
 }: {
-  tournamentEdition: TournamentEditionProps;
-  tournamentWinners: WinnerProps[];
+  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
+  winners: WinnerProps[];
+  type: "tournaments" | "leagues";
 }) {
-  const results = Object.entries(_.groupBy(tournamentWinners, "teamName")).sort(
+  const results = Object.entries(_.groupBy(winners, "teamName")).sort(
     (a, b) => {
       if (a[1].length > b[1].length) {
         return -1;
@@ -36,11 +47,14 @@ export default function TournamentsTitleHolders({
     }
   );
 
+  const tournamentORLeagueName =
+    type === "tournaments"
+      ? (editionOrSeason as TournamentEditionProps).tournament.name
+      : (editionOrSeason as LeagueSeasonProps).league.name;
+
   return (
     <>
-      <PageHeader
-        label={`${tournamentEdition.tournament.name} Title Holders`}
-      />
+      <PageHeader label={`${tournamentORLeagueName} Title Holders`} />
       {results &&
         results.length > 0 &&
         results.map(([teamName, data]) => (

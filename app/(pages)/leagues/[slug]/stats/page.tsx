@@ -1,18 +1,15 @@
 import prisma from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
-import {
-  LeagueTotalCleanSheetsProps,
-  LeagueTotalGoalsProps,
-} from "@/types/totalStats";
+import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
 
 import PageHeader from "@/components/PageHeader";
-import LeagueTeamsStats from "@/components/lists/cards/stats/LeagueTeamsStats";
+import TeamsStats from "@/components/lists/cards/stats/TeamsStats";
 
 import {
-  getLeagueTeamsCleanSheets,
-  getLeagueTeamsGoalsAgainst,
-  getLeagueTeamsGoalsScored,
+  getTeamsCleanSheets,
+  getTeamsGoalsAgainst,
+  getTeamsGoalsScored,
 } from "@/lib/data/queries";
 
 export default async function LeaguesStatsPage({
@@ -34,14 +31,14 @@ export default async function LeaguesStatsPage({
           titleHolder: true,
         },
       }),
-      await prisma.$queryRaw<LeagueTotalGoalsProps[]>`${Prisma.raw(
-        getLeagueTeamsGoalsScored(slug)
+      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
+        getTeamsGoalsScored(slug, undefined, "leagues")
       )}`,
-      await prisma.$queryRaw<LeagueTotalGoalsProps[]>`${Prisma.raw(
-        getLeagueTeamsGoalsAgainst(slug)
+      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
+        getTeamsGoalsAgainst(slug, undefined, "leagues")
       )}`,
-      await prisma.$queryRaw<LeagueTotalCleanSheetsProps[]>`${Prisma.raw(
-        getLeagueTeamsCleanSheets(slug)
+      await prisma.$queryRaw<TotalCleanSheetsProps[]>`${Prisma.raw(
+        getTeamsCleanSheets(slug, undefined, "leagues")
       )}`,
     ]);
 
@@ -53,7 +50,7 @@ export default async function LeaguesStatsPage({
         label={`${leagueSeason.league.name} ${leagueSeason.year} Statistics`}
       />
 
-      <LeagueTeamsStats
+      <TeamsStats
         teamsGoalsScored={teamsGoalsScored}
         teamsGoalsAgainst={teamsGoalsAgainst}
         teamsCleanSheets={teamsCleanSheets}

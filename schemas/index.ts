@@ -119,7 +119,7 @@ export const GroupMatchSchema = z.object({
   round: z.string().optional(),
 });
 
-export const GroupMatchScoreSchema = z.object({
+export const MatchScoreSchema = z.object({
   homeGoals: z.coerce.number({ message: "Please enter a valid number" }),
   awayGoals: z.coerce.number({ message: "Please enter a valid number" }),
 });
@@ -264,14 +264,14 @@ export const LeagueMatchSchema = z.object({
   groupId: z.union([z.coerce.number().optional(), z.string()]),
 });
 
-export const LeagueMatchScoreSchema = z.object({
-  homeGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
-  awayGoals: z.coerce
-    .number({ message: "Please enter a valid number" })
-    .optional(),
-});
+// export const LeagueMatchScoreSchema = z.object({
+//   homeGoals: z.coerce
+//     .number({ message: "Please enter a valid number" })
+//     .optional(),
+//   awayGoals: z.coerce
+//     .number({ message: "Please enter a valid number" })
+//     .optional(),
+// });
 
 export const LeagueKnockoutMatchSchema = z.object({
   homeTeamId: z.union([

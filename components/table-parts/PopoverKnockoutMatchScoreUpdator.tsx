@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
@@ -68,6 +69,8 @@ export default function PopoverKnockoutMatchScoreUpdator({
     null
   );
 
+  const [onlyDate, onlyTime] = date.split(";");
+
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -79,7 +82,7 @@ export default function PopoverKnockoutMatchScoreUpdator({
             </h4>
             <div className="flex flex-col gap-2">
               <div className="flex gap-2 items-center justify-between border-b pb-2">
-                <div className="flex flex-col items-start">
+                <div className="flex flex-col items-center justify-center">
                   <span className="text-[16px] text-muted-background">
                     {tournamentName}
                   </span>
@@ -87,11 +90,23 @@ export default function PopoverKnockoutMatchScoreUpdator({
                     ({editionName})
                   </span>
                 </div>
-                {roundName && (
-                  <span className="text-sm text-muted-foreground">
-                    {roundName}
-                  </span>
-                )}
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Badge variant="destructive" className="hover:bg-destructive">
+                    {onlyDate}
+                  </Badge>
+                  {onlyTime && (
+                    <Badge variant="outline" className="pt-1">
+                      {onlyTime}
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  {roundName && (
+                    <span className="text-sm text-muted-foreground">
+                      {roundName}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2 items-center justify-between">
                 <span className="text-sm text-muted-foreground flex-1">
@@ -128,7 +143,7 @@ export default function PopoverKnockoutMatchScoreUpdator({
                 </div>
                 <FormFieldError error={error?.homeExtraTimeGoals} />
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="homePenaltyGoals">Pen</Label>
+                  <Label htmlFor="homePenaltyGoals">PT</Label>
                   <Input
                     id="homePenaltyGoals"
                     name="homePenaltyGoals"
@@ -160,7 +175,7 @@ export default function PopoverKnockoutMatchScoreUpdator({
                 </div>
                 <FormFieldError error={error?.awayExtraTimeGoals} />
                 <div className="flex flex-row-reverse items-center gap-2">
-                  <Label htmlFor="awayPenaltyGoals">Pen</Label>
+                  <Label htmlFor="awayPenaltyGoals">PT</Label>
                   <Input
                     id="awayPenaltyGoals"
                     name="awayPenaltyGoals"

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import {
   LeagueMatchSchema,
-  LeagueMatchScoreSchema,
+  MatchScoreSchema,
   MatchStatusSchema,
 } from "@/schemas";
 import { MatchStatusOptions } from "@/types/enums";
@@ -104,7 +104,7 @@ export async function updateLeagueMatchFeaturedStatus(
   await prisma.leagueMatch.update({
     where: { id },
     data: {
-      isFeatured,
+      isFeatured: !isFeatured,
     },
   });
 
@@ -121,7 +121,7 @@ export async function updateLeagueMatchScore(
 ) {
   const { id, searchParams } = args;
 
-  const result = LeagueMatchScoreSchema.safeParse(
+  const result = MatchScoreSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
 

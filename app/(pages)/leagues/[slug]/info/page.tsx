@@ -1,17 +1,14 @@
 import prisma from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
-import {
-  LeagueTotalCleanSheetsProps,
-  LeagueTotalGoalsProps,
-} from "@/types/totalStats";
+import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
 
-import LeaguesInfoCards from "@/components/lists/cards/edition-info-cards/LeaguesInfoCards";
+import InfoCards from "@/components/lists/cards/edition-info-cards/InfoCards";
 
 import {
-  getLeagueTeamsGoalsScored,
-  getLeagueTeamsGoalsAgainst,
-  getLeagueTeamsCleanSheets,
+  getTeamsGoalsAgainst,
+  getTeamsGoalsScored,
+  getTeamsCleanSheets,
 } from "@/lib/data/queries";
 
 export default async function LeaguesInfoPage({
@@ -34,9 +31,18 @@ export default async function LeaguesInfoPage({
             },
           },
           teams: true,
+          groups: true,
           winner: true,
           titleHolder: true,
           matches: {
+            include: {
+              group: true,
+              homeTeam: true,
+              awayTeam: true,
+              season: true,
+            },
+          },
+          knockoutMatches: {
             include: {
               homeTeam: true,
               awayTeam: true,
@@ -45,25 +51,26 @@ export default async function LeaguesInfoPage({
           },
         },
       }),
-      await prisma.$queryRaw<LeagueTotalGoalsProps[]>`${Prisma.raw(
-        getLeagueTeamsGoalsScored(slug, 5)
+      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
+        getTeamsGoalsScored(slug, 5, "leagues")
       )}`,
-      await prisma.$queryRaw<LeagueTotalGoalsProps[]>`${Prisma.raw(
-        getLeagueTeamsGoalsAgainst(slug, 5)
+      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
+        getTeamsGoalsAgainst(slug, 5, "leagues")
       )}`,
-      await prisma.$queryRaw<LeagueTotalCleanSheetsProps[]>`${Prisma.raw(
-        getLeagueTeamsCleanSheets(slug, 5)
+      await prisma.$queryRaw<TotalCleanSheetsProps[]>`${Prisma.raw(
+        getTeamsCleanSheets(slug, 5, "leagues")
       )}`,
     ]);
 
   if (!leagueSeason) throw new Error("Something went wrong");
 
   return (
-    <LeaguesInfoCards
-      leagueSeason={leagueSeason}
+    <InfoCards
+      editionOrSeason={leagueSeason}
       teamsGoalsScored={teamsGoalsScored}
       teamsGoalsAgainst={teamsGoalsAgainst}
       teamsCleanSheets={teamsCleanSheets}
+      type="leagues"
     />
   );
 }
