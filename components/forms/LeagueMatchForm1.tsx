@@ -1,4 +1,6 @@
 "use client";
+import { LeagueMatchSchema } from "@/schemas";
+import { z } from "zod";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,20 +21,20 @@ import {
   Country,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
-import { addLeagueMatch, updateLeagueMatch } from "@/actions/leagueMatches";
+import { addLeagueMatch1 } from "@/actions/leagueMatches";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
+import { toast } from "sonner";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useFormState } from "react-dom";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 import { Badge } from "@/components/ui/badge";
-import { Ban } from "lucide-react";
 
 interface LeagueMatchProps extends LeagueMatch {
   season: LeagueSeasonProps;
@@ -49,7 +51,7 @@ interface LeagueTeamProps extends LeagueTeam {
   country: Country | null;
 }
 
-export default function LeagueMatchForm({
+export default function LeagueMatchForm1({
   leagueMatch,
   // teams,
   leagues,
@@ -58,16 +60,25 @@ export default function LeagueMatchForm({
   // teams: Team[];
   leagues: League[];
 }) {
-  const [formState, formAction] = useFormState(
-    // leagueMatch == null
-    //   ?
-    addLeagueMatch,
-    // : updateLeagueMatch.bind(null, leagueMatch.id),
-    { errors: undefined, success: false, customError: null }
-  );
+  const [formState, formAction] = useFormState(addLeagueMatch1, {
+    message: "",
+    errors: undefined,
+    fieldValues: {
+      seasonId: "",
+      groupId: "",
+      date: "",
+      homeTeamId: "",
+      awayTeamId: "",
+      homeGoals: "",
+      awayGoals: "",
+      round: "",
+    },
+  });
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (formState.success) {
+    if (formState.message === "success") {
       formRef.current?.reset();
     }
   }, [formState]);
@@ -97,10 +108,6 @@ export default function LeagueMatchForm({
       (groups && groups.length > 0 && groups[0].id.toString()) ||
       null
   );
-
-  // const [groupTeams, setGroupTeams] = useState<LeagueTeamProps[] | null>(null);
-
-  // const [isGroupTeamsLoading, setIsGroupTeamsLoading] = useState(false);
 
   const [seasonTeams, setSeasonTeams] = useState<LeagueTeamProps[] | null>(
     null
@@ -182,16 +189,6 @@ export default function LeagueMatchForm({
     getTeams();
   }, [seasonId]);
 
-  const formRef = useRef<HTMLFormElement>(null);
-
-  // useEffect(() => {
-  //   console.log("USE EFFECT");
-
-  //   if (!error) {
-  //     formRef.current?.reset();
-  //   }
-  // }, [error]);
-
   useEffect(() => {
     async function getGroupTeams() {
       setIsTeamsLoading(true);
@@ -225,15 +222,14 @@ export default function LeagueMatchForm({
       <PageHeader
         label={leagueMatch ? "Edit League Match" : "Add League Match"}
       />
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+      {formState.message === "success" && (
+        <p className="bg-emerald-500 p-2 rounded-md text-emerald-900">
           Successfully Match Added
         </p>
       )}
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
+      {formState.message === "same team error" && (
+        <p className="bg-destructive p-2 rounded-md text-destructive-foreground">
+          Home team and away team cannot be the same, please change one of them!
         </p>
       )}
       <form action={formAction} className="form-styles" ref={formRef}>
@@ -361,10 +357,11 @@ export default function LeagueMatchForm({
             <Select
               name="homeTeamId"
               defaultValue={
-                leagueMatch?.homeTeamId?.toString() ||
-                homeTeamId ||
-                seasonTeams[0].id.toString() ||
-                undefined
+                // leagueMatch?.homeTeamId?.toString() ||
+                // homeTeamId ||
+                // seasonTeams[0].id.toString() ||
+                // undefined
+                formState.fieldValues.homeTeamId.toString()
               }
             >
               <SelectTrigger className="flex-1">
@@ -404,10 +401,11 @@ export default function LeagueMatchForm({
             <Select
               name="awayTeamId"
               defaultValue={
-                leagueMatch?.awayTeamId?.toString() ||
-                awayTeamId ||
-                seasonTeams[0].id.toString() ||
-                undefined
+                // leagueMatch?.awayTeamId?.toString() ||
+                // awayTeamId ||
+                // seasonTeams[0].id.toString() ||
+                // undefined
+                formState.fieldValues.awayTeamId.toString()
               }
             >
               <SelectTrigger className="flex-1">

@@ -1,7 +1,7 @@
 export default function FormFieldError({
   error,
 }: {
-  error: string[] | undefined;
+  error: string | undefined;
 }) {
-  return <>{error && <div className='text-destructive'>{error}</div>}</>;
+  return <>{error && <div className="text-destructive">{error}</div>}</>;
 }
