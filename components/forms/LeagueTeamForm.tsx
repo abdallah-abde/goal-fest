@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,15 +18,14 @@ import { Button } from "@/components/ui/button";
 
 import { Country, LeagueTeam } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import { addLeagueTeam, updateLeagueTeam } from "@/actions/leagueTeams";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
-import { useState } from "react";
-import { Eraser } from "lucide-react";
+
+import { Ban, Check, Eraser } from "lucide-react";
 
 export default function LeagueTeamForm({
   leagueTeam,
@@ -32,12 +34,24 @@ export default function LeagueTeamForm({
   leagueTeam?: LeagueTeam | null;
   countries: Country[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     leagueTeam == null
       ? addLeagueTeam
       : updateLeagueTeam.bind(null, leagueTeam.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (leagueTeam == null) {
+        setCountryValue(undefined);
+        setCountryKey(+new Date());
+      }
+    }
+  }, [formState]);
 
   const [countryValue, setCountryValue] = useState<number | undefined>(
     leagueTeam?.countryId || undefined
@@ -45,9 +59,22 @@ export default function LeagueTeamForm({
   const [countryKey, setCountryKey] = useState(+new Date());
 
   return (
-    <>
-      <PageHeader label={leagueTeam ? "Edit LeagueTeam" : "Add LeagueTeam"} />
-      <form action={action} className="form-styles">
+    <div className="overflow-auto px-4">
+      <PageHeader label={leagueTeam ? "Edit League Team" : "Add League Team"} />
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          League team has been {leagueTeam == null ? "added" : "updated"}{" "}
+          successfully
+        </p>
+      )}
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+      <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
           <Label htmlFor="name">Name</Label>
           <Input
@@ -57,7 +84,7 @@ export default function LeagueTeamForm({
             defaultValue={leagueTeam?.name || ""}
             autoFocus
           />
-          <FormFieldError error={error?.name} />
+          <FormFieldError error={formState.errors?.name} />
         </FormField>
         <FormField>
           <Label htmlFor="code">Team Code</Label>
@@ -67,24 +94,7 @@ export default function LeagueTeamForm({
             name="code"
             defaultValue={leagueTeam?.code || ""}
           />
-          <FormFieldError error={error?.code} />
-        </FormField>
-        <FormField>
-          <Label htmlFor="flagUrl">Flag</Label>
-          <Input type="file" id="flagUrl" name="flagUrl" />
-          {leagueTeam != null && leagueTeam?.flagUrl && (
-            <div className="current-flag-wrapper">
-              <Label>Current Flag</Label>
-              <Image
-                src={leagueTeam?.flagUrl || ""}
-                height="100"
-                width="100"
-                alt={`${(leagueTeam && leagueTeam.name) || "League Team"} Logo`}
-                className="w-20 h-20"
-              />
-              <FormFieldError error={error?.flagUrl} />
-            </div>
-          )}
+          <FormFieldError error={formState.errors?.code} />
         </FormField>
         <FormField>
           <Label htmlFor="countryId">Country</Label>
@@ -122,11 +132,28 @@ export default function LeagueTeamForm({
                 <Eraser strokeWidth="1.5px" />
               </Button>
             </div>
-            <FormFieldError error={error?.countryId} />
+            <FormFieldError error={formState.errors?.countryId} />
           </div>
+        </FormField>
+        <FormField>
+          <Label htmlFor="flagUrl">Flag</Label>
+          <Input type="file" id="flagUrl" name="flagUrl" />
+          {leagueTeam != null && leagueTeam?.flagUrl && (
+            <div className="current-flag-wrapper">
+              <Label>Current Flag</Label>
+              <Image
+                src={leagueTeam?.flagUrl || ""}
+                height={150}
+                width={150}
+                alt={`${(leagueTeam && leagueTeam.name) || "League Team"} Flag`}
+                className="aspect-video object-contain"
+              />
+              <FormFieldError error={formState.errors?.flagUrl} />
+            </div>
+          )}
         </FormField>
         <SubmitButton />
       </form>
-    </>
+    </div>
   );
 }

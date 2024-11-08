@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,6 @@ import { Button } from "@/components/ui/button";
 
 import { Country, League } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import { addLeague, updateLeague } from "@/actions/leagues";
 
 import PageHeader from "@/components/PageHeader";
@@ -25,7 +25,7 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { Eraser } from "lucide-react";
+import { Ban, Check, Eraser } from "lucide-react";
 import { LeagueTypes } from "@/types/enums";
 
 export default function LeagueForm({
@@ -35,20 +35,52 @@ export default function LeagueForm({
   league?: League | null;
   countries: Country[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     league == null ? addLeague : updateLeague.bind(null, league.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (league == null) {
+        setTypeValue(undefined);
+        setTypeKey(+new Date());
+
+        setCountryValue(undefined);
+        setCountryKey(+new Date());
+      }
+    }
+  }, [formState]);
 
   const [countryValue, setCountryValue] = useState<number | undefined>(
     league?.countryId || undefined
   );
   const [countryKey, setCountryKey] = useState(+new Date());
 
+  const [typeValue, setTypeValue] = useState<string | undefined>(
+    league?.type || undefined
+  );
+  const [typeKey, setTypeKey] = useState(+new Date());
+
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader label={league ? "Edit League" : "Add League"} />
-      <form action={action} className="form-styles">
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          League has been {league == null ? "added" : "updated"} successfully
+        </p>
+      )}
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+      <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
           <Label htmlFor="name">Name</Label>
           <Input
@@ -58,11 +90,15 @@ export default function LeagueForm({
             defaultValue={league?.name || ""}
             autoFocus
           />
-          <FormFieldError error={error?.name} />
+          <FormFieldError error={formState.errors?.name} />
         </FormField>
         <FormField>
           <Label htmlFor="type">Type</Label>
-          <Select name="type" defaultValue={league?.type || ""}>
+          <Select
+            name="type"
+            key={typeKey}
+            defaultValue={(typeValue && typeValue.toString()) || undefined}
+          >
             <SelectTrigger className="flex-1">
               <SelectValue placeholder="Choose Type" />
             </SelectTrigger>
@@ -74,7 +110,7 @@ export default function LeagueForm({
               ))}
             </SelectContent>
           </Select>
-          <FormFieldError error={error?.type} />
+          <FormFieldError error={formState.errors?.type} />
         </FormField>
         <FormField>
           <Label htmlFor="countryId">Country</Label>
@@ -112,7 +148,7 @@ export default function LeagueForm({
                 <Eraser strokeWidth="1.5px" />
               </Button>
             </div>
-            <FormFieldError error={error?.countryId} />
+            <FormFieldError error={formState.errors?.countryId} />
           </div>
         </FormField>
         <FormField>
@@ -120,20 +156,20 @@ export default function LeagueForm({
           <Input type="file" id="logoUrl" name="logoUrl" />
           {league != null && league?.logoUrl && (
             <div className="current-flag-wrapper">
-              <Label>Current Flag</Label>
+              <Label>Current Logo</Label>
               <Image
                 src={league?.logoUrl || ""}
-                height="100"
-                width="100"
+                height={150}
+                width={150}
                 alt={`${(league && league.name) || "League"} Logo`}
-                className="w-20 h-20"
+                className="aspect-video object-contain"
               />
-              <FormFieldError error={error?.logoUrl} />
+              <FormFieldError error={formState.errors?.logoUrl} />
             </div>
           )}
         </FormField>
         <SubmitButton />
       </form>
-    </>
+    </div>
   );
 }

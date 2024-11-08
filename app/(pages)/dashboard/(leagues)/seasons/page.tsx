@@ -18,17 +18,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/Filters";
 import PopoverStageUpdator from "@/components/table-parts/PopoverStageUpdator";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+
+import SeasonForm from "@/components/forms/SeasonForm";
+
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { League, LeagueTeam } from "@prisma/client";
 
 export default async function DashboardSeasonsPage({
   searchParams,
@@ -132,17 +137,17 @@ export default async function DashboardSeasonsPage({
     },
   ];
 
+  const leagues = await prisma.league.findMany();
+  const teams = await prisma.leagueTeam.findMany();
+
   return (
     <>
-      <PageHeader label="Leagues Seasons List" />
+      <PageHeader label="Seasons List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
         <Filters listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by league names, countries, years, winners, title holders ..." />
-        <AddNewLinkComponent
-          href="/dashboard/seasons/new"
-          label="Add New Season"
-        />
+        <FormDialog leagues={leagues} teams={teams} id={null} />
       </div>
       {seasons.length > 0 ? (
         <Table className="dashboard-table">
@@ -208,7 +213,9 @@ export default async function DashboardSeasonsPage({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">{slug}</TableCell>
-                  <ActionsCellDropDown editHref={`/dashboard/seasons/${id}`} />
+                  <TableCell>
+                    <FormDialog leagues={leagues} teams={teams} id={id} />
+                  </TableCell>
                 </TableRow>
               )
             )}
@@ -223,5 +230,50 @@ export default async function DashboardSeasonsPage({
         <NoDataFoundComponent message="No Seasons Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({
+  leagues,
+  teams,
+  id,
+}: {
+  leagues: League[];
+  teams: LeagueTeam[];
+  id: number | null;
+}) {
+  const leagueSeason = id
+    ? await prisma.leagueSeason.findUnique({
+        where: { id },
+        include: {
+          league: true,
+          teams: true,
+        },
+      })
+    : null;
+
+  if (id && !leagueSeason) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {leagueSeason == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <SeasonForm
+          leagues={leagues}
+          teams={teams}
+          leagueSeason={leagueSeason}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }

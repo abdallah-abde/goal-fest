@@ -16,6 +16,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import {
   getFormattedDateTime,
@@ -24,24 +31,21 @@ import {
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
-
-import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import SortByList from "@/components/table-parts/SortByList";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import Filters from "@/components/table-parts/Filters";
 import PopoverStatusUpdator from "@/components/table-parts/PopoverStatusUpdator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 import ScoreTableCell from "@/components/table-parts/ScoreTableCell";
+
+import LeagueMatchForm from "@/components/forms/LeagueMatchForm";
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { League } from "@prisma/client";
 
 export default async function DashboardLeagueMatchesPage({
   searchParams,
@@ -200,6 +204,8 @@ export default async function DashboardLeagueMatchesPage({
     },
   ];
 
+  const leagues = await prisma.league.findMany();
+
   return (
     <>
       <PageHeader label="Leagues Matches List" />
@@ -215,10 +221,7 @@ export default async function DashboardLeagueMatchesPage({
           }}
         />
         <SearchFieldComponent placeholder="Search by league names, years, group names, rounds, teams ..." />
-        <AddNewLinkComponent
-          href="/dashboard/league-matches/new"
-          label="Add New Match"
-        />
+        <FormDialog leagues={leagues} id={null} />
       </div>
       {leagueMatches.length > 0 ? (
         <Table className="dashboard-table">
@@ -377,9 +380,9 @@ export default async function DashboardLeagueMatchesPage({
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>
-                    <ActionsCellDropDown
-                      editHref={`/dashboard/league-matches/${id}`}
-                    />
+                    <TableCell>
+                      <FormDialog leagues={leagues} id={id} />
+                    </TableCell>
                   </TableRow>
                 );
               }
@@ -395,5 +398,48 @@ export default async function DashboardLeagueMatchesPage({
         <NoDataFoundComponent message="No League Matches Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({
+  leagues,
+  id,
+}: {
+  leagues: League[];
+  id: number | null;
+}) {
+  const leagueMatch = id
+    ? await prisma.leagueMatch.findUnique({
+        where: { id },
+        include: {
+          homeTeam: true,
+          awayTeam: true,
+          group: true,
+          season: {
+            include: { league: true },
+          },
+        },
+      })
+    : null;
+
+  if (id && !leagueMatch) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {leagueMatch == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <LeagueMatchForm leagues={leagues} leagueMatch={leagueMatch} />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -19,7 +23,6 @@ import {
   Country,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import { addLeagueMatch, updateLeagueMatch } from "@/actions/leagueMatches";
 
 import PageHeader from "@/components/PageHeader";
@@ -28,11 +31,9 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useRef, useState } from "react";
-
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
-import { Badge } from "@/components/ui/badge";
-import { Ban } from "lucide-react";
+
+import { Ban, Check } from "lucide-react";
 
 interface LeagueMatchProps extends LeagueMatch {
   season: LeagueSeasonProps;
@@ -51,24 +52,27 @@ interface LeagueTeamProps extends LeagueTeam {
 
 export default function LeagueMatchForm({
   leagueMatch,
-  // teams,
   leagues,
 }: {
   leagueMatch?: LeagueMatchProps | null;
-  // teams: Team[];
   leagues: League[];
 }) {
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [formState, formAction] = useFormState(
-    // leagueMatch == null
-    //   ?
-    addLeagueMatch,
-    // : updateLeagueMatch.bind(null, leagueMatch.id),
+    leagueMatch == null
+      ? addLeagueMatch
+      : updateLeagueMatch.bind(null, leagueMatch.id),
     { errors: undefined, success: false, customError: null }
   );
 
   useEffect(() => {
     if (formState.success) {
       formRef.current?.reset();
+      if (leagueMatch == null) {
+        setHomeTeamId(undefined);
+        setAwayTeamId(undefined);
+      }
     }
   }, [formState]);
 
@@ -98,26 +102,28 @@ export default function LeagueMatchForm({
       null
   );
 
-  // const [groupTeams, setGroupTeams] = useState<LeagueTeamProps[] | null>(null);
-
-  // const [isGroupTeamsLoading, setIsGroupTeamsLoading] = useState(false);
-
   const [seasonTeams, setSeasonTeams] = useState<LeagueTeamProps[] | null>(
     null
   );
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
-  const [homeTeamId, setHomeTeamId] = useState<string | null>(
-    leagueMatch?.homeTeamId?.toString() ||
-      (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
-      null
+  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
+
+  const [homeTeamId, setHomeTeamId] = useState<number | undefined>(
+    leagueMatch?.homeTeamId || undefined
+    // leagueMatch?.homeTeamId?.toString() ||
+    //   (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
+    //   null
   );
 
-  const [awayTeamId, setAwayTeamId] = useState<string | null>(
-    leagueMatch?.awayTeamId?.toString() ||
-      (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
-      null
+  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
+
+  const [awayTeamId, setAwayTeamId] = useState<number | undefined>(
+    leagueMatch?.awayTeamId || undefined
+    // leagueMatch?.awayTeamId?.toString() ||
+    //   (seasonTeams && seasonTeams.length > 0 && seasonTeams[0].id.toString()) ||
+    //   null
   );
 
   useEffect(() => {
@@ -169,9 +175,12 @@ export default function LeagueMatchForm({
         if (data.length > 0 && !leagueMatch) {
           setHomeTeamId(data[0].id.toString());
           setAwayTeamId(data[0].id.toString());
+        } else if (data.length > 0 && leagueMatch) {
+          setHomeTeamId(leagueMatch?.homeTeamId);
+          setAwayTeamId(leagueMatch?.awayTeamId);
         } else {
-          setHomeTeamId(null);
-          setAwayTeamId(null);
+          setHomeTeamId(undefined);
+          setAwayTeamId(undefined);
         }
       } else {
         setSeasonTeams([]);
@@ -181,16 +190,6 @@ export default function LeagueMatchForm({
 
     getTeams();
   }, [seasonId]);
-
-  const formRef = useRef<HTMLFormElement>(null);
-
-  // useEffect(() => {
-  //   console.log("USE EFFECT");
-
-  //   if (!error) {
-  //     formRef.current?.reset();
-  //   }
-  // }, [error]);
 
   useEffect(() => {
     async function getGroupTeams() {
@@ -202,14 +201,15 @@ export default function LeagueMatchForm({
 
         setSeasonTeams(data.teams);
 
-        if (data.teams.length > 0) {
-          if (data.length > 0 && !leagueMatch) {
-            setHomeTeamId(data[0].id.toString());
-            setAwayTeamId(data[0].id.toString());
-          } else {
-            setHomeTeamId(null);
-            setAwayTeamId(null);
-          }
+        if (data.length > 0 && !leagueMatch) {
+          setHomeTeamId(data[0].id.toString());
+          setAwayTeamId(data[0].id.toString());
+        } else if (data.length > 0 && leagueMatch) {
+          setHomeTeamId(leagueMatch?.homeTeamId);
+          setAwayTeamId(leagueMatch?.awayTeamId);
+        } else {
+          setHomeTeamId(undefined);
+          setAwayTeamId(undefined);
         }
       } else {
         setSeasonTeams([]);
@@ -221,13 +221,15 @@ export default function LeagueMatchForm({
   }, [groupId]);
 
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader
         label={leagueMatch ? "Edit League Match" : "Add League Match"}
       />
       {formState.success && (
         <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          Successfully Match Added
+          <Check size={20} />
+          Match has been {leagueMatch == null ? "added" : "updated"}{" "}
+          successfully
         </p>
       )}
       {formState.customError && (
@@ -360,9 +362,11 @@ export default function LeagueMatchForm({
             <Label htmlFor="homeTeamId">Home Team</Label>
             <Select
               name="homeTeamId"
+              key={homeTeamKey}
               defaultValue={
+                // (homeTeamId && homeTeamId.toString()) || undefined
                 leagueMatch?.homeTeamId?.toString() ||
-                homeTeamId ||
+                homeTeamId?.toString() ||
                 seasonTeams[0].id.toString() ||
                 undefined
               }
@@ -403,9 +407,11 @@ export default function LeagueMatchForm({
             <Label htmlFor="awayTeamId">Away Team</Label>
             <Select
               name="awayTeamId"
+              key={awayTeamKey}
               defaultValue={
+                // (awayTeamId && awayTeamId.toString()) || undefined
                 leagueMatch?.awayTeamId?.toString() ||
-                awayTeamId ||
+                awayTeamId?.toString() ||
                 seasonTeams[0].id.toString() ||
                 undefined
               }
@@ -496,6 +502,6 @@ export default function LeagueMatchForm({
           }
         />
       </form>
-    </>
+    </div>
   );
 }

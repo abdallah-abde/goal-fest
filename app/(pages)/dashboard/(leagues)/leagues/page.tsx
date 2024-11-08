@@ -22,17 +22,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
+
+import LeagueForm from "@/components/forms/LeagueForm";
+
+import { Country } from "@prisma/client";
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardleaguesPage({
   searchParams,
@@ -144,6 +149,8 @@ export default async function DashboardleaguesPage({
     },
   ];
 
+  const countries = await prisma.country.findMany();
+
   return (
     <>
       <PageHeader label="leagues List" />
@@ -151,10 +158,7 @@ export default async function DashboardleaguesPage({
         <SortByList list={sortingList} defaultField="name" />
         <Filters flagFilters={flagFilters} listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by league names, countries ..." />
-        <AddNewLinkComponent
-          href="/dashboard/leagues/new"
-          label="Add New League"
-        />
+        <FormDialog countries={countries} id={null} />
       </div>
       {leagues.length > 0 ? (
         <Table className="dashboard-table">
@@ -195,7 +199,9 @@ export default async function DashboardleaguesPage({
                     </Tooltip>
                   </TooltipProvider>
                 </TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/leagues/${id}`} />
+                <TableCell>
+                  <FormDialog countries={countries} id={id} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -209,5 +215,40 @@ export default async function DashboardleaguesPage({
         <NoDataFoundComponent message="No leagues Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({
+  countries,
+  id,
+}: {
+  countries: Country[];
+  id: number | null;
+}) {
+  const league = id
+    ? await prisma.league.findUnique({
+        where: { id },
+      })
+    : null;
+
+  if (id && !league) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {league == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <LeagueForm countries={countries} league={league} />
+      </DialogContent>
+    </Dialog>
   );
 }

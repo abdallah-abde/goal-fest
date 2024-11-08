@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,7 +21,6 @@ import {
   Country,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import { addLeagueGroup, updateLeagueGroup } from "@/actions/leagueGroups";
 
 import PageHeader from "@/components/PageHeader";
@@ -27,11 +29,11 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useRef, useState } from "react";
-
 import MultipleSelector, {
   MultipleSelectorRef,
 } from "@/components/ui/multiple-selector";
+
+import { Ban, Check } from "lucide-react";
 
 interface GroupProps extends LeagueGroup {
   season: LeagueSeasonProps;
@@ -53,10 +55,22 @@ export default function LeagueGroupForm({
   group?: GroupProps | null;
   leagues: League[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     group == null ? addLeagueGroup : updateLeagueGroup.bind(null, group.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (group == null) {
+        setSelectedTeams(undefined);
+        setTeamsKey(+new Date());
+      }
+    }
+  }, [formState]);
 
   const [leagueId, setLeagueId] = useState<string | null>(
     group?.season.leagueId.toString() ||
@@ -66,19 +80,15 @@ export default function LeagueGroupForm({
 
   const [isSeasonsLoading, setIsSeasonsLoading] = useState(false);
 
-  const [leaguesSeasons, setLeaguesSeasons] = useState<
-    LeagueSeasonProps[] | null
-  >(null);
+  const [seasons, setSeasons] = useState<LeagueSeasonProps[] | null>(null);
 
-  const [leagueSeasonId, setLeagueSeasonId] = useState<string | null>(
+  const [seasonId, setSeasonId] = useState<string | null>(
     group?.seasonId.toString() ||
-      (leaguesSeasons &&
-        leaguesSeasons.length > 0 &&
-        leaguesSeasons[0].id.toString()) ||
+      (seasons && seasons.length > 0 && seasons[0].id.toString()) ||
       null
   );
 
-  const [seasonTeams, setSeasonTeams] = useState<LeagueTeam[] | null>(null);
+  const [teams, setTeams] = useState<LeagueTeam[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
@@ -94,11 +104,11 @@ export default function LeagueGroupForm({
         const res = await fetch("/api/leagues-seasons/" + leagueId);
         const data: LeagueSeasonProps[] = await res.json();
 
-        setLeaguesSeasons(data);
+        setSeasons(data);
         if (data.length > 0) {
-          setLeagueSeasonId(data[0].id.toString());
+          setSeasonId(data[0].id.toString());
         } else {
-          setLeagueSeasonId(null);
+          setSeasonId(null);
         }
       }
       setIsSeasonsLoading(false);
@@ -111,20 +121,20 @@ export default function LeagueGroupForm({
     async function getTeams() {
       setIsTeamsLoading(true);
 
-      if (leagueSeasonId) {
-        const res = await fetch("/api/seasons-teams/" + leagueSeasonId);
+      if (seasonId) {
+        const res = await fetch("/api/seasons-teams/" + seasonId);
         const data = await res.json();
 
-        setSeasonTeams(data.teams);
+        setTeams(data.teams);
         // if (data.teams.length < 1) setSeasonTeams(null);
       } else {
-        setSeasonTeams(null);
+        setTeams(null);
       }
       setIsTeamsLoading(false);
     }
 
     getTeams();
-  }, [leagueSeasonId]);
+  }, [seasonId]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
   const [hiddenTeams, setHiddenTeams] = useState<string>(
@@ -137,6 +147,8 @@ export default function LeagueGroupForm({
         .join(",")) ||
       ""
   );
+
+  const [teamsKey, setTeamsKey] = useState(+new Date());
 
   const [selectedTeams, setSelectedTeams] = useState(
     (group &&
@@ -152,9 +164,25 @@ export default function LeagueGroupForm({
   );
 
   return (
-    <>
-      <PageHeader label={group ? "Edit Group" : "Add Group"} />
-      <form action={action} className="form-styles">
+    <div className="overflow-auto px-4">
+      <PageHeader label={group ? "Edit League Group" : "Add League Group"} />
+
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          League Group has been {group == null ? "added" : "updated"}{" "}
+          successfully
+        </p>
+      )}
+
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+
+      <form action={formAction} className="form-styles" ref={formRef}>
         {leagues && leagues.length > 0 ? (
           <FormField>
             <Label htmlFor="leagueId">League</Label>
@@ -187,30 +215,31 @@ export default function LeagueGroupForm({
             notFoundText="There is no Leagues, add some!"
           />
         )}
-        {leaguesSeasons && leaguesSeasons.length > 0 && !isSeasonsLoading ? (
+        {seasons && seasons.length > 0 && !isSeasonsLoading ? (
           <FormField>
             <Label htmlFor="seasonId">League Season</Label>
             <Select
               name="seasonId"
               defaultValue={
-                leaguesSeasons[0].id.toString() ||
                 group?.seasonId.toString() ||
+                seasonId ||
+                seasons[0].id.toString() ||
                 undefined
               }
-              onValueChange={(value) => setLeagueSeasonId(value)}
+              onValueChange={(value) => setSeasonId(value)}
             >
               <SelectTrigger className="flex-1">
                 <SelectValue placeholder="Choose Season" />
               </SelectTrigger>
               <SelectContent>
-                {leaguesSeasons.map(({ id, league, year }) => (
+                {seasons.map(({ id, league, year }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {`${league.name} ${year}`}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.seasonId} />
+            <FormFieldError error={formState.errors?.seasonId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -227,16 +256,17 @@ export default function LeagueGroupForm({
             name="name"
             defaultValue={group?.name || ""}
           />
-          <FormFieldError error={error?.name} />
+          <FormFieldError error={formState.errors?.name} />
         </FormField>
-        {seasonTeams && seasonTeams.length > 0 && !isTeamsLoading ? (
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="teams">Teams</Label>
             <Input type="hidden" id="teams" name="teams" value={hiddenTeams} />
             <MultipleSelector
               className="form-multiple-selector-styles"
               ref={teamsRef}
-              defaultOptions={seasonTeams.map(({ id, name }) => {
+              key={teamsKey}
+              defaultOptions={teams.map(({ id, name }) => {
                 return {
                   label: name,
                   value: name,
@@ -258,7 +288,7 @@ export default function LeagueGroupForm({
               }
               value={selectedTeams}
             />
-            <FormFieldError error={error?.teams} />
+            <FormFieldError error={formState.errors?.teams} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -273,14 +303,14 @@ export default function LeagueGroupForm({
             !leagues ||
             leagues.length <= 0 ||
             isSeasonsLoading ||
-            !leaguesSeasons ||
-            leaguesSeasons.length < 1 ||
+            !seasons ||
+            seasons.length < 1 ||
             isTeamsLoading ||
-            !seasonTeams ||
-            seasonTeams.length < 1
+            !teams ||
+            teams.length < 1
           }
         />
       </form>
-    </>
+    </div>
   );
 }

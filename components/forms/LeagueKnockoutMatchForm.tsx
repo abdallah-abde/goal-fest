@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -21,7 +25,6 @@ import {
   Country,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import {
   addLeagueKnockoutMatch,
   updateLeagueKnockoutMatch,
@@ -33,10 +36,9 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useState } from "react";
-
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
-import { Badge } from "@/components/ui/badge";
+
+import { Ban, Check } from "lucide-react";
 
 interface MatchProps extends LeagueKnockoutMatch {
   season: LeagueSeasonProps;
@@ -56,19 +58,32 @@ interface LeagueTeamProps extends LeagueTeam {
 
 export default function LeagueKnockoutMatchForm({
   match,
-  // teams,
   leagues,
 }: {
   match?: MatchProps | null;
-  // teams: LeagueTeam[];
   leagues: League[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     match == null
       ? addLeagueKnockoutMatch
       : updateLeagueKnockoutMatch.bind(null, match.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (match == null) {
+        setHomeTeamValue(undefined);
+        setHomeTeamKey(+new Date());
+
+        setAwayTeamValue(undefined);
+        setAwayTeamKey(+new Date());
+      }
+    }
+  }, [formState]);
 
   const [leagueId, setLeagueId] = useState<string | null>(
     match?.season.leagueId.toString() ||
@@ -76,7 +91,7 @@ export default function LeagueKnockoutMatchForm({
       null
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSeasonsLoading, setIsSeasonsLoading] = useState(false);
 
   const [seasons, setSeasons] = useState<LeagueSeasonProps[] | null>(null);
 
@@ -90,9 +105,21 @@ export default function LeagueKnockoutMatchForm({
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
+  const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
+    match?.homeTeamId || undefined
+  );
+
+  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
+
+  const [awayTeamValue, setAwayTeamValue] = useState<number | undefined>(
+    match?.awayTeamId || undefined
+  );
+
+  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
+
   useEffect(() => {
     async function getSeasons() {
-      setIsLoading(true);
+      setIsSeasonsLoading(true);
 
       if (leagueId) {
         const res = await fetch("/api/leagues-seasons/" + leagueId);
@@ -102,7 +129,7 @@ export default function LeagueKnockoutMatchForm({
 
         if (data.length > 0 && !match) setSeasonId(data[0].id.toString());
       }
-      setIsLoading(false);
+      setIsSeasonsLoading(false);
     }
 
     getSeasons();
@@ -117,6 +144,16 @@ export default function LeagueKnockoutMatchForm({
         const data = await res.json();
 
         setTeams(data.teams);
+
+        if (data.length > 0 && !match) {
+          setHomeTeamValue(data[0].id.toString());
+          setAwayTeamValue(data[0].id.toString());
+        } else {
+          setHomeTeamValue(undefined);
+          setAwayTeamValue(undefined);
+        }
+      } else {
+        setTeams(null);
       }
       setIsTeamsLoading(false);
     }
@@ -124,24 +161,26 @@ export default function LeagueKnockoutMatchForm({
     getLeagueTeams();
   }, [seasonId]);
 
-  const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
-    match?.homeTeamId || undefined
-  );
-  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
-
-  const [awayTeamValue, setAwayTeamValue] = useState<number | undefined>(
-    match?.awayTeamId || undefined
-  );
-  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
-
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader
         label={
           match ? "Edit League Knockout Match" : "Add League Knockout Match"
         }
       />
-      <form action={action} className="form-styles">
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          Match has been {match == null ? "added" : "updated"} successfully
+        </p>
+      )}
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+      <form action={formAction} className="form-styles" ref={formRef}>
         {leagues && leagues.length > 0 ? (
           <FormField>
             <Label htmlFor="leagueId">League</Label>
@@ -174,7 +213,7 @@ export default function LeagueKnockoutMatchForm({
             notFoundText="There is no leagues, add some!"
           />
         )}
-        {seasons && seasons.length > 0 && !isLoading ? (
+        {seasons && seasons.length > 0 && !isSeasonsLoading ? (
           <FormField>
             <Label htmlFor="seasonId">League Season</Label>
             <Select
@@ -185,6 +224,7 @@ export default function LeagueKnockoutMatchForm({
                 seasons[0].id.toString() ||
                 undefined
               }
+              onValueChange={(value) => setSeasonId(value)}
             >
               <SelectTrigger className="flex-1">
                 <SelectValue placeholder="Choose Season" />
@@ -197,11 +237,11 @@ export default function LeagueKnockoutMatchForm({
                 ))}
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.seasonId} />
+            <FormFieldError error={formState.errors?.seasonId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
-            isLoading={isLoading}
+            isLoading={isSeasonsLoading}
             label="Loading Seasons..."
             notFoundText="There is no seasons, add some!"
           />
@@ -254,7 +294,7 @@ export default function LeagueKnockoutMatchForm({
                 </Button>
               </div>
             </div>
-            <FormFieldError error={error?.homeTeamId} />
+            <FormFieldError error={formState.errors?.homeTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -311,7 +351,7 @@ export default function LeagueKnockoutMatchForm({
                 </Button>
               </div>
             </div>
-            <FormFieldError error={error?.awayTeamId} />
+            <FormFieldError error={formState.errors?.awayTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -330,7 +370,7 @@ export default function LeagueKnockoutMatchForm({
               match?.homeGoals !== null ? match?.homeGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.homeGoals} />
+          <FormFieldError error={formState.errors?.homeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayGoals">Away Main Time Goals</Label>
@@ -342,7 +382,7 @@ export default function LeagueKnockoutMatchForm({
               match?.awayGoals !== null ? match?.awayGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.awayGoals} />
+          <FormFieldError error={formState.errors?.awayGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="homeExtraTimeGoals">Home Extra Time Goals</Label>
@@ -356,7 +396,7 @@ export default function LeagueKnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.homeExtraTimeGoals} />
+          <FormFieldError error={formState.errors?.homeExtraTimeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayExtraTimeGoals">Away Extra Time Goals</Label>
@@ -370,7 +410,7 @@ export default function LeagueKnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.awayExtraTimeGoals} />
+          <FormFieldError error={formState.errors?.awayExtraTimeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="homePenaltyGoals">Home Penalty</Label>
@@ -384,7 +424,7 @@ export default function LeagueKnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.homePenaltyGoals} />
+          <FormFieldError error={formState.errors?.homePenaltyGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayPenaltyGoals">Away Penalty</Label>
@@ -398,7 +438,7 @@ export default function LeagueKnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.awayPenaltyGoals} />
+          <FormFieldError error={formState.errors?.awayPenaltyGoals} />
         </FormField>
         <FormField>
           <div className="flex items-baseline gap-4 mt-2">
@@ -417,7 +457,7 @@ export default function LeagueKnockoutMatchForm({
                 : undefined
             }
           />
-          <FormFieldError error={error?.date} />
+          <FormFieldError error={formState.errors?.date} />
         </FormField>
         <FormField>
           <Label htmlFor="round">Round</Label>
@@ -427,7 +467,7 @@ export default function LeagueKnockoutMatchForm({
             name="round"
             defaultValue={match?.round || ""}
           />
-          <FormFieldError error={error?.round} />
+          <FormFieldError error={formState.errors?.round} />
         </FormField>
         <FormField>
           <Label htmlFor="homeTeamPlacehlder">Home Team Placeholder</Label>
@@ -439,7 +479,7 @@ export default function LeagueKnockoutMatchForm({
               match?.homeTeamPlacehlder ? match?.homeTeamPlacehlder : ""
             }
           />
-          <FormFieldError error={error?.homeTeamPlacehlder} />
+          <FormFieldError error={formState.errors?.homeTeamPlacehlder} />
         </FormField>
         <FormField>
           <Label htmlFor="awayTeamPlacehlder">Away Team Placeholder</Label>
@@ -451,12 +491,21 @@ export default function LeagueKnockoutMatchForm({
               match?.awayTeamPlacehlder ? match?.awayTeamPlacehlder : ""
             }
           />
-          <FormFieldError error={error?.awayTeamPlacehlder} />
+          <FormFieldError error={formState.errors?.awayTeamPlacehlder} />
         </FormField>
         <SubmitButton
-          isDisabled={isLoading || !seasons || seasons.length < 1}
+          isDisabled={
+            !leagues ||
+            leagues.length <= 0 ||
+            isSeasonsLoading ||
+            !seasons ||
+            seasons.length < 1 ||
+            isTeamsLoading ||
+            !teams ||
+            teams.length <= 0
+          }
         />
       </form>
-    </>
+    </div>
   );
 }
