@@ -26,6 +26,7 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { Ban, Check, Eraser } from "lucide-react";
+import { Continents } from "@/types/enums";
 
 export default function LeagueTeamForm({
   leagueTeam,
@@ -47,6 +48,9 @@ export default function LeagueTeamForm({
     if (formState.success) {
       formRef.current?.reset();
       if (leagueTeam == null) {
+        setTypeValue(undefined);
+        setTypeKey(+new Date());
+
         setCountryValue(undefined);
         setCountryKey(+new Date());
       }
@@ -58,9 +62,15 @@ export default function LeagueTeamForm({
   );
   const [countryKey, setCountryKey] = useState(+new Date());
 
+  const [typeValue, setTypeValue] = useState<string | undefined>(
+    leagueTeam?.type || undefined
+  );
+  const [typeKey, setTypeKey] = useState(+new Date());
+
   return (
     <div className="overflow-auto px-4">
       <PageHeader label={leagueTeam ? "Edit League Team" : "Add League Team"} />
+
       {formState.success && (
         <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
           <Check size={20} />
@@ -68,12 +78,14 @@ export default function LeagueTeamForm({
           successfully
         </p>
       )}
+
       {formState.customError && (
         <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
           <Ban size={20} />
           {formState.customError}
         </p>
       )}
+
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
           <Label htmlFor="name">Name</Label>
@@ -132,8 +144,8 @@ export default function LeagueTeamForm({
                 <Eraser strokeWidth="1.5px" />
               </Button>
             </div>
-            <FormFieldError error={formState.errors?.countryId} />
           </div>
+          <FormFieldError error={formState.errors?.countryId} />
         </FormField>
         <FormField>
           <Label htmlFor="flagUrl">Flag</Label>
@@ -151,6 +163,26 @@ export default function LeagueTeamForm({
               <FormFieldError error={formState.errors?.flagUrl} />
             </div>
           )}
+        </FormField>
+        <FormField>
+          <Label htmlFor="type">Type</Label>
+          <Select
+            name="type"
+            key={typeKey}
+            defaultValue={(typeValue && typeValue.toString()) || undefined}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Choose Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(Continents).map((type) => (
+                <SelectItem value={type} key={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <FormFieldError error={formState.errors?.type} />
         </FormField>
         <SubmitButton />
       </form>

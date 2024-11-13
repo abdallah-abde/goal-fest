@@ -33,6 +33,15 @@ export enum TournamentTypes {
   Oceanosia = "Oceanosia",
 }
 
+export enum Continents {
+  Europe = "Europe",
+  Asia = "Asia",
+  Africa = "Africa",
+  NorthAmerica = "North America",
+  SouthAmerica = "South America",
+  Oceanosia = "Oceanosia",
+}
+
 export enum LeagueTypes {
   Domestic = "Domestic",
   International = "International",

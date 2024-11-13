@@ -35,6 +35,7 @@ export const CountrySchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
   code: z.string().optional(),
+  type: z.string().min(1, { message: "Type is required!" }),
 });
 
 export const TeamSchema = z.object({
@@ -228,7 +229,11 @@ export const LeagueTeamSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
   code: z.string().optional(),
-  countryId: z.union([z.coerce.number().optional(), z.string()]),
+  countryId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Country is required" }),
+  type: z.string().min(1, { message: "Type is required!" }),
 });
 
 export const LeagueGroupSchema = z.object({
@@ -263,15 +268,6 @@ export const LeagueMatchSchema = z.object({
   round: z.string().optional(),
   groupId: z.union([z.coerce.number().optional(), z.string()]),
 });
-
-// export const LeagueMatchScoreSchema = z.object({
-//   homeGoals: z.coerce
-//     .number({ message: "Please enter a valid number" })
-//     .optional(),
-//   awayGoals: z.coerce
-//     .number({ message: "Please enter a valid number" })
-//     .optional(),
-// });
 
 export const LeagueKnockoutMatchSchema = z.object({
   homeTeamId: z.union([

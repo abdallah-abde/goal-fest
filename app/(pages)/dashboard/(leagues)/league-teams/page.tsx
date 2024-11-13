@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import { SortDirectionOptions, Continents } from "@/types/enums";
 
 import {
   Table,
@@ -19,6 +19,7 @@ import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
 import SortByList from "@/components/table-parts/SortByList";
+import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 import LeagueTeamForm from "@/components/forms/LeagueTeamForm";
@@ -35,12 +36,14 @@ export default async function DashboardLeagueTeamsPage({
     query?: string;
     sortDir?: SortDirectionOptions;
     sortField?: String;
+    type?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const typeCondition = searchParams?.type || "all";
 
   const where = {
     OR: [
@@ -48,6 +51,11 @@ export default async function DashboardLeagueTeamsPage({
       { name: { contains: query } },
       { code: { contains: query } },
     ],
+    ...(typeCondition !== "all"
+      ? {
+          type: typeCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -57,6 +65,8 @@ export default async function DashboardLeagueTeamsPage({
       ? { name: sortDir }
       : sortField === "code"
       ? { code: sortDir }
+      : sortField === "type"
+      ? { type: sortDir }
       : {}),
   };
 
@@ -77,7 +87,18 @@ export default async function DashboardLeagueTeamsPage({
   const sortingList = [
     { label: "Country", fieldName: "country" },
     { label: "Name", fieldName: "name" },
+    { label: "Type", fieldName: "type" },
     { label: "Code", fieldName: "code" },
+  ];
+
+  const listFilters = [
+    {
+      title: "Type",
+      fieldName: "type",
+      searchParamName: "type",
+      placeholder: "Choose Type...",
+      options: Object.values(Continents),
+    },
   ];
 
   const countries = await prisma.country.findMany();
@@ -87,6 +108,7 @@ export default async function DashboardLeagueTeamsPage({
       <PageHeader label="League Teams List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
+        <Filters listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by team names, codes ..." />
         <FormDialog countries={countries} id={null} />
       </div>
@@ -99,11 +121,12 @@ export default async function DashboardLeagueTeamsPage({
               </TableHead>
               <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">Code</TableHead>
+              <TableHead className="dashboard-head-table-cell">Type</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {LeagueTeams.map(({ id, name, code, country }) => (
+            {LeagueTeams.map(({ id, name, code, country, type }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">
                   {country?.name || <NotProvidedSpan />}
@@ -111,6 +134,9 @@ export default async function DashboardLeagueTeamsPage({
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">
                   {code || <NotProvidedSpan />}
+                </TableCell>
+                <TableCell className="dashboard-table-cell">
+                  {type || <NotProvidedSpan />}
                 </TableCell>
                 <TableCell>
                   <FormDialog countries={countries} id={id} />
@@ -121,7 +147,7 @@ export default async function DashboardLeagueTeamsPage({
           <DashboardTableFooter
             totalCount={totalLeagueTeamsCount}
             totalPages={totalPages}
-            colSpan={4}
+            colSpan={5}
           />
         </Table>
       ) : (
@@ -155,7 +181,7 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>

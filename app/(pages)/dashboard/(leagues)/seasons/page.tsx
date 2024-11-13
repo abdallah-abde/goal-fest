@@ -137,9 +137,6 @@ export default async function DashboardSeasonsPage({
     },
   ];
 
-  const leagues = await prisma.league.findMany();
-  const teams = await prisma.leagueTeam.findMany();
-
   return (
     <>
       <PageHeader label="Seasons List" />
@@ -147,7 +144,7 @@ export default async function DashboardSeasonsPage({
         <SortByList list={sortingList} defaultField="name" />
         <Filters listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by league names, countries, years, winners, title holders ..." />
-        <FormDialog leagues={leagues} teams={teams} id={null} />
+        <FormDialog id={null} />
       </div>
       {seasons.length > 0 ? (
         <Table className="dashboard-table">
@@ -214,7 +211,7 @@ export default async function DashboardSeasonsPage({
                   </TableCell>
                   <TableCell className="dashboard-table-cell">{slug}</TableCell>
                   <TableCell>
-                    <FormDialog leagues={leagues} teams={teams} id={id} />
+                    <FormDialog id={id} />
                   </TableCell>
                 </TableRow>
               )
@@ -233,20 +230,12 @@ export default async function DashboardSeasonsPage({
   );
 }
 
-async function FormDialog({
-  leagues,
-  teams,
-  id,
-}: {
-  leagues: League[];
-  teams: LeagueTeam[];
-  id: number | null;
-}) {
+async function FormDialog({ id }: { id: number | null }) {
   const leagueSeason = id
     ? await prisma.leagueSeason.findUnique({
         where: { id },
         include: {
-          league: true,
+          league: { include: { country: true } },
           teams: true,
         },
       })
@@ -263,16 +252,12 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <SeasonForm
-          leagues={leagues}
-          teams={teams}
-          leagueSeason={leagueSeason}
-        />
+        <SeasonForm leagueSeason={leagueSeason} />
       </DialogContent>
     </Dialog>
   );

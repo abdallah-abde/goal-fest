@@ -6,11 +6,12 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 import { ZodError } from "zod";
+import { LeagueTypes } from "@/types/enums";
 
 interface Fields {
   name: string;
-  logoUrl?: string;
-  countryId?: string;
+  logoUrl?: string | null;
+  countryId?: string | null;
   type: string;
 }
 
@@ -42,11 +43,13 @@ export async function addLeague(
 
     const data = result.data;
 
-    //   const league = await prisma.league.findFirst({
-    //     where: { name: data.name },
-    //   });
-
-    //   if (league) return { name: ["League existed"] };
+    if (data.type === LeagueTypes.Domestic && data.countryId === 0) {
+      return {
+        errors: undefined,
+        success: false,
+        customError: `Country is required when Type is ${LeagueTypes.Domestic}`,
+      };
+    }
 
     let logoUrlPath = "";
     if (data.logoUrl != null && data.logoUrl.size > 0) {
@@ -62,10 +65,10 @@ export async function addLeague(
 
     await prisma.league.create({
       data: {
-        name: data.name.toString(),
+        name: data.name,
         logoUrl: logoUrlPath,
         countryId: data.countryId ? +data.countryId : null,
-        type: data.type.toString(),
+        type: data.type,
       },
     });
 
@@ -110,11 +113,13 @@ export async function updateLeague(
 
     const data = result.data;
 
-    //   const existedLeague = await prisma.league.findFirst({
-    //     where: { AND: [{ name: data.name }, { id: { not: id } }] },
-    //   });
-
-    //   if (existedLeague) return { name: ["League existed"] };
+    if (data.type === LeagueTypes.Domestic && data.countryId === 0) {
+      return {
+        errors: undefined,
+        success: false,
+        customError: `Country is required when Type is ${LeagueTypes.Domestic}`,
+      };
+    }
 
     const league = await prisma.league.findUnique({ where: { id } });
 
@@ -167,21 +172,23 @@ export async function updateLeaguePopularStatus(
   isPopular: boolean,
   searchParams: string
 ) {
-  console.log("IS_POPULAR", isPopular);
+  try {
+    const currentLeague = await prisma.league.findUnique({
+      where: { id },
+    });
 
-  const currentLeague = await prisma.league.findUnique({
-    where: { id },
-  });
+    if (currentLeague == null) return notFound();
 
-  if (currentLeague == null) return notFound();
+    await prisma.league.update({
+      where: { id },
+      data: {
+        isPopular: !isPopular,
+      },
+    });
 
-  await prisma.league.update({
-    where: { id },
-    data: {
-      isPopular: !isPopular,
-    },
-  });
-
-  revalidatePath("/dashboard/leagues");
-  redirect(`/dashboard/leagues${searchParams ? `?${searchParams}` : ""}`);
+    revalidatePath("/dashboard/leagues");
+    // redirect(`/dashboard/leagues${searchParams ? `?${searchParams}` : ""}`);
+  } catch (error) {
+    console.log(error);
+  }
 }

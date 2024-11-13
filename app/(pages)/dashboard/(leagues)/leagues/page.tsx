@@ -242,7 +242,7 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>

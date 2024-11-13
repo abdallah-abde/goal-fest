@@ -3,15 +3,16 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { LeagueTeamSchema } from "@/schemas";
 import { ZodError } from "zod";
 
 interface Fields {
   name: string;
-  flagUrl?: string;
-  countryId?: string;
-  code?: string;
+  flagUrl?: string | null;
+  countryId?: string | null;
+  code?: string | null;
+  type: string;
 }
 
 interface ReturnType {
@@ -35,6 +36,7 @@ export async function addLeagueTeam(
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
+        type: result.error.formErrors.fieldErrors.type?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -66,10 +68,11 @@ export async function addLeagueTeam(
 
     await prisma.leagueTeam.create({
       data: {
-        name: data.name.toString(),
-        code: data.code ? data.code.toString() : null,
+        name: data.name,
+        code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
+        type: data.type,
       },
     });
 
@@ -86,6 +89,7 @@ export async function addLeagueTeam(
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
         countryId: errorMap["countryId"]?.[0],
+        type: errorMap["type"]?.[0],
       },
     };
   }
@@ -107,6 +111,7 @@ export async function updateLeagueTeam(
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
+        type: result.error.formErrors.fieldErrors.type?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -145,10 +150,11 @@ export async function updateLeagueTeam(
     await prisma.leagueTeam.update({
       where: { id },
       data: {
-        name: data.name.toString(),
-        code: data.code ? data.code.toString() : null,
+        name: data.name,
+        code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
+        type: data.type,
       },
     });
 
@@ -165,6 +171,7 @@ export async function updateLeagueTeam(
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
         countryId: errorMap["countryId"]?.[0],
+        type: errorMap["type"]?.[0],
       },
     };
   }

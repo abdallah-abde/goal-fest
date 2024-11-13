@@ -196,7 +196,7 @@ async function FormDialog({
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueGroupForm leagues={leagues} group={leagueGroup} />
+        <LeagueGroupForm group={leagueGroup} />
       </DialogContent>
     </Dialog>
   );

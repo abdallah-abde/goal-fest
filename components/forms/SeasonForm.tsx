@@ -7,15 +7,8 @@ import { useFormState } from "react-dom";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-import { LeagueSeason, League, LeagueTeam } from "@prisma/client";
+import { LeagueSeason, League, LeagueTeam, Country } from "@prisma/client";
 
 import { addLeagueSeason, updateLeagueSeason } from "@/actions/seasons";
 
@@ -29,21 +22,22 @@ import { Ban, Check } from "lucide-react";
 
 import MultipleSelector, {
   MultipleSelectorRef,
+  Option,
 } from "@/components/ui/multiple-selector";
 
 interface LeagueSeasonProps extends LeagueSeason {
-  league: League;
+  league: LeagueProps;
   teams: LeagueTeam[];
+}
+
+interface LeagueProps extends League {
+  country: Country | null;
 }
 
 export default function SeasonForm({
   leagueSeason,
-  leagues,
-  teams,
 }: {
   leagueSeason?: LeagueSeasonProps | null;
-  leagues: League[];
-  teams: LeagueTeam[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -58,37 +52,77 @@ export default function SeasonForm({
     if (formState.success) {
       formRef.current?.reset();
       if (leagueSeason == null) {
-        setSelectedTeams(undefined);
+        setSelectedTeams([]);
         setTeamsKey(+new Date());
       }
     }
   }, [formState]);
 
-  const teamsRef = useRef<MultipleSelectorRef>(null);
-  const [hiddenTeams, setHiddenTeams] = useState<string>(
-    (leagueSeason &&
-      leagueSeason.teams.length > 0 &&
-      leagueSeason.teams
-        .map(({ id }) => {
-          return id.toString();
-        })
-        .join(",")) ||
-      ""
+  const [selectedLeague, setSelectedLeague] = useState<Option[]>(
+    leagueSeason
+      ? [
+          {
+            dbValue: leagueSeason.league.id.toString(),
+            label: `${leagueSeason.league.name} ${
+              leagueSeason.league.country
+                ? `(${leagueSeason.league.country.name})`
+                : `(${leagueSeason.league.type})`
+            }`,
+            value: `${leagueSeason.league.name} ${
+              leagueSeason.league.country
+                ? `(${leagueSeason.league.country.name})`
+                : `(${leagueSeason.league.type})`
+            }`,
+          },
+        ]
+      : []
   );
 
+  const searchLeague = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch("/api/leagues/" + value);
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  const [teams, setTeams] = useState<LeagueTeam[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
+  useEffect(() => {
+    async function getTeams() {
+      setIsTeamsLoading(true);
+
+      if (selectedLeague.length > 0) {
+        const res = await fetch(
+          "/api/league-country-teams/" + selectedLeague[0].dbValue
+        );
+        const data = await res.json();
+
+        setTeams(data);
+      } else {
+        setTeams([]);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getTeams();
+  }, [selectedLeague]);
+
+  const teamsRef = useRef<MultipleSelectorRef>(null);
   const [teamsKey, setTeamsKey] = useState(+new Date());
 
-  const [selectedTeams, setSelectedTeams] = useState(
-    (leagueSeason &&
-      leagueSeason.teams.length > 0 &&
-      leagueSeason.teams.map(({ id, name }) => {
-        return {
-          label: name,
-          value: name,
-          dbValue: id.toString(),
-        };
-      })) ||
-      undefined
+  const [selectedTeams, setSelectedTeams] = useState<Option[]>(
+    leagueSeason
+      ? leagueSeason.teams.map(({ id, name }) => {
+          return {
+            label: name,
+            value: name,
+            dbValue: id.toString(),
+          };
+        })
+      : []
   );
 
   return (
@@ -115,37 +149,34 @@ export default function SeasonForm({
       )}
 
       <form action={formAction} className="form-styles" ref={formRef}>
-        {leagues && leagues.length > 0 ? (
-          <FormField>
-            <Label htmlFor="leagueId">League Name</Label>
-            <Select
-              name="leagueId"
-              defaultValue={
-                (leagueSeason?.leagueId && leagueSeason?.leagueId.toString()) ||
-                leagues[0].id.toString() ||
-                undefined
-              }
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose League" />
-              </SelectTrigger>
-              <SelectContent>
-                {leagues.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={formState.errors?.leagueId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=""
-            notFoundText="There is no leagues, add some!"
+        <FormField>
+          <Label htmlFor="leagueId">League</Label>
+          <Input
+            type="hidden"
+            id="leagueId"
+            name="leagueId"
+            value={selectedLeague[0]?.dbValue || ""}
           />
-        )}
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            onSearch={async (value) => {
+              const res = await searchLeague(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select league"
+            emptyIndicator={
+              <p className="empty-indicator">No leagues found.</p>
+            }
+            onChange={setSelectedLeague}
+            value={selectedLeague}
+            disabled={!!leagueSeason}
+          />
+          <FormFieldError error={formState.errors?.leagueId} />
+        </FormField>
+
         <FormField>
           <Label htmlFor="startYear">Start Year</Label>
           <Input
@@ -186,41 +217,56 @@ export default function SeasonForm({
             </div>
           )}
         </FormField>
-        <FormField>
-          <Label htmlFor="leagueTeams">Teams</Label>
-          <Input
-            type="hidden"
-            id="leagueTeams"
-            name="leagueTeams"
-            value={hiddenTeams}
-          />
-          <MultipleSelector
-            className="form-multiple-selector-styles"
-            ref={teamsRef}
-            key={teamsKey}
-            defaultOptions={teams.map(({ id, name }) => {
-              return {
-                label: name,
-                value: name,
-                dbValue: id.toString(),
-              };
-            })}
-            onChange={(options) => {
-              setHiddenTeams(
-                options
-                  .map((a) => {
+        {teams && teams.length > 0 && !isTeamsLoading ? (
+          <FormField>
+            <Label htmlFor="leagueTeams">Teams</Label>
+            <Input
+              type="hidden"
+              id="leagueTeams"
+              name="leagueTeams"
+              value={
+                selectedTeams
+                  ?.map((a) => {
                     return a.dbValue;
                   })
-                  .join(",")
-              );
-            }}
-            placeholder="Select teams you like to add to the league"
-            emptyIndicator={<p className="empty-indicator">No teams found.</p>}
-            value={selectedTeams}
+                  .join(",") || ""
+              }
+            />
+            <MultipleSelector
+              className="form-multiple-selector-styles"
+              ref={teamsRef}
+              key={teamsKey}
+              defaultOptions={teams.map(({ id, name }) => {
+                return {
+                  label: name,
+                  value: name,
+                  dbValue: id.toString(),
+                };
+              })}
+              placeholder="Select teams"
+              emptyIndicator={
+                <p className="empty-indicator">No teams found.</p>
+              }
+              loadingIndicator={
+                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                  loading...
+                </p>
+              }
+              onChange={setSelectedTeams}
+              value={selectedTeams}
+            />
+            <FormFieldError error={formState.errors?.teams} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={isTeamsLoading}
+            label="Loading Teams..."
+            notFoundText="There is no teams, add some!"
           />
-          <FormFieldError error={formState.errors?.teams} />
-        </FormField>
-        <SubmitButton isDisabled={!leagues || leagues.length <= 0} />
+        )}
+        <SubmitButton
+          isDisabled={selectedLeague.length === 0 || isTeamsLoading}
+        />
       </form>
     </div>
   );

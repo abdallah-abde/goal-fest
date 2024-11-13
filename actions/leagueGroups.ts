@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { LeagueGroupSchema } from "@/schemas";
 import { ZodError } from "zod";
 
@@ -65,7 +65,7 @@ export async function addLeagueGroup(
 
     await prisma.leagueGroup.create({
       data: {
-        name: data.name.toString(),
+        name: data.name,
         seasonId: +data.seasonId,
         teams: {
           connect: ts,
@@ -151,7 +151,7 @@ export async function updateLeagueGroup(
     await prisma.leagueGroup.update({
       where: { id },
       data: {
-        name: data.name.toString(),
+        name: data.name,
         seasonId: +data.seasonId,
         teams: {
           disconnect: currentGroup?.teams,

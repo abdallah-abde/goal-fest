@@ -73,6 +73,7 @@ model Country {
   leagues            League[]
   leagueTeams        LeagueTeam[]
   code               String?
+  type               String? // e.g., 'international', 'europe', 'asia' ...
 }
 
 model Match {
@@ -276,6 +277,7 @@ model LeagueTeam {
   countryId              Int?
   country                Country?              @relation(fields: [countryId], references: [id])
   isPopular              Boolean               @default(false)
+  type                   String?
 }
 
 model LeagueGroup {

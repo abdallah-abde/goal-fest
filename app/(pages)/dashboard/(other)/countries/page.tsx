@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import { Continents, SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -12,15 +12,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
+import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+
+import CountryForm from "@/components/forms/CountryForm";
+
+import { Country } from "@prisma/client";
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardCountriesPage({
   searchParams,
@@ -30,15 +36,22 @@ export default async function DashboardCountriesPage({
     query?: string;
     sortDir?: SortDirectionOptions;
     sortField?: String;
+    type?: string;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const typeCondition = searchParams?.type || "all";
 
   const where = {
     OR: [{ name: { contains: query } }, { code: { contains: query } }],
+    ...(typeCondition !== "all"
+      ? {
+          type: typeCondition,
+        }
+      : {}),
   };
 
   const orderBy = {
@@ -46,6 +59,8 @@ export default async function DashboardCountriesPage({
       ? { name: sortDir }
       : sortField === "code"
       ? { code: sortDir }
+      : sortField === "type"
+      ? { type: sortDir }
       : {}),
   };
 
@@ -69,6 +84,17 @@ export default async function DashboardCountriesPage({
   const sortingList = [
     { label: "Name", fieldName: "name" },
     { label: "Code", fieldName: "code" },
+    { label: "Type", fieldName: "type" },
+  ];
+
+  const listFilters = [
+    {
+      title: "Type",
+      fieldName: "type",
+      searchParamName: "type",
+      placeholder: "Choose Type...",
+      options: Object.values(Continents),
+    },
   ];
 
   return (
@@ -76,11 +102,9 @@ export default async function DashboardCountriesPage({
       <PageHeader label="Countries List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
+        <Filters listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by country names, codes ..." />
-        <AddNewLinkComponent
-          href="/dashboard/countries/new"
-          label="Add New Country"
-        />
+        <FormDialog id={null} />
       </div>
       {countries.length > 0 ? (
         <Table className="dashboard-table">
@@ -88,29 +112,64 @@ export default async function DashboardCountriesPage({
             <TableRow className="dashboard-head-table-row">
               <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">Code</TableHead>
+              <TableHead className="dashboard-head-table-cell">Type</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {countries.map(({ id, name, code }) => (
+            {countries.map(({ id, name, code, type }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">
                   {code || <NotProvidedSpan />}
                 </TableCell>
-                <ActionsCellDropDown editHref={`/dashboard/countries/${id}`} />
+                <TableCell className="dashboard-table-cell">
+                  {type || <NotProvidedSpan />}
+                </TableCell>
+                <TableCell>
+                  <FormDialog id={id} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
           <DashboardTableFooter
             totalCount={totalCountriesCount}
             totalPages={totalPages}
-            colSpan={3}
+            colSpan={4}
           />
         </Table>
       ) : (
         <NoDataFoundComponent message="No Countries Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({ id }: { id: number | null }) {
+  const country = id
+    ? await prisma.country.findUnique({
+        where: { id },
+      })
+    : null;
+
+  if (id && !country) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {country == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil className="size-5" />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <CountryForm country={country} />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -204,8 +204,6 @@ export default async function DashboardLeagueMatchesPage({
     },
   ];
 
-  const leagues = await prisma.league.findMany();
-
   return (
     <>
       <PageHeader label="Leagues Matches List" />
@@ -221,7 +219,7 @@ export default async function DashboardLeagueMatchesPage({
           }}
         />
         <SearchFieldComponent placeholder="Search by league names, years, group names, rounds, teams ..." />
-        <FormDialog leagues={leagues} id={null} />
+        <FormDialog id={null} />
       </div>
       {leagueMatches.length > 0 ? (
         <Table className="dashboard-table">
@@ -381,7 +379,7 @@ export default async function DashboardLeagueMatchesPage({
                       </TooltipProvider>
                     </TableCell>
                     <TableCell>
-                      <FormDialog leagues={leagues} id={id} />
+                      <FormDialog id={id} />
                     </TableCell>
                   </TableRow>
                 );
@@ -401,22 +399,16 @@ export default async function DashboardLeagueMatchesPage({
   );
 }
 
-async function FormDialog({
-  leagues,
-  id,
-}: {
-  leagues: League[];
-  id: number | null;
-}) {
+async function FormDialog({ id }: { id: number | null }) {
   const leagueMatch = id
     ? await prisma.leagueMatch.findUnique({
         where: { id },
         include: {
-          homeTeam: true,
-          awayTeam: true,
+          homeTeam: { include: { country: true } },
+          awayTeam: { include: { country: true } },
           group: true,
           season: {
-            include: { league: true },
+            include: { league: { include: { country: true } } },
           },
         },
       })
@@ -433,12 +425,12 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueMatchForm leagues={leagues} leagueMatch={leagueMatch} />
+        <LeagueMatchForm leagueMatch={leagueMatch} />
       </DialogContent>
     </Dialog>
   );
