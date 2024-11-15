@@ -51,7 +51,7 @@ export default function ScoreTableCell({
             type={type}
           >
             <span className="hover:underline">
-              {!homeGoals && !awayGoals ? (
+              {homeGoals === null && awayGoals === null ? (
                 <NotProvidedSpan hover={true}>#NP</NotProvidedSpan>
               ) : (
                 <>

@@ -36,12 +36,19 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
-
 import { Ban, Check } from "lucide-react";
+
+import MultipleSelector, {
+  MultipleSelectorRef,
+  Option,
+} from "@/components/ui/multiple-selector";
+
+import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface MatchProps extends LeagueKnockoutMatch {
   season: LeagueSeasonProps;
+  homeTeam: LeagueTeamProps | null;
+  awayTeam: LeagueTeamProps | null;
 }
 
 interface LeagueSeasonProps extends LeagueSeason {
@@ -58,10 +65,8 @@ interface LeagueTeamProps extends LeagueTeam {
 
 export default function LeagueKnockoutMatchForm({
   match,
-  leagues,
 }: {
   match?: MatchProps | null;
-  leagues: League[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -85,81 +90,105 @@ export default function LeagueKnockoutMatchForm({
     }
   }, [formState]);
 
-  const [leagueId, setLeagueId] = useState<string | null>(
-    match?.season.leagueId.toString() ||
-      (leagues && leagues.length > 0 && leagues[0].id.toString()) ||
-      null
+  const [selectedLeague, setSelectedLeague] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match.season.leagueId.toString(),
+            label: `${match.season.league.name} ${
+              match.season.league.country
+                ? `(${match.season.league.country.name})`
+                : `(${match.season.league.type})`
+            }`,
+            value: `${match.season.league.name} ${
+              match.season.league.country
+                ? `(${match.season.league.country.name})`
+                : `(${match.season.league.type})`
+            }`,
+          },
+        ]
+      : []
   );
 
-  const [isSeasonsLoading, setIsSeasonsLoading] = useState(false);
+  const searchLeague = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch("/api/leagues/" + value);
+      const data = await res.json();
+      resolve(data);
+    });
+  };
 
-  const [seasons, setSeasons] = useState<LeagueSeasonProps[] | null>(null);
+  useEffect(() => {
+    if (match == null) {
+      setSelectedSeason([]);
+      setSeasonsKey(+new Date());
+    }
+  }, [selectedLeague, match]);
 
-  const [seasonId, setSeasonId] = useState<string | null>(
-    match?.seasonId.toString() ||
-      (seasons && seasons.length > 0 && seasons[0].id.toString()) ||
-      null
+  const [selectedSeason, setSelectedSeason] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match?.seasonId.toString(),
+            label: `${match?.season.league.name} ${match?.season.year}`,
+            value: `${match?.season.league.name} ${match?.season.year}`,
+          },
+        ]
+      : []
   );
+
+  const searchSeason = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch(
+        `/api/league-seasons/${selectedLeague[0].dbValue}/${value}`
+      );
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  const [seasonsKey, setSeasonsKey] = useState(+new Date());
+
+  const seasonsRef = useRef<MultipleSelectorRef>(null);
 
   const [teams, setTeams] = useState<LeagueTeamProps[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
-  const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
-    match?.homeTeamId || undefined
-  );
-
-  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
-
-  const [awayTeamValue, setAwayTeamValue] = useState<number | undefined>(
-    match?.awayTeamId || undefined
-  );
-
-  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
-
   useEffect(() => {
-    async function getSeasons() {
-      setIsSeasonsLoading(true);
-
-      if (leagueId) {
-        const res = await fetch("/api/leagues-seasons/" + leagueId);
-        const data = await res.json();
-
-        setSeasons(data);
-
-        if (data.length > 0 && !match) setSeasonId(data[0].id.toString());
-      }
-      setIsSeasonsLoading(false);
-    }
-
-    getSeasons();
-  }, [leagueId]);
-
-  useEffect(() => {
-    async function getLeagueTeams() {
+    async function getTeams() {
       setIsTeamsLoading(true);
 
-      if (seasonId) {
-        const res = await fetch("/api/seasons-teams/" + seasonId);
+      if (selectedSeason.length > 0) {
+        const res = await fetch(
+          "/api/seasons-teams/" + selectedSeason[0].dbValue
+        );
         const data = await res.json();
 
         setTeams(data.teams);
-
-        if (data.length > 0 && !match) {
-          setHomeTeamValue(data[0].id.toString());
-          setAwayTeamValue(data[0].id.toString());
-        } else {
-          setHomeTeamValue(undefined);
-          setAwayTeamValue(undefined);
-        }
       } else {
         setTeams(null);
       }
       setIsTeamsLoading(false);
     }
 
-    getLeagueTeams();
-  }, [seasonId]);
+    getTeams();
+  }, [selectedSeason]);
+
+  const teamsRef = useRef<MultipleSelectorRef>(null);
+  const [teamsKey, setTeamsKey] = useState(+new Date());
+
+  const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
+    match?.homeTeamId?.toString() || undefined
+  );
+
+  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
+
+  const [awayTeamValue, setAwayTeamValue] = useState<string | undefined>(
+    match?.awayTeamId?.toString() || undefined
+  );
+
+  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
 
   return (
     <div className="overflow-auto px-4">
@@ -168,84 +197,90 @@ export default function LeagueKnockoutMatchForm({
           match ? "Edit League Knockout Match" : "Add League Knockout Match"
         }
       />
+
       {formState.success && (
         <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
           <Check size={20} />
           Match has been {match == null ? "added" : "updated"} successfully
         </p>
       )}
+
       {formState.customError && (
         <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
           <Ban size={20} />
           {formState.customError}
         </p>
       )}
+
       <form action={formAction} className="form-styles" ref={formRef}>
-        {leagues && leagues.length > 0 ? (
-          <FormField>
-            <Label htmlFor="leagueId">League</Label>
-            <Select
-              name="leagueId"
-              defaultValue={
-                match?.season.leagueId.toString() ||
-                leagueId ||
-                leagues[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setLeagueId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose League" />
-              </SelectTrigger>
-              <SelectContent>
-                {leagues.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=""
-            notFoundText="There is no leagues, add some!"
+        <FormField>
+          <Label htmlFor="leagueId">League</Label>
+          <Input
+            type="hidden"
+            id="leagueId"
+            name="leagueId"
+            value={selectedLeague[0]?.dbValue || ""}
           />
-        )}
-        {seasons && seasons.length > 0 && !isSeasonsLoading ? (
-          <FormField>
-            <Label htmlFor="seasonId">League Season</Label>
-            <Select
-              name="seasonId"
-              defaultValue={
-                match?.seasonId.toString() ||
-                seasonId ||
-                seasons[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setSeasonId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Season" />
-              </SelectTrigger>
-              <SelectContent>
-                {seasons.map(({ id, league, year }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {`${league.name} ${year}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={formState.errors?.seasonId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isSeasonsLoading}
-            label="Loading Seasons..."
-            notFoundText="There is no seasons, add some!"
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchLeague(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select league"
+            emptyIndicator={
+              <p className="empty-indicator">No leagues found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedLeague}
+            value={selectedLeague}
+            disabled={!!match}
           />
-        )}
+        </FormField>
+
+        <FormField>
+          <Label htmlFor="seasonId">Season</Label>
+          <Input
+            type="hidden"
+            id="seasonId"
+            name="seasonId"
+            value={selectedSeason[0]?.dbValue || ""}
+          />
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            key={seasonsKey}
+            onSearch={async (value) => {
+              const res = await searchSeason(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select season"
+            emptyIndicator={
+              <p className="empty-indicator">No seasons found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            ref={seasonsRef}
+            onChange={setSelectedSeason}
+            value={selectedSeason}
+            disabled={!!match || selectedLeague.length === 0}
+          />
+        </FormField>
+
         {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="homeTeamId">Home Team</Label>
@@ -254,9 +289,7 @@ export default function LeagueKnockoutMatchForm({
                 <Select
                   name="homeTeamId"
                   key={homeTeamKey}
-                  defaultValue={
-                    (homeTeamValue && homeTeamValue.toString()) || undefined
-                  }
+                  defaultValue={homeTeamValue}
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose Home Team" />
@@ -303,6 +336,7 @@ export default function LeagueKnockoutMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="awayTeamId">Away Team</Label>
@@ -311,9 +345,7 @@ export default function LeagueKnockoutMatchForm({
                 <Select
                   name="awayTeamId"
                   key={awayTeamKey}
-                  defaultValue={
-                    (awayTeamValue && awayTeamValue.toString()) || undefined
-                  }
+                  defaultValue={awayTeamValue}
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose Away Team" />
@@ -360,6 +392,7 @@ export default function LeagueKnockoutMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         <FormField>
           <Label htmlFor="homeGoals">Home Main Time Goals</Label>
           <Input
@@ -372,6 +405,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.homeGoals} />
         </FormField>
+
         <FormField>
           <Label htmlFor="awayGoals">Away Main Time Goals</Label>
           <Input
@@ -384,6 +418,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.awayGoals} />
         </FormField>
+
         <FormField>
           <Label htmlFor="homeExtraTimeGoals">Home Extra Time Goals</Label>
           <Input
@@ -398,6 +433,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.homeExtraTimeGoals} />
         </FormField>
+
         <FormField>
           <Label htmlFor="awayExtraTimeGoals">Away Extra Time Goals</Label>
           <Input
@@ -412,6 +448,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.awayExtraTimeGoals} />
         </FormField>
+
         <FormField>
           <Label htmlFor="homePenaltyGoals">Home Penalty</Label>
           <Input
@@ -426,6 +463,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.homePenaltyGoals} />
         </FormField>
+
         <FormField>
           <Label htmlFor="awayPenaltyGoals">Away Penalty</Label>
           <Input
@@ -440,6 +478,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.awayPenaltyGoals} />
         </FormField>
+
         <FormField>
           <div className="flex items-baseline gap-4 mt-2">
             <Label htmlFor="date">Date</Label>
@@ -459,6 +498,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.date} />
         </FormField>
+
         <FormField>
           <Label htmlFor="round">Round</Label>
           <Input
@@ -469,6 +509,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.round} />
         </FormField>
+
         <FormField>
           <Label htmlFor="homeTeamPlacehlder">Home Team Placeholder</Label>
           <Input
@@ -481,6 +522,7 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.homeTeamPlacehlder} />
         </FormField>
+
         <FormField>
           <Label htmlFor="awayTeamPlacehlder">Away Team Placeholder</Label>
           <Input
@@ -493,16 +535,14 @@ export default function LeagueKnockoutMatchForm({
           />
           <FormFieldError error={formState.errors?.awayTeamPlacehlder} />
         </FormField>
+
         <SubmitButton
           isDisabled={
-            !leagues ||
-            leagues.length <= 0 ||
-            isSeasonsLoading ||
-            !seasons ||
-            seasons.length < 1 ||
+            selectedLeague.length === 0 ||
+            selectedSeason.length === 0 ||
             isTeamsLoading ||
             !teams ||
-            teams.length <= 0
+            teams.length === 0
           }
         />
       </form>

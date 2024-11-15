@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,14 +17,14 @@ import {
 
 import { Tournament } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import { addTournament, updateTournament } from "@/actions/tournaments";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
-import { useState } from "react";
+
+import { Ban, Check, Eraser } from "lucide-react";
 import { IsPopularOptions, TournamentTypes } from "@/types/enums";
 
 export default function TournamentForm({
@@ -29,12 +32,29 @@ export default function TournamentForm({
 }: {
   tournament?: Tournament | null;
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     tournament == null
       ? addTournament
       : updateTournament.bind(null, tournament.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
+
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (tournament == null) {
+        setTypeValue(undefined);
+        setTypeKey(+new Date());
+      }
+    }
+  }, [formState]);
+
+  const [typeValue, setTypeValue] = useState<string | undefined>(
+    tournament?.type || undefined
+  );
+  const [typeKey, setTypeKey] = useState(+new Date());
 
   const [isPopularValue, setIsPopularValue] = useState<string>(
     tournament?.isPopular ? IsPopularOptions.Yes : IsPopularOptions.No
@@ -42,9 +62,25 @@ export default function TournamentForm({
   const [isPopularKey, setIsPopularKey] = useState(+new Date());
 
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader label={tournament ? "Edit Tournament" : "Add Tournament"} />
-      <form action={action} className="form-styles">
+
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          Tournament has been {tournament == null ? "added" : "updated"}{" "}
+          successfully
+        </p>
+      )}
+
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+
+      <form action={formAction} className="form-styles">
         <FormField>
           <Label htmlFor="name">Name</Label>
           <Input
@@ -54,11 +90,15 @@ export default function TournamentForm({
             defaultValue={tournament?.name || ""}
             autoFocus
           />
-          <FormFieldError error={error?.name} />
+          <FormFieldError error={formState.errors?.name} />
         </FormField>
         <FormField>
           <Label htmlFor="type">Type</Label>
-          <Select name="type" defaultValue={tournament?.type || ""}>
+          <Select
+            name="type"
+            key={typeKey}
+            defaultValue={(typeValue && typeValue.toString()) || undefined}
+          >
             <SelectTrigger className="flex-1">
               <SelectValue placeholder="Choose Type" />
             </SelectTrigger>
@@ -70,7 +110,7 @@ export default function TournamentForm({
               ))}
             </SelectContent>
           </Select>
-          <FormFieldError error={error?.type} />
+          <FormFieldError error={formState.errors?.type} />
         </FormField>
         <FormField>
           <Label htmlFor="logoUrl">Logo</Label>
@@ -80,12 +120,12 @@ export default function TournamentForm({
               <Label>Current Logo</Label>
               <Image
                 src={tournament?.logoUrl || ""}
-                height="100"
-                width="100"
+                height={150}
+                width={150}
                 alt={`${(tournament && tournament.name) || "Tournament"} Logo`}
-                className="w-20 h-20"
+                className="aspect-video object-contain"
               />
-              <FormFieldError error={error?.logoUrl} />
+              <FormFieldError error={formState.errors?.logoUrl} />
             </div>
           )}
         </FormField>
@@ -109,11 +149,11 @@ export default function TournamentForm({
                 </SelectItem>
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.isPopular} />
+            <FormFieldError error={formState.errors?.isPopular} />
           </div>
         </FormField>
         <SubmitButton />
       </form>
-    </>
+    </div>
   );
 }

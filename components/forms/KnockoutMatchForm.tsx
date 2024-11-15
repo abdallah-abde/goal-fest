@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,8 +14,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-import { Eraser } from "lucide-react";
-
 import {
   KnockoutMatch,
   Team,
@@ -20,7 +21,6 @@ import {
   TournamentEdition,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import {
   addTournamentKnockoutMatch,
   updateTournamentKnockoutMatch,
@@ -32,12 +32,19 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useState } from "react";
+import { Ban, Check, Eraser } from "lucide-react";
+
+import MultipleSelector, {
+  MultipleSelectorRef,
+  Option,
+} from "@/components/ui/multiple-selector";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
 interface MatchProps extends KnockoutMatch {
   tournamentEdition: TournamentEditionProps;
+  homeTeam: Team | null;
+  awayTeam: Team | null;
 }
 
 interface TournamentEditionProps extends TournamentEdition {
@@ -46,160 +53,213 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function KnockoutMatchForm({
   match,
-  // teams,
-  tournaments,
 }: {
   match?: MatchProps | null;
-  // teams: Team[];
-  tournaments: Tournament[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     match == null
       ? addTournamentKnockoutMatch
       : updateTournamentKnockoutMatch.bind(null, match.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
-
-  const [tournamentId, setTournamentId] = useState<string | null>(
-    match?.tournamentEdition.tournamentId.toString() ||
-      (tournaments && tournaments.length > 0 && tournaments[0].id.toString()) ||
-      null
-  );
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [tournamentsEditions, setTournamentsEditions] = useState<
-    TournamentEditionProps[] | null
-  >(null);
-
-  const [tournamentEditionId, setTournamentEditionId] = useState<string | null>(
-    match?.tournamentEditionId.toString() ||
-      (tournamentsEditions &&
-        tournamentsEditions.length > 0 &&
-        tournamentsEditions[0].id.toString()) ||
-      null
-  );
-
-  const [groupTeams, setGroupTeams] = useState<Team[] | null>(null);
-
-  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
   useEffect(() => {
-    async function getEditions() {
-      setIsLoading(true);
+    if (formState.success) {
+      formRef.current?.reset();
+      if (match == null) {
+        setHomeTeamValue(undefined);
+        setHomeTeamKey(+new Date());
 
-      if (tournamentId) {
-        const res = await fetch("/api/tournaments-editions/" + tournamentId);
-        const data = await res.json();
-
-        setTournamentsEditions(data);
-
-        if (data.length > 0 && !match)
-          setTournamentEditionId(data[0].id.toString());
+        setAwayTeamValue(undefined);
+        setAwayTeamKey(+new Date());
       }
-      setIsLoading(false);
     }
+  }, [formState]);
 
-    getEditions();
-  }, [tournamentId]);
+  const [selectedTournament, setSelectedTournament] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match.tournamentEdition.tournament.id.toString(),
+            label: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
+            value: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
+          },
+        ]
+      : []
+  );
+
+  const searchTournament = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch("/api/tournaments/" + value);
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  useEffect(() => {
+    if (match == null) {
+      setSelectedEdition([]);
+      setEditionsKey(+new Date());
+    }
+  }, [selectedTournament, match]);
+
+  const [selectedEdition, setSelectedEdition] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match?.tournamentEditionId.toString(),
+            label: `${match?.tournamentEdition.tournament.name} ${match?.tournamentEdition.year}`,
+            value: `${match?.tournamentEdition.tournament.name} ${match?.tournamentEdition.year}`,
+          },
+        ]
+      : []
+  );
+
+  const searchEdition = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch(
+        `/api/tournament-editions/${selectedTournament[0].dbValue}/${value}`
+      );
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  const [editionsKey, setEditionsKey] = useState(+new Date());
+
+  const editionsRef = useRef<MultipleSelectorRef>(null);
+
+  const [teams, setTeams] = useState<Team[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
   useEffect(() => {
     async function getTeams() {
       setIsTeamsLoading(true);
 
-      if (tournamentEditionId) {
-        const res = await fetch("/api/editions-teams/" + tournamentEditionId);
+      if (selectedEdition.length > 0) {
+        const res = await fetch(
+          "/api/editions-teams/" + selectedEdition[0].dbValue
+        );
         const data = await res.json();
 
-        setGroupTeams(data.teams);
+        setTeams(data.teams);
+      } else {
+        setTeams(null);
       }
       setIsTeamsLoading(false);
     }
 
     getTeams();
-  }, [tournamentEditionId]);
+  }, [selectedEdition]);
 
-  const [homeTeamValue, setHomeTeamValue] = useState<number | undefined>(
-    match?.homeTeamId || undefined
+  const teamsRef = useRef<MultipleSelectorRef>(null);
+  const [teamsKey, setTeamsKey] = useState(+new Date());
+
+  const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
+    match?.homeTeamId?.toString() || undefined
   );
+
   const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
 
-  const [awayTeamValue, setAwayTeamValue] = useState<number | undefined>(
-    match?.awayTeamId || undefined
+  const [awayTeamValue, setAwayTeamValue] = useState<string | undefined>(
+    match?.awayTeamId?.toString() || undefined
   );
+
   const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
 
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader
         label={match ? "Edit Knockout Match" : "Add Knockout Match"}
       />
-      <form action={action} className="form-styles">
-        {tournaments && tournaments.length > 0 ? (
-          <FormField>
-            <Label htmlFor="tournamentId">Tournament</Label>
-            <Select
-              name="tournamentId"
-              defaultValue={
-                match?.tournamentEdition.tournamentId.toString() ||
-                tournamentId ||
-                tournaments[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setTournamentId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament" />
-              </SelectTrigger>
-              <SelectContent>
-                {tournaments.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=""
-            notFoundText="There is no tournaments, add some!"
+
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          Match has been {match == null ? "added" : "updated"} successfully
+        </p>
+      )}
+
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+
+      <form action={formAction} className="form-styles" ref={formRef}>
+        <FormField>
+          <Label htmlFor="tournamentId">Tournament</Label>
+          <Input
+            type="hidden"
+            id="tournamentId"
+            name="tournamentId"
+            value={selectedTournament[0]?.dbValue || ""}
           />
-        )}
-        {tournamentsEditions && tournamentsEditions.length > 0 && !isLoading ? (
-          <FormField>
-            <Label htmlFor="tournamentEditionId">Tournament Edition</Label>
-            <Select
-              name="tournamentEditionId"
-              defaultValue={
-                match?.tournamentEditionId.toString() ||
-                tournamentEditionId ||
-                tournamentsEditions[0].id.toString() ||
-                undefined
-              }
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament Edition" />
-              </SelectTrigger>
-              <SelectContent>
-                {tournamentsEditions.map(({ id, tournament, year }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {`${tournament.name} ${year.toString()}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={error?.tournamentEditionId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isLoading}
-            label="Loading Editions..."
-            notFoundText="There is no editions, add some!"
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchTournament(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select tournament"
+            emptyIndicator={
+              <p className="empty-indicator">No tournaments found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedTournament}
+            value={selectedTournament}
+            disabled={!!match}
           />
-        )}
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+        </FormField>
+
+        <FormField>
+          <Label htmlFor="tournamentEditionId">Edition</Label>
+          <Input
+            type="hidden"
+            id="tournamentEditionId"
+            name="tournamentEditionId"
+            value={selectedEdition[0]?.dbValue || ""}
+          />
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            key={editionsKey}
+            onSearch={async (value) => {
+              const res = await searchEdition(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select edition"
+            emptyIndicator={
+              <p className="empty-indicator">No editions found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            ref={editionsRef}
+            onChange={setSelectedEdition}
+            value={selectedEdition}
+            disabled={!!match || selectedTournament.length === 0}
+          />
+        </FormField>
+
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="homeTeamId">Home Team</Label>
             <div>
@@ -207,20 +267,13 @@ export default function KnockoutMatchForm({
                 <Select
                   name="homeTeamId"
                   key={homeTeamKey}
-                  defaultValue={
-                    (homeTeamValue && homeTeamValue.toString()) || undefined
-                  }
-                  // defaultValue={
-                  //   (match?.homeTeamId && match?.homeTeamId.toString()) ||
-                  //   teams[0].id.toString() ||
-                  //   undefined
-                  // }
+                  defaultValue={homeTeamValue}
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose Home Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groupTeams.map(({ id, name }) => (
+                    {teams.map(({ id, name }) => (
                       <SelectItem value={id.toString()} key={id}>
                         {name}
                       </SelectItem>
@@ -242,7 +295,7 @@ export default function KnockoutMatchForm({
                 </Button>
               </div>
             </div>
-            <FormFieldError error={error?.homeTeamId} />
+            <FormFieldError error={formState.errors?.homeTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -251,7 +304,8 @@ export default function KnockoutMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="awayTeamId">Away Team</Label>
             <div>
@@ -259,15 +313,13 @@ export default function KnockoutMatchForm({
                 <Select
                   name="awayTeamId"
                   key={awayTeamKey}
-                  defaultValue={
-                    (awayTeamValue && awayTeamValue.toString()) || undefined
-                  }
+                  defaultValue={awayTeamValue}
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose Away Team" />
                   </SelectTrigger>
                   <SelectContent>
-                    {groupTeams.map(({ id, name }) => (
+                    {teams.map(({ id, name }) => (
                       <SelectItem value={id.toString()} key={id}>
                         {name}
                       </SelectItem>
@@ -289,7 +341,7 @@ export default function KnockoutMatchForm({
                 </Button>
               </div>
             </div>
-            <FormFieldError error={error?.awayTeamId} />
+            <FormFieldError error={formState.errors?.awayTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -298,6 +350,7 @@ export default function KnockoutMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         <FormField>
           <Label htmlFor="homeGoals">Home Main Time Goals</Label>
           <Input
@@ -308,7 +361,7 @@ export default function KnockoutMatchForm({
               match?.homeGoals !== null ? match?.homeGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.homeGoals} />
+          <FormFieldError error={formState.errors?.homeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayGoals">Away Main Time Goals</Label>
@@ -320,7 +373,7 @@ export default function KnockoutMatchForm({
               match?.awayGoals !== null ? match?.awayGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.awayGoals} />
+          <FormFieldError error={formState.errors?.awayGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="homeExtraTimeGoals">Home Extra Time Goals</Label>
@@ -334,7 +387,7 @@ export default function KnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.homeExtraTimeGoals} />
+          <FormFieldError error={formState.errors?.homeExtraTimeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayExtraTimeGoals">Away Extra Time Goals</Label>
@@ -348,7 +401,7 @@ export default function KnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.awayExtraTimeGoals} />
+          <FormFieldError error={formState.errors?.awayExtraTimeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="homePenaltyGoals">Home Penalty</Label>
@@ -362,7 +415,7 @@ export default function KnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.homePenaltyGoals} />
+          <FormFieldError error={formState.errors?.homePenaltyGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayPenaltyGoals">Away Penalty</Label>
@@ -376,7 +429,7 @@ export default function KnockoutMatchForm({
                 : ""
             }
           />
-          <FormFieldError error={error?.awayPenaltyGoals} />
+          <FormFieldError error={formState.errors?.awayPenaltyGoals} />
         </FormField>
         <FormField>
           <div className="flex items-baseline gap-4 mt-2">
@@ -395,7 +448,7 @@ export default function KnockoutMatchForm({
                 : undefined
             }
           />
-          <FormFieldError error={error?.date} />
+          <FormFieldError error={formState.errors?.date} />
         </FormField>
         <FormField>
           <Label htmlFor="round">Round</Label>
@@ -405,7 +458,7 @@ export default function KnockoutMatchForm({
             name="round"
             defaultValue={match?.round || ""}
           />
-          <FormFieldError error={error?.round} />
+          <FormFieldError error={formState.errors?.round} />
         </FormField>
         <FormField>
           <Label htmlFor="homeTeamPlacehlder">Home Team Placeholder</Label>
@@ -417,7 +470,7 @@ export default function KnockoutMatchForm({
               match?.homeTeamPlacehlder ? match?.homeTeamPlacehlder : ""
             }
           />
-          <FormFieldError error={error?.homeTeamPlacehlder} />
+          <FormFieldError error={formState.errors?.homeTeamPlacehlder} />
         </FormField>
         <FormField>
           <Label htmlFor="awayTeamPlacehlder">Away Team Placeholder</Label>
@@ -429,14 +482,16 @@ export default function KnockoutMatchForm({
               match?.awayTeamPlacehlder ? match?.awayTeamPlacehlder : ""
             }
           />
-          <FormFieldError error={error?.awayTeamPlacehlder} />
+          <FormFieldError error={formState.errors?.awayTeamPlacehlder} />
         </FormField>
         <SubmitButton
           isDisabled={
-            isLoading || !tournamentsEditions || tournamentsEditions.length < 1
+            selectedTournament.length === 0 ||
+            selectedEdition.length === 0 ||
+            isTeamsLoading
           }
         />
       </form>
-    </>
+    </div>
   );
 }

@@ -18,27 +18,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/Filters";
 import PopoverStageUpdator from "@/components/table-parts/PopoverStageUpdator";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 
+import EditionForm from "@/components/forms/EditionForm";
+
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 export default async function DashboardEditionsPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: string;
-    stage?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    stage?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -132,10 +136,7 @@ export default async function DashboardEditionsPage({
         <SortByList list={sortingList} defaultField="name" />
         <Filters listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by tournament names, years, winners, title holders ..." />
-        <AddNewLinkComponent
-          href="/dashboard/editions/new"
-          label="Add New Edition"
-        />
+        <FormDialog id={null} />
       </div>
       {editions.length > 0 ? (
         <Table className="dashboard-table">
@@ -195,7 +196,9 @@ export default async function DashboardEditionsPage({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell className="dashboard-table-cell">{slug}</TableCell>
-                  <ActionsCellDropDown editHref={`/dashboard/editions/${id}`} />
+                  <TableCell>
+                    <FormDialog id={id} />
+                  </TableCell>
                 </TableRow>
               )
             )}
@@ -210,5 +213,41 @@ export default async function DashboardEditionsPage({
         <NoDataFoundComponent message="No Editions Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({ id }: { id: number | null }) {
+  const tournamentEdition = id
+    ? await prisma.tournamentEdition.findUnique({
+        where: { id },
+        include: {
+          tournament: true,
+          hostingCountries: true,
+          winner: true,
+          titleHolder: true,
+          teams: true,
+        },
+      })
+    : null;
+
+  if (id && !tournamentEdition) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {tournamentEdition == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil className="size-5" />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <EditionForm tournamentEdition={tournamentEdition} />
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -45,19 +45,18 @@ import KnockoutScoreTableCell from "@/components/table-parts/KnockoutScoreTableC
 import LeagueKnockoutMatchForm from "@/components/forms/LeagueKnockoutMatchForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { League } from "@prisma/client";
 
 export default async function DashboardLeagueKnockoutMatchesPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
+    page?: string | null;
+    query?: string | null;
     sortDir?: SortDirectionOptions;
-    sortField?: string;
-    isFeatured?: string;
-    status?: string;
-    date?: string;
+    sortField?: string | null;
+    isFeatured?: string | null;
+    status?: string | null;
+    date?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -214,7 +213,7 @@ export default async function DashboardLeagueKnockoutMatchesPage({
           }}
         />
         <SearchFieldComponent placeholder="Search by league names, years, countries, rounds, teams ..." />
-        <FormDialog leagues={leagues} id={null} />
+        <FormDialog id={null} />
       </div>
 
       {matches.length > 0 ? (
@@ -330,7 +329,7 @@ export default async function DashboardLeagueKnockoutMatchesPage({
                         tc === "MT" ? "MT" : tc === "ET" ? "ET" : "PT";
 
                       return (
-                        <TableCell className="dashboard-table-cell">
+                        <TableCell key={tc} className="dashboard-table-cell">
                           <KnockoutScoreTableCell
                             id={id}
                             homeTeamName={homeTeamName || ""}
@@ -404,7 +403,7 @@ export default async function DashboardLeagueKnockoutMatchesPage({
                       </TooltipProvider>
                     </TableCell>
                     <TableCell>
-                      <FormDialog leagues={leagues} id={id} />
+                      <FormDialog id={id} />
                     </TableCell>
                   </TableRow>
                 );
@@ -424,17 +423,21 @@ export default async function DashboardLeagueKnockoutMatchesPage({
   );
 }
 
-async function FormDialog({
-  leagues,
-  id,
-}: {
-  leagues: League[];
-  id: number | null;
-}) {
+async function FormDialog({ id }: { id: number | null }) {
   const leagueKnockoutMatch = id
     ? await prisma.leagueKnockoutMatch.findUnique({
         where: { id },
         include: {
+          homeTeam: {
+            include: {
+              country: true,
+            },
+          },
+          awayTeam: {
+            include: {
+              country: true,
+            },
+          },
           season: {
             include: { league: { include: { country: true } } },
           },
@@ -453,15 +456,12 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueKnockoutMatchForm
-          leagues={leagues}
-          match={leagueKnockoutMatch}
-        />
+        <LeagueKnockoutMatchForm match={leagueKnockoutMatch} />
       </DialogContent>
     </Dialog>
   );

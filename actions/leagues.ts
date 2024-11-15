@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 import { ZodError } from "zod";
 import { LeagueTypes } from "@/types/enums";
@@ -169,8 +169,7 @@ export async function updateLeague(
 
 export async function updateLeaguePopularStatus(
   id: number,
-  isPopular: boolean,
-  searchParams: string
+  isPopular: boolean
 ) {
   try {
     const currentLeague = await prisma.league.findUnique({
@@ -187,7 +186,6 @@ export async function updateLeaguePopularStatus(
     });
 
     revalidatePath("/dashboard/leagues");
-    // redirect(`/dashboard/leagues${searchParams ? `?${searchParams}` : ""}`);
   } catch (error) {
     console.log(error);
   }

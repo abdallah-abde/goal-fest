@@ -43,12 +43,12 @@ export default async function DashboardleaguesPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: string;
-    isPopular?: string;
-    type?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    isPopular?: string | null;
+    type?: string | null;
   };
 }) {
   const query = searchParams?.query || "";

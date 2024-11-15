@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { CurrentStageSchema, SeasonSchema } from "@/schemas";
 import { generateSlug } from "@/lib/generateSlug";
 import { LeagueStages } from "@/types/enums";
@@ -14,7 +14,7 @@ interface Fields {
   startYear: string;
   endYear: string;
   teams: string[];
-  logoUrl?: string;
+  logoUrl?: string | null;
 }
 
 interface ReturnType {
@@ -280,35 +280,38 @@ export async function updateLeagueSeason(
 }
 
 export async function updateLeagueSeasonCurrentStage(
-  args: { id: number; searchParams: string },
+  args: { id: number },
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
+  try {
+    const { id } = args;
 
-  const result = CurrentStageSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+    const result = CurrentStageSchema.safeParse(
+      Object.fromEntries(formData.entries())
+    );
 
-  if (result.success === false) {
-    return result.error.formErrors.fieldErrors;
+    if (result.success === false) {
+      return result.error.formErrors.fieldErrors;
+    }
+
+    const data = result.data;
+
+    const currentLeagueSeason = await prisma.leagueSeason.findUnique({
+      where: { id },
+    });
+
+    if (currentLeagueSeason == null) return notFound();
+
+    await prisma.leagueSeason.update({
+      where: { id },
+      data: {
+        currentStage: data.currentStage,
+      },
+    });
+
+    revalidatePath("/dashboard/seasons");
+  } catch (error) {
+    console.log(error);
   }
-
-  const data = result.data;
-
-  const currentLeagueSeason = await prisma.leagueSeason.findUnique({
-    where: { id },
-  });
-
-  if (currentLeagueSeason == null) return notFound();
-
-  await prisma.leagueSeason.update({
-    where: { id },
-    data: {
-      currentStage: data.currentStage,
-    },
-  });
-
-  revalidatePath("/dashboard/seasons");
-  redirect(`/dashboard/seasons${searchParams ? `?${searchParams}` : ""}`);
 }

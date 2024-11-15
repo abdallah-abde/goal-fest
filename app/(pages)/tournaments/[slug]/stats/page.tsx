@@ -37,15 +37,9 @@ export default async function TournamentsStatsPage({
         hostingCountries: true,
       },
     }),
-    await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-      getTeamsGoalsScored(slug, undefined, "tournaments")
-    )}`,
-    await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-      getTeamsGoalsAgainst(slug, undefined, "tournaments")
-    )}`,
-    await prisma.$queryRaw<TotalCleanSheetsProps[]>`${Prisma.raw(
-      getTeamsCleanSheets(slug, undefined, "tournaments")
-    )}`,
+    getTeamsGoalsScored(slug, undefined, "tournaments"),
+    getTeamsGoalsAgainst(slug, undefined, "tournaments"),
+    getTeamsCleanSheets(slug, undefined, "tournaments"),
   ]);
 
   if (!tournamentEdition) throw new Error("Something went wrong");

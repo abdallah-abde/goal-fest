@@ -2,22 +2,14 @@
 
 import Image from "next/image";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-
-import { Eraser } from "lucide-react";
 
 import { TournamentEdition, Tournament, Team, Country } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import {
   addTournamentEdition,
   updateTournamentEdition,
@@ -29,98 +21,179 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useRef, useState } from "react";
+import { Ban, Check } from "lucide-react";
 
 import MultipleSelector, {
   MultipleSelectorRef,
+  Option,
 } from "@/components/ui/multiple-selector";
 
 interface TournamentEditionProps extends TournamentEdition {
   hostingCountries: Country[];
   tournament: Tournament;
+  winner: Team | null;
+  titleHolder: Team | null;
   teams: Team[];
 }
 
 export default function EditionForm({
   tournamentEdition,
-  tournaments,
-  teams,
-  countries,
 }: {
   tournamentEdition?: TournamentEditionProps | null;
-  tournaments: Tournament[];
-  teams: Team[];
-  countries: Country[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     tournamentEdition == null
       ? addTournamentEdition
       : updateTournamentEdition.bind(null, tournamentEdition.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
 
-  const hostingCountriesRef = useRef<MultipleSelectorRef>(null);
-  const [hiddenHostingCountries, setHiddenHostingCountries] = useState<string>(
-    (tournamentEdition &&
-      tournamentEdition.hostingCountries.length > 0 &&
-      tournamentEdition.hostingCountries
-        .map(({ id }) => {
-          return id.toString();
-        })
-        .join(",")) ||
-      ""
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (tournamentEdition == null) {
+        setSelectedTeams([]);
+        setTeamsKey(+new Date());
+      }
+    }
+  }, [formState]);
+
+  const [selectedTournament, setSelectedTournament] = useState<Option[]>(
+    tournamentEdition
+      ? [
+          {
+            dbValue: tournamentEdition.tournamentId.toString(),
+            label: `${tournamentEdition.tournament.name} (${tournamentEdition.tournament.type})`,
+            value: `${tournamentEdition.tournament.name} (${tournamentEdition.tournament.type})`,
+          },
+        ]
+      : []
   );
+
+  const searchTournament = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch("/api/tournaments/" + value);
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  const [teams, setTeams] = useState<Team[] | null>(null);
+
+  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
+  useEffect(() => {
+    async function getTeams() {
+      setIsTeamsLoading(true);
+
+      if (selectedTournament.length > 0) {
+        const res = await fetch(
+          "/api/edition-teams/" + selectedTournament[0].dbValue
+        );
+        const data = await res.json();
+
+        setTeams(data);
+      } else {
+        setTeams([]);
+      }
+      setIsTeamsLoading(false);
+    }
+
+    getTeams();
+  }, [selectedTournament]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
-  const [hiddenTeams, setHiddenTeams] = useState<string>(
-    (tournamentEdition &&
-      tournamentEdition.teams.length > 0 &&
-      tournamentEdition.teams
-        .map(({ id }) => {
-          return id.toString();
+  const [teamsKey, setTeamsKey] = useState(+new Date());
+
+  const [selectedTeams, setSelectedTeams] = useState<Option[]>(
+    tournamentEdition
+      ? tournamentEdition.teams.map(({ id, name }) => {
+          return {
+            label: name,
+            value: name,
+            dbValue: id.toString(),
+          };
         })
-        .join(",")) ||
-      ""
+      : []
   );
 
-  const [selectedTeams, setSelectedTeams] = useState(
-    (tournamentEdition &&
-      tournamentEdition.teams.length > 0 &&
-      tournamentEdition.teams.map(({ id, name }) => {
-        return {
-          label: name,
-          value: name,
-          dbValue: id.toString(),
-        };
-      })) ||
-      undefined
+  const [countries, setCountries] = useState<Country[] | null>(null);
+
+  const [isCountriesLoading, setIsCountriesLoading] = useState(false);
+
+  useEffect(() => {
+    async function getCountries() {
+      setIsCountriesLoading(true);
+
+      if (selectedTournament.length > 0) {
+        const res = await fetch(
+          "/api/edition-countries/" + selectedTournament[0].dbValue
+        );
+        const data = await res.json();
+
+        setCountries(data);
+      } else {
+        setCountries([]);
+      }
+      setIsCountriesLoading(false);
+    }
+
+    getCountries();
+  }, [selectedTournament]);
+
+  const countriesRef = useRef<MultipleSelectorRef>(null);
+  const [countriesKey, setCountriesKey] = useState(+new Date());
+
+  const [selectedCountries, setSelectedCountries] = useState<Option[]>(
+    tournamentEdition
+      ? tournamentEdition.hostingCountries.map(({ id, name }) => {
+          return {
+            label: name,
+            value: name,
+            dbValue: id.toString(),
+          };
+        })
+      : []
   );
 
-  const [selectedHostingCountries, setSelectedHostingCountries] = useState(
-    (tournamentEdition &&
-      tournamentEdition.hostingCountries.length > 0 &&
-      tournamentEdition.hostingCountries.map(({ id, name }) => {
-        return {
-          label: name,
-          value: name,
-          dbValue: id.toString(),
-        };
-      })) ||
-      undefined
+  const [selectedWinner, setSelectedWinner] = useState<Option[]>(
+    tournamentEdition && tournamentEdition.winnerId
+      ? [
+          {
+            dbValue: tournamentEdition.winnerId.toString(),
+            label: `${tournamentEdition.winner?.name}`,
+            value: `${tournamentEdition.winner?.name}`,
+          },
+        ]
+      : []
   );
 
-  const [winnerValue, setWinnerValue] = useState<number | undefined>(
-    tournamentEdition?.winnerId || undefined
+  const [selectedTitleHolder, setSelectedTitleHolder] = useState<Option[]>(
+    tournamentEdition && tournamentEdition.titleHolderId
+      ? [
+          {
+            dbValue: tournamentEdition.titleHolderId.toString(),
+            label: `${tournamentEdition.titleHolder?.name}`,
+            value: `${tournamentEdition.titleHolder?.name}`,
+          },
+        ]
+      : []
   );
-  const [winnerKey, setWinnerKey] = useState(+new Date());
 
-  const [titleHolderValue, setTitleHolderValue] = useState<number | undefined>(
-    tournamentEdition?.titleHolderId || undefined
-  );
-  const [titleHolderKey, setTitleHolderKey] = useState(+new Date());
+  const searchTeam = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch(
+        `/api/teams/${selectedTournament[0].dbValue}/${value}`
+      );
+      const data = await res.json();
+      resolve(data);
+    });
+  };
 
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader
         label={
           tournamentEdition
@@ -128,39 +201,59 @@ export default function EditionForm({
             : "Add Tournament Edition"
         }
       />
-      <form action={action} className="form-styles">
-        {tournaments && tournaments.length > 0 ? (
-          <FormField>
-            <Label htmlFor="tournamentId">Tournament Name</Label>
-            <Select
-              name="tournamentId"
-              defaultValue={
-                (tournamentEdition?.tournamentId &&
-                  tournamentEdition?.tournamentId.toString()) ||
-                tournaments[0].id.toString() ||
-                undefined
-              }
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament" />
-              </SelectTrigger>
-              <SelectContent>
-                {tournaments.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={error?.tournamentId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=""
-            notFoundText="There is no tournaments, add some!"
+
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          Edition has been {tournamentEdition == null
+            ? "added"
+            : "updated"}{" "}
+          successfully
+        </p>
+      )}
+
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+
+      <form action={formAction} className="form-styles" ref={formRef}>
+        <FormField>
+          <Label htmlFor="tournamentId">Tournament</Label>
+          <Input
+            type="hidden"
+            id="tournamentId"
+            name="tournamentId"
+            value={selectedTournament[0]?.dbValue || ""}
           />
-        )}
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchTournament(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select tournament"
+            emptyIndicator={
+              <p className="empty-indicator">No tournaments found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedTournament}
+            value={selectedTournament}
+            disabled={!!tournamentEdition}
+          />
+          <FormFieldError error={formState.errors?.tournamentId} />
+        </FormField>
+
         <FormField>
           <Label htmlFor="startYear">Start Year</Label>
           <Input
@@ -168,7 +261,7 @@ export default function EditionForm({
             name="startYear"
             defaultValue={tournamentEdition?.startYear || undefined}
           />
-          <FormFieldError error={error?.startYear} />
+          <FormFieldError error={formState.errors?.startYear} />
         </FormField>
         <FormField>
           <Label htmlFor="endYear">End Year</Label>
@@ -177,7 +270,7 @@ export default function EditionForm({
             name="endYear"
             defaultValue={tournamentEdition?.endYear || undefined}
           />
-          <FormFieldError error={error?.endYear} />
+          <FormFieldError error={formState.errors?.endYear} />
         </FormField>
         <FormField>
           <Label htmlFor="logoUrl">Logo</Label>
@@ -187,8 +280,8 @@ export default function EditionForm({
               <Label>Current Logo</Label>
               <Image
                 src={tournamentEdition?.logoUrl || ""}
-                height="100"
-                width="100"
+                height={150}
+                width={150}
                 alt={`${
                   (tournamentEdition &&
                     tournamentEdition.tournament &&
@@ -197,155 +290,179 @@ export default function EditionForm({
                       tournamentEdition.year) ||
                   "Tournament Edition"
                 } Logo`}
-                className="w-20 h-20"
+                className="aspect-video object-contain"
               />
-              <FormFieldError error={error?.logoUrl} />
+              <FormFieldError error={formState.errors?.logoUrl} />
             </div>
           )}
         </FormField>
+
         <FormField>
-          <Label htmlFor="winnerId">Winner Team</Label>
-          <div>
-            <div className="flex items-center gap-2">
-              <Select
-                name="winnerId"
-                key={winnerKey}
-                defaultValue={
-                  (winnerValue && winnerValue.toString()) || undefined
-                }
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Choose Winner Team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teams.map(({ id, name }) => (
-                    <SelectItem value={id.toString()} key={id}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                className="bg-secondary/50 hover:bg-primary/50 transition duration-300"
-                variant="outline"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setWinnerValue(undefined);
-                  setWinnerKey(+new Date());
-                }}
-              >
-                <Eraser strokeWidth="1.5px" />
-              </Button>
-            </div>
-            <FormFieldError error={error?.winnerId} />
-          </div>
-        </FormField>
-        <FormField>
-          <Label htmlFor="titleHolderId">Title Holder Team</Label>
-          <div>
-            <div className="flex items-center gap-2">
-              <Select
-                name="titleHolderId"
-                key={titleHolderKey}
-                defaultValue={
-                  (titleHolderValue && titleHolderValue.toString()) || undefined
-                }
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Choose Title Holder Team" />
-                </SelectTrigger>
-                <SelectContent>
-                  {teams.map(({ id, name }) => (
-                    <SelectItem value={id.toString()} key={id}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                className="bg-secondary/50 hover:bg-primary/50 transition duration-300"
-                variant="outline"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTitleHolderValue(undefined);
-                  setTitleHolderKey(+new Date());
-                }}
-              >
-                <Eraser strokeWidth="1.5px" />
-              </Button>
-            </div>
-            <FormFieldError error={error?.titleHolderId} />
-          </div>
-        </FormField>
-        <FormField>
-          <Label htmlFor="hostingCountries">Hosting Countries</Label>
+          <Label htmlFor="winnerId">Winner</Label>
           <Input
             type="hidden"
-            id="hostingCountries"
-            name="hostingCountries"
-            value={hiddenHostingCountries}
+            id="winnerId"
+            name="winnerId"
+            value={selectedWinner[0]?.dbValue || ""}
           />
           <MultipleSelector
             className="form-multiple-selector-styles"
-            ref={hostingCountriesRef}
-            defaultOptions={countries.map(({ id, name }) => {
-              return {
-                label: name,
-                value: name,
-                dbValue: id.toString(),
-              };
-            })}
-            onChange={(options) => {
-              setHiddenHostingCountries(
-                options
-                  .map((a) => {
-                    return a.dbValue;
-                  })
-                  .join(",")
-              );
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchTeam(value);
+              return res;
             }}
-            placeholder="Select hosting countries for this tournament"
-            emptyIndicator={
-              <p className="empty-indicator">No countries found</p>
-            }
-            value={selectedHostingCountries}
-          />
-          <FormFieldError error={error?.hostingCountries} />
-        </FormField>
-        <FormField>
-          <Label htmlFor="teams">Teams</Label>
-          <Input type="hidden" id="teams" name="teams" value={hiddenTeams} />
-          <MultipleSelector
-            className="form-multiple-selector-styles"
-            ref={teamsRef}
-            defaultOptions={teams.map(({ id, name }) => {
-              return {
-                label: name,
-                value: name,
-                dbValue: id.toString(),
-              };
-            })}
-            onChange={(options) => {
-              setHiddenTeams(
-                options
-                  .map((a) => {
-                    return a.dbValue;
-                  })
-                  .join(",")
-              );
-            }}
-            placeholder="Select teams you like to add to the tournament"
+            maxSelected={1}
+            placeholder="Select team"
             emptyIndicator={<p className="empty-indicator">No teams found.</p>}
-            value={selectedTeams}
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedWinner}
+            value={selectedWinner}
           />
-          <FormFieldError error={error?.teams} />
+          <FormFieldError error={formState.errors?.winnerId} />
         </FormField>
-        <SubmitButton isDisabled={!tournaments || tournaments.length <= 0} />
+
+        <FormField>
+          <Label htmlFor="titleHolderId">Title Holder</Label>
+          <Input
+            type="hidden"
+            id="titleHolderId"
+            name="titleHolderId"
+            value={selectedTitleHolder[0]?.dbValue || ""}
+          />
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchTeam(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select team"
+            emptyIndicator={<p className="empty-indicator">No teams found.</p>}
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedTitleHolder}
+            value={selectedTitleHolder}
+          />
+          <FormFieldError error={formState.errors?.titleHolderId} />
+        </FormField>
+
+        {countries && countries.length > 0 && !isCountriesLoading ? (
+          <FormField>
+            <Label htmlFor="hostingCountries">Hosting Countries</Label>
+            <Input
+              type="hidden"
+              id="hostingCountries"
+              name="hostingCountries"
+              value={
+                selectedCountries
+                  ?.map((a) => {
+                    return a.dbValue;
+                  })
+                  .join(",") || ""
+              }
+            />
+            <MultipleSelector
+              className="form-multiple-selector-styles"
+              ref={countriesRef}
+              key={countriesKey}
+              defaultOptions={countries.map(({ id, name }) => {
+                return {
+                  label: name,
+                  value: name,
+                  dbValue: id.toString(),
+                };
+              })}
+              placeholder="Select countries"
+              emptyIndicator={
+                <p className="empty-indicator">No countries found.</p>
+              }
+              loadingIndicator={
+                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                  Loading...
+                </p>
+              }
+              onChange={setSelectedCountries}
+              value={selectedCountries}
+            />
+            <FormFieldError error={formState.errors?.hostingCountries} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={isCountriesLoading}
+            label="Loading Countries..."
+            notFoundText="There is no countries, add some!"
+          />
+        )}
+
+        {teams && teams.length > 0 && !isTeamsLoading ? (
+          <FormField>
+            <Label htmlFor="teams">Teams</Label>
+            <Input
+              type="hidden"
+              id="teams"
+              name="teams"
+              value={
+                selectedTeams
+                  ?.map((a) => {
+                    return a.dbValue;
+                  })
+                  .join(",") || ""
+              }
+            />
+            <MultipleSelector
+              className="form-multiple-selector-styles"
+              ref={teamsRef}
+              key={teamsKey}
+              defaultOptions={teams.map(({ id, name }) => {
+                return {
+                  label: name,
+                  value: name,
+                  dbValue: id.toString(),
+                };
+              })}
+              placeholder="Select teams"
+              emptyIndicator={
+                <p className="empty-indicator">No teams found.</p>
+              }
+              loadingIndicator={
+                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                  Loading...
+                </p>
+              }
+              onChange={setSelectedTeams}
+              value={selectedTeams}
+            />
+            <FormFieldError error={formState.errors?.teams} />
+          </FormField>
+        ) : (
+          <FormFieldLoadingState
+            isLoading={isTeamsLoading}
+            label="Loading Teams..."
+            notFoundText="There is no teams, add some!"
+          />
+        )}
+
+        <SubmitButton
+          isDisabled={
+            selectedTournament.length === 0 ||
+            isTeamsLoading ||
+            isCountriesLoading
+          }
+        />
       </form>
-    </>
+    </div>
   );
 }

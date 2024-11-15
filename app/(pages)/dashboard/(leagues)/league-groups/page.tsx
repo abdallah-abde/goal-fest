@@ -24,16 +24,15 @@ import NotProvidedSpan from "@/components/NotProvidedSpan";
 import LeagueGroupForm from "@/components/forms/LeagueGroupForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { League } from "@prisma/client";
 
 export default async function DashboardLeagueGroupsPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: String;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -104,7 +103,7 @@ export default async function DashboardLeagueGroupsPage({
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="league" />
         <SearchFieldComponent placeholder="Search by league names, years, countries, group names ..." />
-        <FormDialog leagues={leagues} id={null} />
+        <FormDialog id={null} />
       </div>
       {groups.length > 0 ? (
         <Table className="dashboard-table">
@@ -137,7 +136,7 @@ export default async function DashboardLeagueGroupsPage({
                 </TableCell>
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell>
-                  <FormDialog leagues={leagues} id={id} />
+                  <FormDialog id={id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -155,13 +154,7 @@ export default async function DashboardLeagueGroupsPage({
   );
 }
 
-async function FormDialog({
-  leagues,
-  id,
-}: {
-  leagues: League[];
-  id: number | null;
-}) {
+async function FormDialog({ id }: { id: number | null }) {
   const leagueGroup = id
     ? await prisma.leagueGroup.findUnique({
         where: { id },
@@ -191,7 +184,7 @@ async function FormDialog({
           </Button>
         ) : (
           <Button variant="outline" size="icon">
-            <Pencil />
+            <Pencil className="size-5" />
           </Button>
         )}
       </DialogTrigger>

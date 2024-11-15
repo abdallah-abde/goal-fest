@@ -1,4 +1,3 @@
-import { MatchStatusOptions } from "@/types/enums";
 import { z } from "zod";
 
 const _fileSchema = z.instanceof(File, { message: "Required" });
@@ -42,6 +41,7 @@ export const TeamSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
   code: z.string().optional(),
+  type: z.string().min(1, { message: "Type is required!" }),
 });
 
 export const TournamentSchema = z.object({

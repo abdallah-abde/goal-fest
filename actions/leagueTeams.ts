@@ -52,7 +52,7 @@ export async function addLeagueTeam(
       return {
         errors: undefined,
         success: false,
-        customError: "Home team and away team cannot be the same!",
+        customError: "League team existed",
       };
     }
 
@@ -127,7 +127,7 @@ export async function updateLeagueTeam(
       return {
         errors: undefined,
         success: false,
-        customError: "Home team and away team cannot be the same!",
+        customError: "League team existed",
       };
     }
 

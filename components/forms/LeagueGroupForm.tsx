@@ -195,6 +195,7 @@ export default function LeagueGroupForm({
             className="form-multiple-selector-styles"
             hidePlaceholderWhenSelected
             hideClearAllButton
+            badgeClassName="text-primary"
             onSearch={async (value) => {
               const res = await searchLeague(value);
               return res;
@@ -206,7 +207,7 @@ export default function LeagueGroupForm({
             }
             loadingIndicator={
               <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                loading...
+                Loading...
               </p>
             }
             onChange={setSelectedLeague}
@@ -227,6 +228,7 @@ export default function LeagueGroupForm({
             className="form-multiple-selector-styles"
             hidePlaceholderWhenSelected
             hideClearAllButton
+            badgeClassName="text-primary"
             key={seasonsKey}
             onSearch={async (value) => {
               const res = await searchSeason(value);
@@ -239,7 +241,7 @@ export default function LeagueGroupForm({
             }
             loadingIndicator={
               <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                loading...
+                Loading...
               </p>
             }
             ref={seasonsRef}
@@ -291,7 +293,7 @@ export default function LeagueGroupForm({
               }
               loadingIndicator={
                 <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                  loading...
+                  Loading...
                 </p>
               }
               onChange={setSelectedTeams}

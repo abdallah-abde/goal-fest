@@ -3,123 +3,198 @@
 import prisma from "@/lib/db";
 import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { TournamentSchema } from "@/schemas";
+import { ZodError } from "zod";
 import { IsPopularOptions } from "@/types/enums";
 
-export async function addTournament(prevState: unknown, formData: FormData) {
-  const result = TournamentSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+interface Fields {
+  name: string;
+  logoUrl?: string | null;
+  type: string;
+  isPopular: boolean;
+}
 
-  if (result.success === false) {
-    return result.error.formErrors.fieldErrors;
-  }
+interface ReturnType {
+  errors: Record<keyof Fields, string | undefined> | undefined;
+  success: boolean;
+  customError?: string | null;
+}
 
-  const data = result.data;
-
-  const tournament = await prisma.tournament.findFirst({
-    where: { name: data.name },
-  });
-
-  if (tournament) return { name: ["Tournament existed"] };
-
-  let logoUrlPath = "";
-  if (data.logoUrl != null && data.logoUrl.size > 0) {
-    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-      data.logoUrl.name
-    }`;
-
-    await fs.writeFile(
-      `public${logoUrlPath}`,
-      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
+export async function addTournament(
+  prevState: ReturnType,
+  formData: FormData
+): Promise<ReturnType> {
+  try {
+    const result = TournamentSchema.safeParse(
+      Object.fromEntries(formData.entries())
     );
+
+    if (result.success === false) {
+      const errors: Record<keyof Fields, string | undefined> = {
+        name: result.error.formErrors.fieldErrors.name?.[0],
+        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        type: result.error.formErrors.fieldErrors.type?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+      };
+
+      return { errors, success: false, customError: null };
+    }
+
+    const data = result.data;
+
+    const tournament = await prisma.tournament.findFirst({
+      where: { name: data.name },
+    });
+
+    if (tournament) {
+      return {
+        errors: undefined,
+        success: false,
+        customError: `Tournament existed`,
+      };
+    }
+
+    let logoUrlPath = "";
+    if (data.logoUrl != null && data.logoUrl.size > 0) {
+      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+        data.logoUrl.name
+      }`;
+
+      await fs.writeFile(
+        `public${logoUrlPath}`,
+        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
+      );
+    }
+
+    await prisma.tournament.create({
+      data: {
+        name: data.name,
+        logoUrl: logoUrlPath,
+        type: data.type,
+        isPopular: data.isPopular === IsPopularOptions.Yes,
+      },
+    });
+
+    revalidatePath("/dashboard/tournaments");
+    return { errors: undefined, success: true, customError: null };
+  } catch (error) {
+    const zodError = error as ZodError;
+    const errorMap = zodError.flatten().fieldErrors;
+    return {
+      success: false,
+      customError: null,
+      errors: {
+        name: errorMap["name"]?.[0],
+        logoUrl: errorMap["logoUrl"]?.[0],
+        type: errorMap["type"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
+      },
+    };
   }
-
-  await prisma.tournament.create({
-    data: {
-      name: data.name.toString(),
-      logoUrl: logoUrlPath,
-      type: data.type.toString(),
-      isPopular: data.isPopular === IsPopularOptions.Yes,
-    },
-  });
-
-  revalidatePath("/dashboard/tournaments");
-  redirect(`/dashboard/tournaments`);
 }
 
 export async function updateTournament(
   id: number,
-  prevState: unknown,
+  prevState: ReturnType,
   formData: FormData
-) {
-  const result = TournamentSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
-
-  if (result.success === false) {
-    return result.error.formErrors.fieldErrors;
-  }
-
-  const data = result.data;
-
-  const existedTournament = await prisma.tournament.findFirst({
-    where: { AND: [{ name: data.name }, { id: { not: id } }] },
-  });
-
-  if (existedTournament) return { name: ["Tournament existed"] };
-
-  const tournament = await prisma.tournament.findUnique({ where: { id } });
-
-  if (tournament == null) return notFound();
-
-  let logoUrlPath = tournament.logoUrl;
-  if (data.logoUrl != null && data.logoUrl.size > 0) {
-    if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
-
-    logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-      data.logoUrl.name
-    }`;
-
-    await fs.writeFile(
-      `public${logoUrlPath}`,
-      new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
+): Promise<ReturnType> {
+  try {
+    const result = TournamentSchema.safeParse(
+      Object.fromEntries(formData.entries())
     );
+
+    if (result.success === false) {
+      const errors: Record<keyof Fields, string | undefined> = {
+        name: result.error.formErrors.fieldErrors.name?.[0],
+        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        type: result.error.formErrors.fieldErrors.type?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+      };
+
+      return { errors, success: false, customError: null };
+    }
+
+    const data = result.data;
+
+    const existedTournament = await prisma.tournament.findFirst({
+      where: { AND: [{ name: data.name }, { id: { not: id } }] },
+    });
+
+    if (existedTournament) {
+      return {
+        errors: undefined,
+        success: false,
+        customError: `Tournament existed`,
+      };
+    }
+
+    const tournament = await prisma.tournament.findUnique({ where: { id } });
+
+    if (tournament == null) return notFound();
+
+    let logoUrlPath = tournament.logoUrl;
+    if (data.logoUrl != null && data.logoUrl.size > 0) {
+      if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
+
+      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
+        data.logoUrl.name
+      }`;
+
+      await fs.writeFile(
+        `public${logoUrlPath}`,
+        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
+      );
+    }
+
+    await prisma.tournament.update({
+      where: { id },
+      data: {
+        name: data.name,
+        logoUrl: logoUrlPath,
+        type: data.type,
+        isPopular: data.isPopular === IsPopularOptions.Yes,
+      },
+    });
+
+    revalidatePath("/dashboard/tournaments");
+    return { errors: undefined, success: true, customError: null };
+  } catch (error) {
+    const zodError = error as ZodError;
+    const errorMap = zodError.flatten().fieldErrors;
+    return {
+      success: false,
+      customError: null,
+      errors: {
+        name: errorMap["name"]?.[0],
+        logoUrl: errorMap["logoUrl"]?.[0],
+        type: errorMap["type"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
+      },
+    };
   }
-
-  await prisma.tournament.update({
-    where: { id },
-    data: {
-      name: data.name.toString(),
-      logoUrl: logoUrlPath,
-      type: data.type.toString(),
-      isPopular: data.isPopular === IsPopularOptions.Yes,
-    },
-  });
-
-  revalidatePath("/dashboard/tournaments");
-  redirect(`/dashboard/tournaments`);
 }
 
 export async function updateTournamentPopularStatus(
   id: number,
-  isPopular: boolean,
-  searchParams: string
+  isPopular: boolean
 ) {
-  const currentTournament = await prisma.tournament.findUnique({
-    where: { id },
-  });
+  try {
+    const currentTournament = await prisma.tournament.findUnique({
+      where: { id },
+    });
 
-  if (currentTournament == null) return notFound();
+    if (currentTournament == null) return notFound();
 
-  await prisma.tournament.update({
-    where: { id },
-    data: {
-      isPopular: !isPopular,
-    },
-  });
+    await prisma.tournament.update({
+      where: { id },
+      data: {
+        isPopular: !isPopular,
+      },
+    });
 
-  revalidatePath("/dashboard/tournaments");
-  redirect(`/dashboard/tournaments${searchParams ? `?${searchParams}` : ""}`);
+    revalidatePath("/dashboard/tournaments");
+  } catch (error) {
+    console.log(error);
+  }
 }

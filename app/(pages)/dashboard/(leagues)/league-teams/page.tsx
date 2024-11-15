@@ -32,11 +32,11 @@ export default async function DashboardLeagueTeamsPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: String;
-    type?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    type?: string | null;
   };
 }) {
   const query = searchParams?.query || "";

@@ -33,17 +33,16 @@ import SeasonForm from "@/components/forms/SeasonForm";
 
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { League, LeagueTeam } from "@prisma/client";
 
 export default async function DashboardSeasonsPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: string;
-    stage?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    stage?: string | null;
   };
 }) {
   const query = searchParams?.query || "";

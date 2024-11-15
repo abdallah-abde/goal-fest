@@ -22,27 +22,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
 import SortByList from "@/components/table-parts/SortByList";
-import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import Filters from "@/components/table-parts/Filters";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
+
+import TournamentForm from "@/components/forms/TournamentForm";
+
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardTournamentsPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: string;
-    isPopular?: string;
-    type?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    isPopular?: string | null;
+    type?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -137,14 +141,12 @@ export default async function DashboardTournamentsPage({
   return (
     <>
       <PageHeader label="Tournaments List" />
+
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
         <Filters flagFilters={flagFilters} listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by tournament names ..." />
-        <AddNewLinkComponent
-          href="/dashboard/tournaments/new"
-          label="Add New Tournament"
-        />
+        <FormDialog id={null} />
       </div>
       {tournaments.length > 0 ? (
         <Table className="dashboard-table">
@@ -179,9 +181,9 @@ export default async function DashboardTournamentsPage({
                     </Tooltip>
                   </TooltipProvider>
                 </TableCell>
-                <ActionsCellDropDown
-                  editHref={`/dashboard/tournaments/${id}`}
-                />
+                <TableCell>
+                  <FormDialog id={id} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -195,5 +197,34 @@ export default async function DashboardTournamentsPage({
         <NoDataFoundComponent message="No Tournaments Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({ id }: { id: number | null }) {
+  const tournament = id
+    ? await prisma.tournament.findUnique({
+        where: { id },
+      })
+    : null;
+
+  if (id && !tournament) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {tournament == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil className="size-5" />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <TournamentForm tournament={tournament} />
+      </DialogContent>
+    </Dialog>
   );
 }

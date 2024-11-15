@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useFormState } from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,7 +21,6 @@ import {
   Group,
 } from "@prisma/client";
 
-import { useFormState } from "react-dom";
 import {
   addTournamentGroupMatch,
   updateTournamentGroupMatch,
@@ -30,7 +32,12 @@ import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
 
-import { useEffect, useState } from "react";
+import { Ban, Check } from "lucide-react";
+
+import MultipleSelector, {
+  MultipleSelectorRef,
+  Option,
+} from "@/components/ui/multiple-selector";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
 
@@ -47,209 +54,286 @@ interface TournamentEditionProps extends TournamentEdition {
 
 export default function GroupMatchForm({
   match,
-  // teams,
-  tournaments,
 }: {
   match?: MatchProps | null;
-  // teams: Team[];
-  tournaments: Tournament[];
 }) {
-  const [error, action] = useFormState(
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formState, formAction] = useFormState(
     match == null
       ? addTournamentGroupMatch
       : updateTournamentGroupMatch.bind(null, match.id),
-    {}
+    { errors: undefined, success: false, customError: null }
   );
 
-  const [tournamentId, setTournamentId] = useState<string | null>(
-    match?.tournamentEdition.tournamentId.toString() ||
-      (tournaments && tournaments.length > 0 && tournaments[0].id.toString()) ||
-      null
+  useEffect(() => {
+    if (formState.success) {
+      formRef.current?.reset();
+      if (match == null) {
+        setHomeTeamValue(undefined);
+        setHomeTeamKey(+new Date());
+
+        setAwayTeamValue(undefined);
+        setAwayTeamKey(+new Date());
+      }
+    }
+  }, [formState]);
+
+  const [selectedTournament, setSelectedTournament] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match.tournamentEdition.tournament.id.toString(),
+            label: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
+            value: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
+          },
+        ]
+      : []
   );
 
-  const [isEditionsLoading, setIsEditionsLoading] = useState(false);
+  const searchTournament = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch("/api/tournaments/" + value);
+      const data = await res.json();
+      resolve(data);
+    });
+  };
 
-  const [tournamentsEditions, setTournamentsEditions] = useState<
-    TournamentEditionProps[] | null
-  >(null);
+  useEffect(() => {
+    if (match == null) {
+      setSelectedEdition([]);
+      setEditionsKey(+new Date());
 
-  const [tournamentEditionId, setTournamentEditionId] = useState<string | null>(
-    match?.tournamentEditionId.toString() ||
-      (tournamentsEditions &&
-        tournamentsEditions.length > 0 &&
-        tournamentsEditions[0].id.toString()) ||
-      null
+      setSelectedGroup([]);
+      setGroupsKey(+new Date());
+    }
+  }, [selectedTournament, match]);
+
+  const [selectedEdition, setSelectedEdition] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match?.tournamentEditionId.toString(),
+            label: `${match?.tournamentEdition.tournament.name} ${match?.tournamentEdition.year}`,
+            value: `${match?.tournamentEdition.tournament.name} ${match?.tournamentEdition.year}`,
+          },
+        ]
+      : []
   );
 
-  const [groups, setGroups] = useState<Group[] | null>(null);
+  const searchEdition = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch(
+        `/api/tournament-editions/${selectedTournament[0].dbValue}/${value}`
+      );
+      const data = await res.json();
+      resolve(data);
+    });
+  };
 
-  const [isGroupsLoading, setIsGroupsLoading] = useState(false);
+  useEffect(() => {
+    if (match == null) {
+      setSelectedGroup([]);
+      setGroupsKey(+new Date());
+    }
+  }, [selectedEdition, match]);
 
-  const [groupId, setGroupId] = useState<string | null>(
-    match?.groupId.toString() ||
-      (groups && groups.length > 0 && groups[0].id.toString()) ||
-      null
+  const [editionsKey, setEditionsKey] = useState(+new Date());
+
+  const editionsRef = useRef<MultipleSelectorRef>(null);
+
+  const [selectedGroup, setSelectedGroup] = useState<Option[]>(
+    match
+      ? [
+          {
+            dbValue: match.groupId.toString(),
+            label: `${match.group.name}`,
+            value: `${match.group.name}`,
+          },
+        ]
+      : []
   );
 
-  const [groupTeams, setGroupTeams] = useState<Team[] | null>(null);
+  const searchGroup = async (value: string): Promise<Option[]> => {
+    return new Promise(async (resolve) => {
+      const res = await fetch(
+        `/api/tournament-edition-groups/${selectedEdition[0].dbValue}/${value}`
+      );
+      const data = await res.json();
+      resolve(data);
+    });
+  };
+
+  const [groupsKey, setGroupsKey] = useState(+new Date());
+
+  const groupsRef = useRef<MultipleSelectorRef>(null);
+
+  const [teams, setTeams] = useState<Team[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
-
-  useEffect(() => {
-    async function getEditions() {
-      setIsEditionsLoading(true);
-
-      if (tournamentId) {
-        const res = await fetch("/api/tournaments-editions/" + tournamentId);
-        const data: TournamentEditionProps[] = await res.json();
-
-        setTournamentsEditions(data);
-        if (data.length > 0 && !match)
-          setTournamentEditionId(data[0].id.toString());
-      }
-      setIsEditionsLoading(false);
-    }
-
-    getEditions();
-  }, [tournamentId]);
-
-  useEffect(() => {
-    async function getGroups() {
-      setIsGroupsLoading(true);
-
-      if (tournamentEditionId) {
-        const res = await fetch("/api/groups/" + tournamentEditionId);
-        const data: Group[] = await res.json();
-
-        setGroups(data);
-        if (data.length > 0 && !match) setGroupId(data[0].id.toString());
-      }
-      setIsGroupsLoading(false);
-    }
-
-    getGroups();
-  }, [tournamentEditionId]);
 
   useEffect(() => {
     async function getTeams() {
       setIsTeamsLoading(true);
 
-      if (groupId) {
-        const res = await fetch("/api/groups-teams/" + groupId);
+      if (selectedGroup.length > 0) {
+        const res = await fetch(
+          "/api/tournament-group-teams/" + selectedGroup[0].dbValue
+        );
         const data = await res.json();
 
-        setGroupTeams(data.teams);
+        setTeams(data.teams);
+      } else if (selectedEdition.length > 0) {
+        const res = await fetch(
+          "/api/editions-teams/" + selectedEdition[0].dbValue
+        );
+        const data = await res.json();
+
+        setTeams(data.teams);
+      } else {
+        setTeams(null);
       }
       setIsTeamsLoading(false);
     }
 
     getTeams();
-  }, [groupId]);
+  }, [selectedEdition, selectedGroup]);
+
+  const teamsRef = useRef<MultipleSelectorRef>(null);
+  const [teamsKey, setTeamsKey] = useState(+new Date());
+
+  const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
+    match?.homeTeamId.toString() || undefined
+  );
+
+  const [homeTeamKey, setHomeTeamKey] = useState(+new Date());
+
+  const [awayTeamValue, setAwayTeamValue] = useState<string | undefined>(
+    match?.awayTeamId.toString() || undefined
+  );
+
+  const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
 
   return (
-    <>
+    <div className="overflow-auto px-4">
       <PageHeader label={match ? "Edit Group Match" : "Add Group Match"} />
-      <form action={action} className="form-styles">
-        {tournaments && tournaments.length > 0 ? (
-          <FormField>
-            <Label htmlFor="tournamentId">Tournament</Label>
-            <Select
-              name="tournamentId"
-              defaultValue={
-                match?.tournamentEdition.tournamentId.toString() ||
-                tournamentId ||
-                tournaments[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setTournamentId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament" />
-              </SelectTrigger>
-              <SelectContent>
-                {tournaments.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={false}
-            label=""
-            notFoundText="There is no tournaments, add some!"
+
+      {formState.success && (
+        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
+          <Check size={20} />
+          Match has been {match == null ? "added" : "updated"} successfully
+        </p>
+      )}
+
+      {formState.customError && (
+        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
+          <Ban size={20} />
+          {formState.customError}
+        </p>
+      )}
+
+      <form action={formAction} className="form-styles" ref={formRef}>
+        <FormField>
+          <Label htmlFor="tournamentId">Tournament</Label>
+          <Input
+            type="hidden"
+            id="tournamentId"
+            name="tournamentId"
+            value={selectedTournament[0]?.dbValue || ""}
           />
-        )}
-        {tournamentsEditions &&
-        tournamentsEditions.length > 0 &&
-        !isEditionsLoading ? (
-          <FormField>
-            <Label htmlFor="tournamentEditionId">Tournament Edition</Label>
-            <Select
-              name="tournamentEditionId"
-              defaultValue={
-                match?.tournamentEditionId.toString() ||
-                tournamentEditionId ||
-                tournamentsEditions[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setTournamentEditionId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Tournament Edition" />
-              </SelectTrigger>
-              <SelectContent>
-                {tournamentsEditions.map(({ id, tournament, year }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {`${tournament.name} ${year.toString()}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={error?.tournamentEditionId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isEditionsLoading}
-            label="Loading Editions..."
-            notFoundText="There is no editions, add some!"
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchTournament(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select tournament"
+            emptyIndicator={
+              <p className="empty-indicator">No tournaments found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            onChange={setSelectedTournament}
+            value={selectedTournament}
+            disabled={!!match}
           />
-        )}
-        {groups && groups.length > 0 && !isGroupsLoading ? (
-          <FormField>
-            <Label htmlFor="groupId">Group</Label>
-            <Select
-              name="groupId"
-              defaultValue={
-                match?.groupId.toString() ||
-                groupId ||
-                groups[0].id.toString() ||
-                undefined
-              }
-              onValueChange={(value) => setGroupId(value)}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Group" />
-              </SelectTrigger>
-              <SelectContent>
-                {groups.map(({ id, name }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={error?.groupId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isGroupsLoading}
-            label="Loading Groups..."
-            notFoundText="There is no groups, add some!"
+        </FormField>
+
+        <FormField>
+          <Label htmlFor="tournamentEditionId">Edition</Label>
+          <Input
+            type="hidden"
+            id="tournamentEditionId"
+            name="tournamentEditionId"
+            value={selectedEdition[0]?.dbValue || ""}
           />
-        )}
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            key={editionsKey}
+            onSearch={async (value) => {
+              const res = await searchEdition(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select edition"
+            emptyIndicator={
+              <p className="empty-indicator">No editions found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            ref={editionsRef}
+            onChange={setSelectedEdition}
+            value={selectedEdition}
+            disabled={!!match || selectedTournament.length === 0}
+          />
+        </FormField>
+
+        <FormField>
+          <Label htmlFor="groupId">Group</Label>
+          <Input
+            type="hidden"
+            id="groupId"
+            name="groupId"
+            value={selectedGroup[0]?.dbValue || ""}
+          />
+          <MultipleSelector
+            className="form-multiple-selector-styles"
+            hidePlaceholderWhenSelected
+            hideClearAllButton
+            badgeClassName="text-primary"
+            key={groupsKey}
+            onSearch={async (value) => {
+              const res = await searchGroup(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select group"
+            emptyIndicator={<p className="empty-indicator">No groups found.</p>}
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
+            }
+            ref={groupsRef}
+            onChange={setSelectedGroup}
+            value={selectedGroup}
+            disabled={!!match || selectedEdition.length === 0}
+          />
+        </FormField>
+
         <FormField>
           <div className="flex items-baseline gap-4 mt-2">
             <Label htmlFor="date">Date</Label>
@@ -267,31 +351,29 @@ export default function GroupMatchForm({
                 : undefined
             }
           />
-          <FormFieldError error={error?.date} />
+          <FormFieldError error={formState.errors?.date} />
         </FormField>
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="homeTeamId">Home Team</Label>
             <Select
               name="homeTeamId"
-              defaultValue={
-                (match && match?.homeTeamId.toString()) ||
-                (groupTeams && groupTeams[0].id.toString()) ||
-                undefined
-              }
+              key={homeTeamKey}
+              defaultValue={homeTeamValue}
             >
               <SelectTrigger className="flex-1">
                 <SelectValue placeholder="Choose Home Team" />
               </SelectTrigger>
               <SelectContent>
-                {groupTeams.map(({ id, name }) => (
+                {teams.map(({ id, name }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.homeTeamId} />
+            <FormFieldError error={formState.errors?.homeTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -300,29 +382,27 @@ export default function GroupMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
-        {groupTeams && groupTeams.length > 0 && !isTeamsLoading ? (
+
+        {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="awayTeamId">Away Team</Label>
             <Select
               name="awayTeamId"
-              defaultValue={
-                match?.awayTeamId.toString() ||
-                groupTeams[0].id.toString() ||
-                undefined
-              }
+              key={awayTeamKey}
+              defaultValue={awayTeamValue}
             >
               <SelectTrigger className="flex-1">
                 <SelectValue placeholder="Choose Away Team" />
               </SelectTrigger>
               <SelectContent>
-                {groupTeams.map(({ id, name }) => (
+                {teams.map(({ id, name }) => (
                   <SelectItem value={id.toString()} key={id}>
                     {name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <FormFieldError error={error?.awayTeamId} />
+            <FormFieldError error={formState.errors?.awayTeamId} />
           </FormField>
         ) : (
           <FormFieldLoadingState
@@ -331,6 +411,7 @@ export default function GroupMatchForm({
             notFoundText="There is no teams, add some!"
           />
         )}
+
         <FormField>
           <Label htmlFor="homeGoals">Home Goals</Label>
           <Input
@@ -341,7 +422,7 @@ export default function GroupMatchForm({
               match?.homeGoals !== null ? match?.homeGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.homeGoals} />
+          <FormFieldError error={formState.errors?.homeGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="awayGoals">Away Goals</Label>
@@ -353,7 +434,7 @@ export default function GroupMatchForm({
               match?.awayGoals !== null ? match?.awayGoals.toString() : ""
             }
           />
-          <FormFieldError error={error?.awayGoals} />
+          <FormFieldError error={formState.errors?.awayGoals} />
         </FormField>
         <FormField>
           <Label htmlFor="round">Round</Label>
@@ -363,25 +444,18 @@ export default function GroupMatchForm({
             name="round"
             defaultValue={match?.round || ""}
           />
-          <FormFieldError error={error?.round} />
+          <FormFieldError error={formState.errors?.round} />
         </FormField>
 
         <SubmitButton
           isDisabled={
-            !tournaments ||
-            tournaments.length <= 0 ||
-            isEditionsLoading ||
-            !tournamentsEditions ||
-            tournamentsEditions.length <= 0 ||
-            isGroupsLoading ||
-            !groups ||
-            groups.length <= 0 ||
-            isTeamsLoading ||
-            !groupTeams ||
-            groupTeams.length <= 0
+            selectedTournament.length === 0 ||
+            selectedEdition.length === 0 ||
+            selectedGroup.length === 0 ||
+            isTeamsLoading
           }
         />
       </form>
-    </>
+    </div>
   );
 }

@@ -63,6 +63,7 @@ model Team {
   groups                        Group[]
   code                          String?
   isPopular                     Boolean             @default(false)
+  type                          String?
 }
 
 model Country {

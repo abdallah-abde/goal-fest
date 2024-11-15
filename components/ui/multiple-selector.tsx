@@ -159,8 +159,8 @@ const CommandEmpty = forwardRef<
     <div
       ref={forwardedRef}
       className={cn("py-6 text-center text-sm", className)}
-      cmdk-empty=''
-      role='presentation'
+      cmdk-empty=""
+      role="presentation"
       {...props}
     />
   );
@@ -305,7 +305,7 @@ const MultipleSelector = React.forwardRef<
       const Item = (
         <CommandItem
           value={inputValue}
-          className='cursor-pointer'
+          className="cursor-pointer"
           onMouseDown={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -344,7 +344,7 @@ const MultipleSelector = React.forwardRef<
       // For async search that showing emptyIndicator
       if (onSearch && !creatable && Object.keys(options).length === 0) {
         return (
-          <CommandItem value='-' disabled>
+          <CommandItem value="-" disabled>
             {emptyIndicator}
           </CommandItem>
         );
@@ -382,7 +382,10 @@ const MultipleSelector = React.forwardRef<
         }}
         className={cn(
           "h-auto overflow-visible bg-primary/50 text-primary-foreground",
-          commandProps?.className
+          commandProps?.className,
+          {
+            "bg-primary/25 cursor-not-allowed": disabled,
+          }
         )}
         shouldFilter={
           commandProps?.shouldFilter !== undefined
@@ -405,15 +408,19 @@ const MultipleSelector = React.forwardRef<
             inputRef.current?.focus();
           }}
         >
-          <div className='relative flex flex-wrap gap-1'>
+          <div className="relative flex flex-wrap gap-1">
             {selected.map((option) => {
               return (
                 <Badge
+                  variant="secondary"
                   key={option.value}
                   className={cn(
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                     "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
-                    badgeClassName
+                    badgeClassName,
+                    {
+                      "cursor-not-allowed": disabled,
+                    }
                   )}
                   data-fixed={option.fixed}
                   data-disabled={disabled || undefined}
@@ -435,7 +442,7 @@ const MultipleSelector = React.forwardRef<
                     }}
                     onClick={() => handleUnselect(option)}
                   >
-                    <X className='h-3 w-3 text-muted-foreground hover:text-foreground' />
+                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                   </button>
                 </Badge>
               );
@@ -472,12 +479,13 @@ const MultipleSelector = React.forwardRef<
                   "w-full": hidePlaceholderWhenSelected,
                   "px-3 py-2": selected.length === 0,
                   "ml-1": selected.length !== 0,
+                  "cursor-not-allowed": disabled,
                 },
                 inputProps?.className
               )}
             />
             <button
-              type='button'
+              type="button"
               onClick={() => {
                 setSelected(selected.filter((s) => s.fixed));
                 onChange?.(selected.filter((s) => s.fixed));
@@ -495,10 +503,10 @@ const MultipleSelector = React.forwardRef<
             </button>
           </div>
         </div>
-        <div className='relative'>
+        <div className="relative">
           {open && (
             <CommandList
-              className='absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in'
+              className="absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
               onMouseLeave={() => {
                 mouseOn.current = false;
               }}
@@ -516,13 +524,13 @@ const MultipleSelector = React.forwardRef<
                   {EmptyItem()}
                   {CreatableItem()}
                   {!selectFirstItem && (
-                    <CommandItem value='-' className='hidden' />
+                    <CommandItem value="-" className="hidden" />
                   )}
                   {Object.entries(selectables).map(([key, dropdowns]) => (
                     <CommandGroup
                       key={key}
                       heading={key}
-                      className='h-full overflow-auto'
+                      className="h-full overflow-auto"
                     >
                       <>
                         {dropdowns.map((option) => {

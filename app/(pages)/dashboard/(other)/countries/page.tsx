@@ -24,7 +24,6 @@ import NotProvidedSpan from "@/components/NotProvidedSpan";
 
 import CountryForm from "@/components/forms/CountryForm";
 
-import { Country } from "@prisma/client";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -32,11 +31,11 @@ export default async function DashboardCountriesPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: String;
-    type?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    type?: string | null;
   };
 }) {
   const query = searchParams?.query || "";

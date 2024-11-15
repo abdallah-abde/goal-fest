@@ -45,19 +45,18 @@ import ScoreTableCell from "@/components/table-parts/ScoreTableCell";
 import LeagueMatchForm from "@/components/forms/LeagueMatchForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { League } from "@prisma/client";
 
 export default async function DashboardLeagueMatchesPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: String;
-    isFeatured?: string;
-    status?: string;
-    date?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    isFeatured?: string | null;
+    status?: string | null;
+    date?: string | null;
   };
 }) {
   const query = searchParams?.query || "";

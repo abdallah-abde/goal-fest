@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   LeagueKnockoutMatchSchema,
   knockoutMatchScoreSchema,
@@ -254,112 +254,108 @@ export async function updateLeagueKnockoutMatch(
 
 export async function updateLeagueKnockoutMatchFeaturedStatus(
   id: number,
-  isFeatured: boolean,
-  searchParams: string
+  isFeatured: boolean
 ) {
-  const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
-    where: { id },
-  });
+  try {
+    const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
+      where: { id },
+    });
 
-  if (currentMatch == null) return notFound();
+    if (currentMatch == null) return notFound();
 
-  await prisma.leagueKnockoutMatch.update({
-    where: { id },
-    data: {
-      isFeatured: !isFeatured,
-    },
-  });
+    await prisma.leagueKnockoutMatch.update({
+      where: { id },
+      data: {
+        isFeatured: !isFeatured,
+      },
+    });
 
-  revalidatePath("/dashboard/league-knockout-matches");
-  redirect(
-    `/dashboard/league-knockout-matches${
-      searchParams ? `?${searchParams}` : ""
-    }`
-  );
+    revalidatePath("/dashboard/league-knockout-matches");
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function updateLeagueKnockoutMatchScore(
-  args: { id: number; searchParams: string },
+  args: { id: number },
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
+  try {
+    const { id } = args;
 
-  const result = knockoutMatchScoreSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+    const result = knockoutMatchScoreSchema.safeParse(
+      Object.fromEntries(formData.entries())
+    );
 
-  if (result.success === false) {
-    return result.error.formErrors.fieldErrors;
+    if (result.success === false) {
+      return result.error.formErrors.fieldErrors;
+    }
+
+    const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
+      where: { id },
+    });
+
+    if (currentMatch == null) return notFound();
+
+    const homeGoals = formData.get("homeGoals");
+    const awayGoals = formData.get("awayGoals");
+    const homeExtraTimeGoals = formData.get("homeExtraTimeGoals");
+    const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
+    const homePenaltyGoals = formData.get("homePenaltyGoals");
+    const awayPenaltyGoals = formData.get("awayPenaltyGoals");
+
+    await prisma.leagueKnockoutMatch.update({
+      where: { id },
+      data: {
+        homeGoals: homeGoals ? +homeGoals : null,
+        awayGoals: awayGoals ? +awayGoals : null,
+        homeExtraTimeGoals: homeExtraTimeGoals ? +homeExtraTimeGoals : null,
+        awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
+        homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
+        awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
+      },
+    });
+
+    revalidatePath("/dashboard/league-knockout-matches");
+  } catch (error) {
+    console.log(error);
   }
-
-  const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
-    where: { id },
-  });
-
-  if (currentMatch == null) return notFound();
-
-  const homeGoals = formData.get("homeGoals");
-  const awayGoals = formData.get("awayGoals");
-  const homeExtraTimeGoals = formData.get("homeExtraTimeGoals");
-  const awayExtraTimeGoals = formData.get("awayExtraTimeGoals");
-  const homePenaltyGoals = formData.get("homePenaltyGoals");
-  const awayPenaltyGoals = formData.get("awayPenaltyGoals");
-
-  await prisma.leagueKnockoutMatch.update({
-    where: { id },
-    data: {
-      homeGoals: homeGoals ? +homeGoals : null,
-      awayGoals: awayGoals ? +awayGoals : null,
-      homeExtraTimeGoals: homeExtraTimeGoals ? +homeExtraTimeGoals : null,
-      awayExtraTimeGoals: awayExtraTimeGoals ? +awayExtraTimeGoals : null,
-      homePenaltyGoals: homePenaltyGoals ? +homePenaltyGoals : null,
-      awayPenaltyGoals: awayPenaltyGoals ? +awayPenaltyGoals : null,
-    },
-  });
-
-  revalidatePath("/dashboard/league-knockout-matches");
-  redirect(
-    `/dashboard/league-knockout-matches${
-      searchParams ? `?${searchParams}` : ""
-    }`
-  );
 }
 
 export async function updateLeagueKnockoutMatchStatus(
-  args: { id: number; searchParams: string },
+  args: { id: number },
   prevState: unknown,
   formData: FormData
 ) {
-  const { id, searchParams } = args;
+  try {
+    const { id } = args;
 
-  const result = MatchStatusSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
+    const result = MatchStatusSchema.safeParse(
+      Object.fromEntries(formData.entries())
+    );
 
-  if (result.success === false) {
-    return result.error.formErrors.fieldErrors;
+    if (result.success === false) {
+      return result.error.formErrors.fieldErrors;
+    }
+
+    const data = result.data;
+
+    const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
+      where: { id },
+    });
+
+    if (currentMatch == null) return notFound();
+
+    await prisma.leagueKnockoutMatch.update({
+      where: { id },
+      data: {
+        status: data.status,
+      },
+    });
+
+    revalidatePath("/dashboard/league-knockout-matches");
+  } catch (error) {
+    console.log(error);
   }
-
-  const data = result.data;
-
-  const currentMatch = await prisma.leagueKnockoutMatch.findUnique({
-    where: { id },
-  });
-
-  if (currentMatch == null) return notFound();
-
-  await prisma.leagueKnockoutMatch.update({
-    where: { id },
-    data: {
-      status: data.status,
-    },
-  });
-
-  revalidatePath("/dashboard/league-knockout-matches");
-  redirect(
-    `/dashboard/league-knockout-matches${
-      searchParams ? `?${searchParams}` : ""
-    }`
-  );
 }

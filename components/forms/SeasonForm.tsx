@@ -161,6 +161,7 @@ export default function SeasonForm({
             className="form-multiple-selector-styles"
             hideClearAllButton
             hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
             onSearch={async (value) => {
               const res = await searchLeague(value);
               return res;
@@ -169,6 +170,11 @@ export default function SeasonForm({
             placeholder="Select league"
             emptyIndicator={
               <p className="empty-indicator">No leagues found.</p>
+            }
+            loadingIndicator={
+              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
+                Loading...
+              </p>
             }
             onChange={setSelectedLeague}
             value={selectedLeague}
@@ -249,7 +255,7 @@ export default function SeasonForm({
               }
               loadingIndicator={
                 <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                  loading...
+                  Loading...
                 </p>
               }
               onChange={setSelectedTeams}

@@ -16,6 +16,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import {
   getFormattedDateTime,
@@ -24,36 +31,33 @@ import {
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
-import AddNewLinkComponent from "@/components/forms/parts/AddNewLinkComponent";
 import SearchFieldComponent from "@/components/table-parts/SearchFieldComponent";
 import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter";
-import ActionsCellDropDown from "@/components/table-parts/ActionsCellDropDown";
-
-import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import SortByList from "@/components/table-parts/SortByList";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 import Filters from "@/components/table-parts/Filters";
 import PopoverStatusUpdator from "@/components/table-parts/PopoverStatusUpdator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 import ScoreTableCell from "@/components/table-parts/ScoreTableCell";
+
+import GroupMatchForm from "@/components/forms/GroupMatchForm";
+
+import { Pencil, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardGroupMatchesPage({
   searchParams,
 }: {
   searchParams: {
-    page?: string;
-    query?: string;
-    sortDir?: SortDirectionOptions;
-    sortField?: string;
-    isFeatured?: string;
-    status?: string;
-    date?: string;
+    page?: string | null;
+    query?: string | null;
+    sortDir?: SortDirectionOptions | null;
+    sortField?: string | null;
+    isFeatured?: string | null;
+    status?: string | null;
+    date?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -209,10 +213,7 @@ export default async function DashboardGroupMatchesPage({
           }}
         />
         <SearchFieldComponent placeholder="Search by tournamet names, years, group names, rounds, teams ..." />
-        <AddNewLinkComponent
-          href="/dashboard/matches/new"
-          label="Add New Match"
-        />
+        <FormDialog id={null} />
       </div>
       {matches.length > 0 ? (
         <Table className="dashboard-table">
@@ -363,9 +364,9 @@ export default async function DashboardGroupMatchesPage({
                         </Tooltip>
                       </TooltipProvider>
                     </TableCell>
-                    <ActionsCellDropDown
-                      editHref={`/dashboard/matches/${id}`}
-                    />
+                    <TableCell>
+                      <FormDialog id={id} />
+                    </TableCell>
                   </TableRow>
                 );
               }
@@ -381,5 +382,42 @@ export default async function DashboardGroupMatchesPage({
         <NoDataFoundComponent message="No Matches Found" />
       )}
     </>
+  );
+}
+
+async function FormDialog({ id }: { id: number | null }) {
+  const match = id
+    ? await prisma.match.findUnique({
+        where: { id },
+        include: {
+          homeTeam: true,
+          awayTeam: true,
+          group: true,
+          tournamentEdition: {
+            include: { tournament: true },
+          },
+        },
+      })
+    : null;
+
+  if (id && !match) throw new Error("Something went wrong");
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        {match == null ? (
+          <Button variant="outline" size="icon">
+            <Plus className="size-5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="icon">
+            <Pencil className="size-5" />
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
+        <GroupMatchForm match={match} />
+      </DialogContent>
+    </Dialog>
   );
 }
