@@ -1,12 +1,12 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 import { ZodError } from "zod";
 import { LeagueTypes } from "@/types/enums";
+import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   name: string;
@@ -51,17 +51,7 @@ export async function addLeague(
       };
     }
 
-    let logoUrlPath = "";
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
 
     await prisma.league.create({
       data: {
@@ -125,19 +115,11 @@ export async function updateLeague(
 
     if (league == null) return notFound();
 
-    let logoUrlPath = league.logoUrl;
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      if (league.logoUrl) await fs.unlink(`public${league.logoUrl}`);
-
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await deleteAndWriteImageFile(
+      data.logoUrl,
+      "tournaments",
+      league.logoUrl
+    );
 
     await prisma.league.update({
       where: { id },

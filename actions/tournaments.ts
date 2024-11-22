@@ -1,12 +1,12 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { TournamentSchema } from "@/schemas";
 import { ZodError } from "zod";
 import { IsPopularOptions } from "@/types/enums";
+import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   name: string;
@@ -55,17 +55,7 @@ export async function addTournament(
       };
     }
 
-    let logoUrlPath = "";
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
 
     await prisma.tournament.create({
       data: {
@@ -133,19 +123,11 @@ export async function updateTournament(
 
     if (tournament == null) return notFound();
 
-    let logoUrlPath = tournament.logoUrl;
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      if (tournament.logoUrl) await fs.unlink(`public${tournament.logoUrl}`);
-
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await deleteAndWriteImageFile(
+      data.logoUrl,
+      "tournaments",
+      tournament.logoUrl
+    );
 
     await prisma.tournament.update({
       where: { id },

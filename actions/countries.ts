@@ -1,11 +1,11 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { CountrySchema } from "@/schemas";
 import { ZodError } from "zod";
+import { writeImageFile, deleteAndWriteImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   name: string;
@@ -54,19 +54,7 @@ export async function addCountry(
       };
     }
 
-    let flagUrlPath = "";
-    if (data.flagUrl != null && data.flagUrl.size > 0) {
-      flagUrlPath = `/images/countries/${crypto.randomUUID()}-${
-        data.flagUrl.name
-      }`;
-
-      if (data.flagUrl !== null) {
-        await fs.writeFile(
-          `public${flagUrlPath}`,
-          new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
-        );
-      }
-    }
+    const flagUrlPath = await writeImageFile(data.flagUrl, "countries");
 
     await prisma.country.create({
       data: {
@@ -134,19 +122,11 @@ export async function updateCountry(
 
     if (country == null) return notFound();
 
-    let flagUrlPath = country.flagUrl;
-    if (data.flagUrl != null && data.flagUrl.size > 0) {
-      if (country.flagUrl) await fs.unlink(`public${country.flagUrl}`);
-
-      flagUrlPath = `/images/countries/${crypto.randomUUID()}-${
-        data.flagUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${flagUrlPath}`,
-        new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
-      );
-    }
+    const flagUrlPath = await deleteAndWriteImageFile(
+      data.flagUrl,
+      "countries",
+      country.flagUrl
+    );
 
     await prisma.country.update({
       where: { id },

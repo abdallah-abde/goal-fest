@@ -31,12 +31,14 @@ import {
 } from "@/actions/leagueKnockoutMatches";
 
 import PageHeader from "@/components/PageHeader";
+import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
-
-import { Ban, Check } from "lucide-react";
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
+import MultipleSelectorEmptyIndicator from "@/components/forms/parts/MultipleSelectorEmptyIndicator";
 
 import MultipleSelector, {
   MultipleSelectorRef,
@@ -44,6 +46,7 @@ import MultipleSelector, {
 } from "@/components/ui/multiple-selector";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
+import { searchLeague, searchSeason } from "@/lib/api-functions";
 
 interface MatchProps extends LeagueKnockoutMatch {
   season: LeagueSeasonProps;
@@ -110,14 +113,6 @@ export default function LeagueKnockoutMatchForm({
       : []
   );
 
-  const searchLeague = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch("/api/leagues/" + value);
-      const data = await res.json();
-      resolve(data);
-    });
-  };
-
   useEffect(() => {
     if (match == null) {
       setSelectedSeason([]);
@@ -136,16 +131,6 @@ export default function LeagueKnockoutMatchForm({
         ]
       : []
   );
-
-  const searchSeason = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch(
-        `/api/league-seasons/${selectedLeague[0].dbValue}/${value}`
-      );
-      const data = await res.json();
-      resolve(data);
-    });
-  };
 
   const [seasonsKey, setSeasonsKey] = useState(+new Date());
 
@@ -167,16 +152,13 @@ export default function LeagueKnockoutMatchForm({
 
         setTeams(data.teams);
       } else {
-        setTeams(null);
+        setTeams([]);
       }
       setIsTeamsLoading(false);
     }
 
     getTeams();
   }, [selectedSeason]);
-
-  const teamsRef = useRef<MultipleSelectorRef>(null);
-  const [teamsKey, setTeamsKey] = useState(+new Date());
 
   const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
     match?.homeTeamId?.toString() || undefined
@@ -198,19 +180,14 @@ export default function LeagueKnockoutMatchForm({
         }
       />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          Match has been {match == null ? "added" : "updated"} successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`Match has been ${
+          match == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
@@ -233,13 +210,9 @@ export default function LeagueKnockoutMatchForm({
             maxSelected={1}
             placeholder="Select league"
             emptyIndicator={
-              <p className="empty-indicator">No leagues found.</p>
+              <MultipleSelectorEmptyIndicator label="No leagues found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedLeague}
             value={selectedLeague}
             disabled={!!match}
@@ -261,19 +234,15 @@ export default function LeagueKnockoutMatchForm({
             badgeClassName="text-primary"
             key={seasonsKey}
             onSearch={async (value) => {
-              const res = await searchSeason(value);
+              const res = await searchSeason(value, selectedLeague[0].dbValue);
               return res;
             }}
             maxSelected={1}
             placeholder="Select season"
             emptyIndicator={
-              <p className="empty-indicator">No seasons found.</p>
+              <MultipleSelectorEmptyIndicator label="No seasons found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             ref={seasonsRef}
             onChange={setSelectedSeason}
             value={selectedSeason}

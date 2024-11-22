@@ -25,8 +25,10 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { Ban, Check, Eraser } from "lucide-react";
+import { Eraser } from "lucide-react";
 import { LeagueTypes } from "@/types/enums";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
 
 export default function LeagueForm({
   league,
@@ -68,18 +70,16 @@ export default function LeagueForm({
   return (
     <div className="overflow-auto px-4">
       <PageHeader label={league ? "Edit League" : "Add League"} />
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          League has been {league == null ? "added" : "updated"} successfully
-        </p>
-      )}
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+
+      <FormSuccessMessage
+        success={formState.success}
+        message={`League has been ${
+          league == null ? "added" : "updated"
+        } successfully`}
+      />
+
+      <FormCustomErrorMessage customError={formState.customError} />
+
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
           <Label htmlFor="name">Name</Label>

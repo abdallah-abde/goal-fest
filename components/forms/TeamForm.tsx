@@ -24,8 +24,10 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { Ban, Check } from "lucide-react";
 import { Continents } from "@/types/enums";
+
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
 
 export default function TeamForm({ team }: { team?: Team | null }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -54,19 +56,14 @@ export default function TeamForm({ team }: { team?: Team | null }) {
     <div className="overflow-auto px-4">
       <PageHeader label={team ? "Edit Team" : "Add Team"} />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          Team has been {team == null ? "added" : "updated"} successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`Team has been ${
+          team == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>

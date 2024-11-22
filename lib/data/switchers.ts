@@ -212,8 +212,8 @@ export function switchLeagueMatchToNeutralMatch(match: LeagueMatchProps) {
     type: "LEAGUE_MATCH",
     editionOrSeason: match.season,
     editionOrSeasonLogoUrl:
-      match.season.logoUrl ||
-      match.season.league.logoUrl ||
+      match?.season?.logoUrl ||
+      match?.season?.league?.logoUrl ||
       EmptyImageUrls.Tournament,
     editionOrSeasonSlug: match.season.slug,
     tournamentOrLeagueName: match.season?.league?.name,

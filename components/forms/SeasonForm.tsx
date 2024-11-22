@@ -13,17 +13,21 @@ import { LeagueSeason, League, LeagueTeam, Country } from "@prisma/client";
 import { addLeagueSeason, updateLeagueSeason } from "@/actions/seasons";
 
 import PageHeader from "@/components/PageHeader";
+import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
-
-import { Ban, Check } from "lucide-react";
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
+import MultipleSelectorEmptyIndicator from "@/components/forms/parts/MultipleSelectorEmptyIndicator";
 
 import MultipleSelector, {
   MultipleSelectorRef,
   Option,
 } from "@/components/ui/multiple-selector";
+
+import { searchLeague } from "@/lib/api-functions";
 
 interface LeagueSeasonProps extends LeagueSeason {
   league: LeagueProps;
@@ -78,14 +82,6 @@ export default function SeasonForm({
       : []
   );
 
-  const searchLeague = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch("/api/leagues/" + value);
-      const data = await res.json();
-      resolve(data);
-    });
-  };
-
   const [teams, setTeams] = useState<LeagueTeam[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
@@ -131,22 +127,14 @@ export default function SeasonForm({
         label={leagueSeason ? "Edit League Season" : "Add League Season"}
       />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          League Season has been {leagueSeason == null
-            ? "added"
-            : "updated"}{" "}
-          successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`League Season has been ${
+          leagueSeason == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
@@ -169,13 +157,9 @@ export default function SeasonForm({
             maxSelected={1}
             placeholder="Select league"
             emptyIndicator={
-              <p className="empty-indicator">No leagues found.</p>
+              <MultipleSelectorEmptyIndicator label="No leagues found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedLeague}
             value={selectedLeague}
             disabled={!!leagueSeason}
@@ -251,13 +235,9 @@ export default function SeasonForm({
               })}
               placeholder="Select teams"
               emptyIndicator={
-                <p className="empty-indicator">No teams found.</p>
+                <MultipleSelectorEmptyIndicator label="No teams found" />
               }
-              loadingIndicator={
-                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                  Loading...
-                </p>
-              }
+              loadingIndicator={<MultipleSelectorLoadingIndicator />}
               onChange={setSelectedTeams}
               value={selectedTeams}
             />

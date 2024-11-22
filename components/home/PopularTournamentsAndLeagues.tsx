@@ -10,9 +10,9 @@ import { EmptyImageUrls } from "@/types/enums";
 
 interface TournamentOrLeague {
   name: string;
-  logoUrl: string;
+  logoUrl: string | null;
   slug: string;
-  currentTournamentOrLeagueLogoUrl: string;
+  currentTournamentOrLeagueLogoUrl: string | null;
   type: string;
   country: string;
 }
@@ -54,6 +54,7 @@ export default async function PopulatTournamentsAndLeagues() {
           select: {
             name: true,
             logoUrl: true,
+            type: true,
             country: {
               select: {
                 name: true,
@@ -117,7 +118,8 @@ export default async function PopulatTournamentsAndLeagues() {
                     height={25}
                     src={
                       currentTournamentOrLeagueLogoUrl ||
-                      logoUrl || EmptyImageUrls.Tournament
+                      logoUrl ||
+                      EmptyImageUrls.Tournament
                     }
                     alt={name + " Logo"}
                   />

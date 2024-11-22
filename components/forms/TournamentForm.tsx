@@ -24,8 +24,10 @@ import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { Ban, Check, Eraser } from "lucide-react";
 import { IsPopularOptions, TournamentTypes } from "@/types/enums";
+
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
 
 export default function TournamentForm({
   tournament,
@@ -65,20 +67,14 @@ export default function TournamentForm({
     <div className="overflow-auto px-4">
       <PageHeader label={tournament ? "Edit Tournament" : "Add Tournament"} />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          Tournament has been {tournament == null ? "added" : "updated"}{" "}
-          successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`Tournament has been ${
+          tournament == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles">
         <FormField>

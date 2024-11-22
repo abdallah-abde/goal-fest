@@ -1,13 +1,13 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { EditionSchema, CurrentStageSchema } from "@/schemas";
 import { TournamentStages } from "@/types/enums";
 import { generateSlug } from "@/lib/generateSlug";
 import { ZodError } from "zod";
+import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   tournamentId: string;
@@ -103,17 +103,7 @@ export async function addTournamentEdition(
       exists = await prisma.tournamentEdition.findUnique({ where: { slug } });
     }
 
-    let logoUrlPath = "";
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
 
     const hostingCountries = await prisma.country.findMany({
       where: {
@@ -246,20 +236,11 @@ export async function updateTournamentEdition(
 
     if (currentTournamentEdition == null) return notFound();
 
-    let logoUrlPath = currentTournamentEdition.logoUrl;
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      if (currentTournamentEdition.logoUrl)
-        await fs.unlink(`public${currentTournamentEdition.logoUrl}`);
-
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await deleteAndWriteImageFile(
+      data.logoUrl,
+      "tournaments",
+      currentTournamentEdition.logoUrl
+    );
 
     const hostingCountries = await prisma.country.findMany({
       where: {

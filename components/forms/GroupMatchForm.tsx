@@ -27,12 +27,14 @@ import {
 } from "@/actions/groupMatches";
 
 import PageHeader from "@/components/PageHeader";
+import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
-
-import { Ban, Check } from "lucide-react";
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
+import MultipleSelectorEmptyIndicator from "@/components/forms/parts/MultipleSelectorEmptyIndicator";
 
 import MultipleSelector, {
   MultipleSelectorRef,
@@ -40,6 +42,11 @@ import MultipleSelector, {
 } from "@/components/ui/multiple-selector";
 
 import { getDateValueForDateTimeInput } from "@/lib/getFormattedDate";
+import {
+  searchTournament,
+  searchEdition,
+  searchGroup,
+} from "@/lib/api-functions";
 
 interface MatchProps extends Match {
   tournamentEdition: TournamentEditionProps;
@@ -83,21 +90,13 @@ export default function GroupMatchForm({
     match
       ? [
           {
-            dbValue: match.tournamentEdition.tournament.id.toString(),
+            dbValue: match.tournamentEdition.tournamentId.toString(),
             label: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
             value: `${match.tournamentEdition.tournament.name} (${match.tournamentEdition.tournament.type})`,
           },
         ]
       : []
   );
-
-  const searchTournament = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch("/api/tournaments/" + value);
-      const data = await res.json();
-      resolve(data);
-    });
-  };
 
   useEffect(() => {
     if (match == null) {
@@ -121,16 +120,6 @@ export default function GroupMatchForm({
       : []
   );
 
-  const searchEdition = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch(
-        `/api/tournament-editions/${selectedTournament[0].dbValue}/${value}`
-      );
-      const data = await res.json();
-      resolve(data);
-    });
-  };
-
   useEffect(() => {
     if (match == null) {
       setSelectedGroup([]);
@@ -153,16 +142,6 @@ export default function GroupMatchForm({
         ]
       : []
   );
-
-  const searchGroup = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch(
-        `/api/tournament-edition-groups/${selectedEdition[0].dbValue}/${value}`
-      );
-      const data = await res.json();
-      resolve(data);
-    });
-  };
 
   const [groupsKey, setGroupsKey] = useState(+new Date());
 
@@ -191,16 +170,13 @@ export default function GroupMatchForm({
 
         setTeams(data.teams);
       } else {
-        setTeams(null);
+        setTeams([]);
       }
       setIsTeamsLoading(false);
     }
 
     getTeams();
   }, [selectedEdition, selectedGroup]);
-
-  const teamsRef = useRef<MultipleSelectorRef>(null);
-  const [teamsKey, setTeamsKey] = useState(+new Date());
 
   const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
     match?.homeTeamId.toString() || undefined
@@ -218,19 +194,14 @@ export default function GroupMatchForm({
     <div className="overflow-auto px-4">
       <PageHeader label={match ? "Edit Group Match" : "Add Group Match"} />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          Match has been {match == null ? "added" : "updated"} successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`Match has been ${
+          match == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
@@ -253,13 +224,9 @@ export default function GroupMatchForm({
             maxSelected={1}
             placeholder="Select tournament"
             emptyIndicator={
-              <p className="empty-indicator">No tournaments found.</p>
+              <MultipleSelectorEmptyIndicator label="No tournaments found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedTournament}
             value={selectedTournament}
             disabled={!!match}
@@ -281,19 +248,18 @@ export default function GroupMatchForm({
             badgeClassName="text-primary"
             key={editionsKey}
             onSearch={async (value) => {
-              const res = await searchEdition(value);
+              const res = await searchEdition(
+                value,
+                selectedTournament[0].dbValue
+              );
               return res;
             }}
             maxSelected={1}
             placeholder="Select edition"
             emptyIndicator={
-              <p className="empty-indicator">No editions found.</p>
+              <MultipleSelectorEmptyIndicator label="No editions found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             ref={editionsRef}
             onChange={setSelectedEdition}
             value={selectedEdition}
@@ -316,12 +282,14 @@ export default function GroupMatchForm({
             badgeClassName="text-primary"
             key={groupsKey}
             onSearch={async (value) => {
-              const res = await searchGroup(value);
+              const res = await searchGroup(value, selectedEdition[0].dbValue);
               return res;
             }}
             maxSelected={1}
             placeholder="Select group"
-            emptyIndicator={<p className="empty-indicator">No groups found.</p>}
+            emptyIndicator={
+              <MultipleSelectorEmptyIndicator label="No groups found" />
+            }
             loadingIndicator={
               <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
                 Loading...

@@ -51,15 +51,9 @@ export default async function LeaguesInfoPage({
           },
         },
       }),
-      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-        getTeamsGoalsScored(slug, 5, "leagues")
-      )}`,
-      await prisma.$queryRaw<TotalGoalsProps[]>`${Prisma.raw(
-        getTeamsGoalsAgainst(slug, 5, "leagues")
-      )}`,
-      await prisma.$queryRaw<TotalCleanSheetsProps[]>`${Prisma.raw(
-        getTeamsCleanSheets(slug, 5, "leagues")
-      )}`,
+      await getTeamsGoalsScored(slug, 5, "leagues"),
+      await getTeamsGoalsAgainst(slug, 5, "leagues"),
+      await getTeamsCleanSheets(slug, 5, "leagues"),
     ]);
 
   if (!leagueSeason) throw new Error("Something went wrong");

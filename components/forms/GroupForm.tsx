@@ -8,28 +8,24 @@ import { Label } from "@/components/ui/label";
 
 import { Group, Team, Tournament, TournamentEdition } from "@prisma/client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import { addTournamentGroup, updateTournamentGroup } from "@/actions/groups";
 
 import PageHeader from "@/components/PageHeader";
+import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 import FormFieldLoadingState from "@/components/forms/parts/FormFieldLoadingState";
+import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
+import MultipleSelectorEmptyIndicator from "@/components/forms/parts/MultipleSelectorEmptyIndicator";
 
 import MultipleSelector, {
   MultipleSelectorRef,
   Option,
 } from "@/components/ui/multiple-selector";
 
-import { Ban, Check } from "lucide-react";
+import { searchEdition, searchTournament } from "@/lib/api-functions";
 
 interface GroupProps extends Group {
   tournamentEdition: TournamentEditionProps;
@@ -64,21 +60,13 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
     group
       ? [
           {
-            dbValue: group.tournamentEdition.tournament.id.toString(),
+            dbValue: group.tournamentEdition.tournamentId.toString(),
             label: `${group.tournamentEdition.tournament.name} (${group.tournamentEdition.tournament.type})`,
             value: `${group.tournamentEdition.tournament.name} (${group.tournamentEdition.tournament.type})`,
           },
         ]
       : []
   );
-
-  const searchTournament = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch("/api/tournaments/" + value);
-      const data = await res.json();
-      resolve(data);
-    });
-  };
 
   useEffect(() => {
     if (group == null) {
@@ -98,16 +86,6 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
         ]
       : []
   );
-
-  const searchEdition = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch(
-        `/api/tournament-editions/${selectedTournament[0].dbValue}/${value}`
-      );
-      const data = await res.json();
-      resolve(data);
-    });
-  };
 
   useEffect(() => {
     if (group == null) {
@@ -163,19 +141,14 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
     <div className="overflow-auto px-4">
       <PageHeader label={group ? "Edit Group" : "Add Group"} />
 
-      {formState.success && (
-        <p className="p-2 px-3 rounded-md w-full bg-emerald-500/10 text-emerald-500 text-lg mb-2 text-center flex items-center gap-2">
-          <Check size={20} />
-          Group has been {group == null ? "added" : "updated"} successfully
-        </p>
-      )}
+      <FormSuccessMessage
+        success={formState.success}
+        message={`Group has been ${
+          group == null ? "added" : "updated"
+        } successfully`}
+      />
 
-      {formState.customError && (
-        <p className="p-2 px-3 rounded-md w-full bg-destructive/10 text-destructive text-lg mb-2 text-center flex items-center gap-2">
-          <Ban size={20} />
-          {formState.customError}
-        </p>
-      )}
+      <FormCustomErrorMessage customError={formState.customError} />
 
       <form action={formAction} className="form-styles" ref={formRef}>
         <FormField>
@@ -198,13 +171,9 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
             maxSelected={1}
             placeholder="Select tournament"
             emptyIndicator={
-              <p className="empty-indicator">No tournaments found.</p>
+              <MultipleSelectorEmptyIndicator label="No tournaments found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedTournament}
             value={selectedTournament}
             disabled={!!group}
@@ -226,19 +195,18 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
             badgeClassName="text-primary"
             key={editionsKey}
             onSearch={async (value) => {
-              const res = await searchEdition(value);
+              const res = await searchEdition(
+                value,
+                selectedTournament[0].dbValue
+              );
               return res;
             }}
             maxSelected={1}
             placeholder="Select edition"
             emptyIndicator={
-              <p className="empty-indicator">No editions found.</p>
+              <MultipleSelectorEmptyIndicator label="No editions found" />
             }
-            loadingIndicator={
-              <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                Loading...
-              </p>
-            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
             ref={editionsRef}
             onChange={setSelectedEdition}
             value={selectedEdition}
@@ -284,13 +252,9 @@ export default function GroupForm({ group }: { group?: GroupProps | null }) {
               })}
               placeholder="Select teams"
               emptyIndicator={
-                <p className="empty-indicator">no teams found.</p>
+                <MultipleSelectorEmptyIndicator label="No teams found" />
               }
-              loadingIndicator={
-                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                  loading...
-                </p>
-              }
+              loadingIndicator={<MultipleSelectorLoadingIndicator />}
               onChange={setSelectedTeams}
               value={selectedTeams}
             />

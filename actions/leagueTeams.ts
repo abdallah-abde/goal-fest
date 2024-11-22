@@ -1,11 +1,11 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { LeagueTeamSchema } from "@/schemas";
 import { ZodError } from "zod";
+import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   name: string;
@@ -56,15 +56,7 @@ export async function addLeagueTeam(
       };
     }
 
-    let flagUrlPath = "";
-    if (data.flagUrl != null && data.flagUrl.size > 0) {
-      flagUrlPath = `/images/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
-
-      await fs.writeFile(
-        `public${flagUrlPath}`,
-        new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
-      );
-    }
+    const flagUrlPath = await writeImageFile(data.flagUrl, "teams");
 
     await prisma.leagueTeam.create({
       data: {
@@ -135,17 +127,11 @@ export async function updateLeagueTeam(
 
     if (team == null) return notFound();
 
-    let flagUrlPath = team.flagUrl;
-    if (data.flagUrl != null && data.flagUrl.size > 0) {
-      if (team.flagUrl) await fs.unlink(`public${team.flagUrl}`);
-
-      flagUrlPath = `/images/teams/${crypto.randomUUID()}-${data.flagUrl.name}`;
-
-      await fs.writeFile(
-        `public${flagUrlPath}`,
-        new Uint8Array(Buffer.from(await data.flagUrl.arrayBuffer()))
-      );
-    }
+    const flagUrlPath = await deleteAndWriteImageFile(
+      data.flagUrl,
+      "teams",
+      team.flagUrl
+    );
 
     await prisma.leagueTeam.update({
       where: { id },

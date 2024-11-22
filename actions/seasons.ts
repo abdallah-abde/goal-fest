@@ -1,13 +1,13 @@
 "use server";
 
 import prisma from "@/lib/db";
-import fs from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { CurrentStageSchema, SeasonSchema } from "@/schemas";
 import { generateSlug } from "@/lib/generateSlug";
 import { LeagueStages } from "@/types/enums";
 import { ZodError } from "zod";
+import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   leagueId: string;
@@ -96,17 +96,7 @@ export async function addLeagueSeason(
       exists = await prisma.leagueSeason.findUnique({ where: { slug } });
     }
 
-    let logoUrlPath = "";
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
 
     const leagueTeams = await prisma.leagueTeam.findMany({
       where: {
@@ -215,20 +205,11 @@ export async function updateLeagueSeason(
 
     if (currentLeagueSeason == null) return notFound();
 
-    let logoUrlPath = currentLeagueSeason.logoUrl;
-    if (data.logoUrl != null && data.logoUrl.size > 0) {
-      if (currentLeagueSeason.logoUrl)
-        await fs.unlink(`public${currentLeagueSeason.logoUrl}`);
-
-      logoUrlPath = `/images/tournaments/${crypto.randomUUID()}-${
-        data.logoUrl.name
-      }`;
-
-      await fs.writeFile(
-        `public${logoUrlPath}`,
-        new Uint8Array(Buffer.from(await data.logoUrl.arrayBuffer()))
-      );
-    }
+    const logoUrlPath = await deleteAndWriteImageFile(
+      data.logoUrl,
+      "tournaments",
+      currentLeagueSeason.logoUrl
+    );
 
     const leagueTeams = await prisma.leagueTeam.findMany({
       where: {
