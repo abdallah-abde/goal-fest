@@ -162,3 +162,27 @@ export async function updateLeagueTeam(
     };
   }
 }
+
+export async function updateLeagueTeamPopularStatus(
+  id: number,
+  isPopular: boolean
+) {
+  try {
+    const currentLeagueTeam = await prisma.leagueTeam.findUnique({
+      where: { id },
+    });
+
+    if (currentLeagueTeam == null) return notFound();
+
+    await prisma.leagueTeam.update({
+      where: { id },
+      data: {
+        isPopular: !isPopular,
+      },
+    });
+
+    revalidatePath("/dashboard/league-teams");
+  } catch (error) {
+    console.log(error);
+  }
+}

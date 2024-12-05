@@ -42,7 +42,7 @@ export default async function PopularTeams() {
                   <p className="font-semibold text-sm">{name}</p>
                   {country && (
                     <p className="text-muted-foreground text-xs">
-                      {country.name})
+                      {country.name}
                     </p>
                   )}
                 </div>

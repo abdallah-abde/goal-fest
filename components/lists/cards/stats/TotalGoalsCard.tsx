@@ -2,15 +2,14 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TotalGoalsProps } from "@/types/totalStats";
 import { Badge } from "@/components/ui/badge";
+import { EmptyImageUrls } from "@/types/enums";
 
 export default function TotalGoalsCard({
   teamsGoals,
   label,
-}: // type
-{
+}: {
   teamsGoals: TotalGoalsProps[];
   label: string;
-  // type: 'tournaments' | 'leagues'
 }) {
   return (
     <Card>
@@ -32,14 +31,13 @@ export default function TotalGoalsCard({
               className="flex justify-between border-b border-primary/10 py-2 last:border-0"
             >
               <div className="flex gap-4 items-center">
-                {teamFlagUrl && (
-                  <Image
-                    src={teamFlagUrl}
-                    alt={teamName}
-                    width={25}
-                    height={25}
-                  />
-                )}
+                <Image
+                  src={teamFlagUrl || EmptyImageUrls.Team}
+                  alt={teamName + " Flag" || "Team Flag"}
+                  width={35}
+                  height={35}
+                  className="aspect-video object-contain"
+                />
                 <span className="hidden sm:block font-bold">{teamName}</span>
                 <span className="hidden max-sm:block font-bold">
                   {teamCode}

@@ -18,6 +18,7 @@ import {
 } from "@prisma/client";
 import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
 import { standingsHeaders } from "@/lib/data/standingsHeaders";
+import { EmptyImageUrls } from "@/types/enums";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
@@ -60,24 +61,22 @@ export default function StandingsTables({
               {standings.sort(sortGroupTeams).map((team) => (
                 <TableRow key={team.id} className="dashboard-table-row">
                   <TableCell className="dashboard-table-cell text-left flex gap-3 items-center">
-                    {team.flagUrl && (
-                      <>
-                        <Image
-                          src={team.flagUrl}
-                          width={20}
-                          height={20}
-                          alt={`${team.name} flag`}
-                          className="hidden max-xs:block"
-                        />
-                        <Image
-                          src={team.flagUrl}
-                          width={25}
-                          height={25}
-                          alt={`${team.name} flag`}
-                          className="hidden xs:block"
-                        />
-                      </>
-                    )}
+                    <>
+                      <Image
+                        src={team.flagUrl || EmptyImageUrls.Team}
+                        width={30}
+                        height={30}
+                        alt={`${team.name} Flag` || "Team Flag"}
+                        className="hidden max-xs:block aspect-video object-contain"
+                      />
+                      <Image
+                        src={team.flagUrl || EmptyImageUrls.Team}
+                        width={35}
+                        height={35}
+                        alt={`${team.name} Flag` || "Team Flag"}
+                        className="hidden xs:block aspect-video object-contain"
+                      />
+                    </>
                     <span className="hidden max-2xs:block">
                       {team.code ? team.code : team.name}
                     </span>

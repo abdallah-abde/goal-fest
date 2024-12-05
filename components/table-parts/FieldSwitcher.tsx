@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { updateGroupMatchFeaturedStatus } from "@/actions/groupMatches";
 import { updateKnockoutMatchFeaturedStatus } from "@/actions/knockoutMatches";
@@ -12,6 +12,7 @@ import { updateTournamentPopularStatus } from "@/actions/tournaments";
 
 import { Switch } from "@/components/ui/switch";
 import { LoadingSpinner } from "@/components/LoadingComponents";
+import { updateLeagueTeamPopularStatus } from "@/actions/leagueTeams";
 
 export default function FieldSwitcher({
   id,
@@ -26,11 +27,11 @@ export default function FieldSwitcher({
     | "leagueMatches"
     | "leagueKnockoutMatches"
     | "leagues"
+    | "leagueTeams"
     | "tournaments";
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   return (
     <>
@@ -41,40 +42,18 @@ export default function FieldSwitcher({
           onCheckedChange={async (value) =>
             startTransition(async () => {
               type === "matches"
-                ? await updateGroupMatchFeaturedStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  )
+                ? await updateGroupMatchFeaturedStatus(id, !value)
                 : type === "knockoutMatches"
-                ? await updateKnockoutMatchFeaturedStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  )
+                ? await updateKnockoutMatchFeaturedStatus(id, !value)
                 : type === "leagueMatches"
-                ? await updateLeagueMatchFeaturedStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  )
+                ? await updateLeagueMatchFeaturedStatus(id, !value)
                 : type === "leagueKnockoutMatches"
-                ? await updateLeagueKnockoutMatchFeaturedStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  )
+                ? await updateLeagueKnockoutMatchFeaturedStatus(id, !value)
                 : type === "leagues"
-                ? await updateLeaguePopularStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  )
-                : await updateTournamentPopularStatus(
-                    id,
-                    !value,
-                    searchParams.toString()
-                  );
+                ? await updateLeaguePopularStatus(id, !value)
+                : type === "leagueTeams"
+                ? await updateLeagueTeamPopularStatus(id, !value)
+                : await updateTournamentPopularStatus(id, !value);
 
               router.refresh();
             })

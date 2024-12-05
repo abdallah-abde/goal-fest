@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { EmptyImageUrls } from "@/types/enums";
 
 export default function TeamOrCountryCard({
   id,
@@ -37,9 +38,13 @@ export default function TeamOrCountryCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6 pb-0">
-        {flagUrl && (
-          <Image width={40} height={40} src={flagUrl} alt={name + " Flag"} />
-        )}
+        <Image
+          width={60}
+          height={60}
+          src={flagUrl || EmptyImageUrls.Team}
+          alt={name + " Flag"}
+          className="aspect-video object-contain"
+        />
       </CardContent>
     </Card>
   );

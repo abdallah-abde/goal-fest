@@ -2,7 +2,11 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions, Continents } from "@/types/enums";
+import {
+  SortDirectionOptions,
+  Continents,
+  FlagFilterOptions,
+} from "@/types/enums";
 
 import {
   Table,
@@ -12,6 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 import PageHeader from "@/components/PageHeader";
@@ -21,6 +31,7 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import SortByList from "@/components/table-parts/SortByList";
 import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
+import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 
 import LeagueTeamForm from "@/components/forms/LeagueTeamForm";
 
@@ -36,6 +47,7 @@ export default async function DashboardLeagueTeamsPage({
     query?: string | null;
     sortDir?: SortDirectionOptions | null;
     sortField?: string | null;
+    isPopular?: string | null;
     type?: string | null;
   };
 }) {
@@ -43,6 +55,7 @@ export default async function DashboardLeagueTeamsPage({
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const isPopularCondition = searchParams?.isPopular;
   const typeCondition = searchParams?.type || "all";
 
   const where = {
@@ -51,6 +64,14 @@ export default async function DashboardLeagueTeamsPage({
       { name: { contains: query } },
       { code: { contains: query } },
     ],
+    ...(isPopularCondition
+      ? {
+          isPopular:
+            isPopularCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
     ...(typeCondition !== "all"
       ? {
           type: typeCondition,
@@ -67,6 +88,8 @@ export default async function DashboardLeagueTeamsPage({
       ? { code: sortDir }
       : sortField === "type"
       ? { type: sortDir }
+      : sortField === "isPopular"
+      ? { isPopular: sortDir }
       : {}),
   };
 
@@ -89,6 +112,10 @@ export default async function DashboardLeagueTeamsPage({
     { label: "Name", fieldName: "name" },
     { label: "Type", fieldName: "type" },
     { label: "Code", fieldName: "code" },
+    {
+      label: "Is Popular",
+      fieldName: "isPopular",
+    },
   ];
 
   const listFilters = [
@@ -101,6 +128,29 @@ export default async function DashboardLeagueTeamsPage({
     },
   ];
 
+  const flagFilters = [
+    {
+      title: "Is Popular",
+      defaultValue: "all",
+      fieldName: "isPopular",
+      searchParamName: "isPopular",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+  ];
+
   const countries = await prisma.country.findMany();
 
   return (
@@ -108,7 +158,7 @@ export default async function DashboardLeagueTeamsPage({
       <PageHeader label="League Teams List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
-        <Filters listFilters={listFilters} />
+        <Filters flagFilters={flagFilters} listFilters={listFilters} />
         <SearchFieldComponent placeholder="Search by team names, codes ..." />
         <FormDialog countries={countries} id={null} />
       </div>
@@ -122,11 +172,14 @@ export default async function DashboardLeagueTeamsPage({
               <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">Code</TableHead>
               <TableHead className="dashboard-head-table-cell">Type</TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Is Popular
+              </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {LeagueTeams.map(({ id, name, code, country, type }) => (
+            {LeagueTeams.map(({ id, name, code, country, type, isPopular }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">
                   {country?.name || <NotProvidedSpan />}
@@ -138,6 +191,22 @@ export default async function DashboardLeagueTeamsPage({
                 <TableCell className="dashboard-table-cell">
                   {type || <NotProvidedSpan />}
                 </TableCell>
+                <TableCell className="dashboard-table-cell">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <FieldSwitcher
+                          id={id}
+                          type="leagueTeams"
+                          value={isPopular}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Click to update popular status</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
                 <TableCell>
                   <FormDialog countries={countries} id={id} />
                 </TableCell>
@@ -147,7 +216,7 @@ export default async function DashboardLeagueTeamsPage({
           <DashboardTableFooter
             totalCount={totalLeagueTeamsCount}
             totalPages={totalPages}
-            colSpan={5}
+            colSpan={6}
           />
         </Table>
       ) : (

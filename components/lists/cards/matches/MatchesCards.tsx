@@ -39,7 +39,7 @@ import {
   switchLeagueMatchesToNeutralMatches,
   switchLeagueKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
-import { sortMatches } from "@/lib/sortGroupTeams";
+import { sortMatches, sortMatchesByRound } from "@/lib/sortGroupTeams";
 
 interface TournamentEditionProps extends TournamentEdition {
   tournament: Tournament;
@@ -120,7 +120,12 @@ export default function MatchesCards({
     GroupByOptions.ONLYDATE
   );
   const results = Object.entries(
-    _.groupBy(allMatches.sort(sortMatches), groupBy)
+    _.groupBy(
+      allMatches.sort(
+        groupBy === GroupByOptions.ONLYDATE ? sortMatches : sortMatchesByRound
+      ),
+      groupBy
+    )
   );
 
   return (

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import CardsSectionContainer from "@/components/lists/cards/templates/CardsSectionContainer";
 
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
+import { EmptyImageUrls } from "@/types/enums";
 
 export default function NextMatches({
   allMatches,
@@ -51,14 +52,13 @@ export default function NextMatches({
                   </div>
                   <div className="flex flex-col gap-0 border-y border-primary/10">
                     <div className="flex items-center gap-2 py-2">
-                      {homeTeam && homeTeam.flagUrl && (
-                        <Image
-                          src={homeTeam.flagUrl}
-                          alt={homeTeam.name}
-                          width={25}
-                          height={25}
-                        />
-                      )}
+                      <Image
+                        src={homeTeam?.flagUrl || EmptyImageUrls.Team}
+                        alt={homeTeam?.name + " Flag" || "Team Flag"}
+                        width={35}
+                        height={35}
+                        className="aspect-video object-contain"
+                      />
                       <span className="hidden sm:block font-bold">
                         {homeTeam ? homeTeam.name : homeTeamPlaceholder}
                       </span>
@@ -67,14 +67,13 @@ export default function NextMatches({
                       </span>
                     </div>
                     <div className="flex items-center gap-2 py-2">
-                      {awayTeam && awayTeam.flagUrl && (
-                        <Image
-                          src={awayTeam.flagUrl}
-                          alt={awayTeam.name}
-                          width={25}
-                          height={25}
-                        />
-                      )}
+                      <Image
+                        src={awayTeam?.flagUrl || EmptyImageUrls.Team}
+                        alt={awayTeam?.name + " Flag" || "Team Flag"}
+                        width={35}
+                        height={35}
+                        className="aspect-video object-contain"
+                      />
                       <span className="hidden sm:block font-bold">
                         {awayTeam ? awayTeam.name : awayTeamPlaceholder}
                       </span>

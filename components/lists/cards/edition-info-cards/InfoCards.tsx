@@ -35,6 +35,7 @@ import {
   switchLeagueMatchesToNeutralMatches,
   switchLeagueKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
+import { sortMatches } from "@/lib/sortGroupTeams";
 
 interface KnockoutMatchProps extends KnockoutMatch {
   homeTeam: Team | null;
@@ -129,53 +130,93 @@ export default function InfoCards({
   const allMatches: NeutralMatch[] =
     type === "tournaments"
       ? switchTournamentMatchesToNeutralMatches(
-          (matches as MatchProps[]).filter((a) => {
-            if (
-              a.date &&
-              a.date > new Date("July 05, 2024 21:00:00") &&
-              counter < 3
-            ) {
-              counter++;
-              return a;
-            }
-          })
-        ).concat(
-          switchTournamentKnockoutMatchesToNeutralMatches(
-            (knockoutMatches as KnockoutMatchProps[]).filter((a) => {
-              if (
-                a.date &&
-                a.date > new Date("July 05, 2024 21:00:00") &&
-                counter < 3
-              ) {
+          (matches as MatchProps[])
+            .sort((a, b) => {
+              if (a.date && b.date)
+                if (a.date > b.date) {
+                  return -1;
+                } else if (a.date < b.date) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+
+              return 0;
+            })
+            .reverse()
+            .filter((a) => {
+              if (a.date && a.date > new Date() && counter < 3) {
                 counter++;
                 return a;
               }
             })
+        ).concat(
+          switchTournamentKnockoutMatchesToNeutralMatches(
+            (knockoutMatches as KnockoutMatchProps[])
+              .sort((a, b) => {
+                if (a.date && b.date)
+                  if (a.date > b.date) {
+                    return -1;
+                  } else if (a.date < b.date) {
+                    return 1;
+                  } else {
+                    return 0;
+                  }
+
+                return 0;
+              })
+              .reverse()
+              .filter((a) => {
+                if (a.date && a.date > new Date() && counter < 3) {
+                  counter++;
+                  return a;
+                }
+              })
           )
         )
       : switchLeagueMatchesToNeutralMatches(
-          (matches as LeagueMatchProps[]).filter((a) => {
-            if (
-              a.date &&
-              a.date > new Date("July 05, 2024 21:00:00") &&
-              counter < 3
-            ) {
-              counter++;
-              return a;
-            }
-          })
-        ).concat(
-          switchLeagueKnockoutMatchesToNeutralMatches(
-            (knockoutMatches as LeagueKnockoutMatchProps[]).filter((a) => {
-              if (
-                a.date &&
-                a.date > new Date("July 05, 2024 21:00:00") &&
-                counter < 3
-              ) {
+          (matches as LeagueMatchProps[])
+            .sort((a, b) => {
+              if (a.date && b.date)
+                if (a.date > b.date) {
+                  return -1;
+                } else if (a.date < b.date) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+
+              return 0;
+            })
+            .reverse()
+            .filter((a) => {
+              if (a.date && a.date > new Date() && counter < 3) {
                 counter++;
                 return a;
               }
             })
+        ).concat(
+          switchLeagueKnockoutMatchesToNeutralMatches(
+            (knockoutMatches as LeagueKnockoutMatchProps[])
+              .sort((a, b) => {
+                if (a.date && b.date)
+                  if (a.date > b.date) {
+                    return -1;
+                  } else if (a.date < b.date) {
+                    return 1;
+                  } else {
+                    return 0;
+                  }
+
+                return 0;
+              })
+              .reverse()
+              .filter((a) => {
+                if (a.date && a.date > new Date() && counter < 3) {
+                  counter++;
+                  return a;
+                }
+              })
           )
         );
 
