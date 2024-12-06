@@ -18,13 +18,14 @@ export default async function LeaguesInfoPage({
 }) {
   const { slug } = params;
 
-  const [leagueSeason, teamsGoalsScored, teamsGoalsAgainst, teamsCleanSheets] =
+  const [season, teamsGoalsScored, teamsGoalsAgainst, teamsCleanSheets] =
     await Promise.all([
-      prisma.leagueSeason.findFirst({
+      prisma.season.findFirst({
         where: {
           slug,
         },
         include: {
+          hostingCountries: true,
           league: {
             include: {
               country: true,
@@ -42,29 +43,22 @@ export default async function LeaguesInfoPage({
               season: true,
             },
           },
-          knockoutMatches: {
-            include: {
-              homeTeam: true,
-              awayTeam: true,
-              season: true,
-            },
-          },
         },
       }),
-      await getTeamsGoalsScored(slug, 5, "leagues"),
-      await getTeamsGoalsAgainst(slug, 5, "leagues"),
-      await getTeamsCleanSheets(slug, 5, "leagues"),
+      await getTeamsGoalsScored(slug, 5),
+      await getTeamsGoalsAgainst(slug, 5),
+      await getTeamsCleanSheets(slug, 5),
     ]);
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
   return (
     <InfoCards
-      editionOrSeason={leagueSeason}
+      season={season}
       teamsGoalsScored={teamsGoalsScored}
       teamsGoalsAgainst={teamsGoalsAgainst}
       teamsCleanSheets={teamsCleanSheets}
-      type="leagues"
+      // type="leagues"
     />
   );
 }

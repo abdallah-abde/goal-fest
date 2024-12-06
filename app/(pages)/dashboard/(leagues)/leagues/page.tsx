@@ -5,7 +5,7 @@ import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 import {
   FlagFilterOptions,
   SortDirectionOptions,
-  LeagueTypes,
+  Continents,
 } from "@/types/enums";
 
 import {
@@ -47,8 +47,11 @@ export default async function DashboardleaguesPage({
     query?: string | null;
     sortDir?: SortDirectionOptions | null;
     sortField?: string | null;
+    continent?: string | null;
+    country?: string | null;
     isPopular?: string | null;
-    type?: string | null;
+    isClubs?: string | null;
+    isDomestic?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -56,12 +59,16 @@ export default async function DashboardleaguesPage({
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
   const isPopularCondition = searchParams?.isPopular;
-  const typeCondition = searchParams?.type || "all";
+  const isClubsCondition = searchParams?.isClubs;
+  const isDomesticCondition = searchParams?.isDomestic;
+  const continentCondition = searchParams?.continent || "all";
+  const countryCondition = searchParams?.country || "all";
 
   const where = {
     OR: [
       { name: { contains: query } },
       { country: { name: { contains: query } } },
+      { continent: { contains: query } },
     ],
     ...(isPopularCondition
       ? {
@@ -71,9 +78,30 @@ export default async function DashboardleaguesPage({
               : false,
         }
       : {}),
-    ...(typeCondition !== "all"
+    ...(isClubsCondition
       ? {
-          type: typeCondition,
+          isClubs:
+            isClubsCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(isDomesticCondition
+      ? {
+          isDomestic:
+            isDomesticCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(continentCondition !== "all"
+      ? {
+          continent: continentCondition,
+        }
+      : {}),
+    ...(countryCondition !== "all"
+      ? {
+          country: { name: countryCondition },
         }
       : {}),
   };
@@ -83,10 +111,14 @@ export default async function DashboardleaguesPage({
       ? { name: sortDir }
       : sortField === "country"
       ? { country: { name: sortDir } }
-      : sortField === "type"
-      ? { type: sortDir }
+      : sortField === "continent"
+      ? { continent: sortDir }
       : sortField === "isPopular"
       ? { isPopular: sortDir }
+      : sortField === "isClubs"
+      ? { isClubs: sortDir }
+      : sortField === "isDomestic"
+      ? { isDomestic: sortDir }
       : {}),
   };
 
@@ -109,20 +141,45 @@ export default async function DashboardleaguesPage({
   const sortingList = [
     { label: "Name", fieldName: "name" },
     { label: "Country", fieldName: "country" },
-    { label: "Type", fieldName: "type" },
+    { label: "Continent", fieldName: "continent" },
     {
       label: "Is Popular",
       fieldName: "isPopular",
     },
+    {
+      label: "Is Clubs",
+      fieldName: "isClubs",
+    },
+    {
+      label: "Is Domestic",
+      fieldName: "isDomestic",
+    },
   ];
+
+  const countries = await prisma.country.findMany();
 
   const listFilters = [
     {
-      title: "Type",
-      fieldName: "type",
-      searchParamName: "type",
-      placeholder: "Choose Type...",
-      options: Object.values(LeagueTypes),
+      title: "Continent",
+      fieldName: "continent",
+      searchParamName: "continent",
+      placeholder: "Choose continent...",
+      options: Object.values(Continents),
+    },
+    // {
+    //   title: "Country",
+    //   fieldName: "country",
+    //   searchParamName: "country",
+    //   placeholder: "Choose country...",
+    //   options: countries.map((a) => a.name),
+    // },
+  ];
+
+  const textFilters = [
+    {
+      title: "Country",
+      fieldName: "country",
+      searchParamName: "country",
     },
   ];
 
@@ -147,17 +204,59 @@ export default async function DashboardleaguesPage({
         },
       ],
     },
+    {
+      title: "Is Clubs",
+      defaultValue: "all",
+      fieldName: "isClubs",
+      searchParamName: "isClubs",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+    {
+      title: "Is Domestic",
+      defaultValue: "all",
+      fieldName: "isDomestic",
+      searchParamName: "isDomestic",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
   ];
-
-  const countries = await prisma.country.findMany();
 
   return (
     <>
       <PageHeader label="leagues List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
-        <Filters flagFilters={flagFilters} listFilters={listFilters} />
-        <SearchFieldComponent placeholder="Search by league names, countries ..." />
+        <Filters
+          flagFilters={flagFilters}
+          listFilters={listFilters}
+          textFilters={textFilters}
+        />
+        <SearchFieldComponent placeholder="Search by league name, country, continent ..." />
         <FormDialog countries={countries} id={null} />
       </div>
       {leagues.length > 0 ? (
@@ -168,47 +267,99 @@ export default async function DashboardleaguesPage({
               <TableHead className="dashboard-head-table-cell">
                 Country
               </TableHead>
-              <TableHead className="dashboard-head-table-cell">Type</TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Continent
+              </TableHead>
               <TableHead className="dashboard-head-table-cell">
                 Is Popular
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Is Clubs
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Is Domestic
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {leagues.map(({ id, name, country, type, isPopular }) => (
-              <TableRow key={id} className="dashboard-table-row">
-                <TableCell className="dashboard-table-cell">{name}</TableCell>
-                <TableCell className="dashboard-table-cell">
-                  {country?.name || <NotProvidedSpan />}
-                </TableCell>
-                <TableCell className="dashboard-table-cell">{type}</TableCell>
-                <TableCell className="dashboard-table-cell">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <FieldSwitcher
-                          id={id}
-                          type="leagues"
-                          value={isPopular}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Click to update popular status</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </TableCell>
-                <TableCell>
-                  <FormDialog countries={countries} id={id} />
-                </TableCell>
-              </TableRow>
-            ))}
+            {leagues.map(
+              ({
+                id,
+                name,
+                country,
+                continent,
+                isPopular,
+                isClubs,
+                isDomestic,
+              }) => (
+                <TableRow key={id} className="dashboard-table-row">
+                  <TableCell className="dashboard-table-cell">{name}</TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {country?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {continent}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FieldSwitcher
+                            id={id}
+                            type="leagues"
+                            value={isPopular}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update popular status</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FieldSwitcher
+                            id={id}
+                            type="leagues"
+                            value={isClubs}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update clubs status</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <FieldSwitcher
+                            id={id}
+                            type="leagues"
+                            value={isDomestic}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Click to update domestic status</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell>
+                    <FormDialog countries={countries} id={id} />
+                  </TableCell>
+                </TableRow>
+              )
+            )}
           </TableBody>
           <DashboardTableFooter
             totalCount={totalLeaguesCount}
             totalPages={totalPages}
-            colSpan={5}
+            colSpan={7}
           />
         </Table>
       ) : (

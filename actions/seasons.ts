@@ -10,11 +10,15 @@ import { ZodError } from "zod";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
-  leagueId: string;
   startYear: string;
   endYear: string;
+  flagUrl?: string | null;
+  leagueId: string;
   teams: string[];
-  logoUrl?: string | null;
+  winnerId?: string | null;
+  titleHolderId?: string | null;
+  currentStage?: string | null;
+  hostingCountries: string[];
 }
 
 interface ReturnType {
@@ -38,7 +42,12 @@ export async function addLeagueSeason(
         startYear: result.error.formErrors.fieldErrors.startYear?.[0],
         endYear: result.error.formErrors.fieldErrors.endYear?.[0],
         teams: result.error.formErrors.fieldErrors.teams?.[0],
-        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
+        winnerId: result.error.formErrors.fieldErrors.winnerId?.[0],
+        titleHolderId: result.error.formErrors.fieldErrors.titleHolderId?.[0],
+        currentStage: result.error.formErrors.fieldErrors.currentStage?.[0],
+        hostingCountries:
+          result.error.formErrors.fieldErrors.hostingCountries?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -54,7 +63,7 @@ export async function addLeagueSeason(
       };
     }
 
-    const season = await prisma.leagueSeason.findFirst({
+    const season = await prisma.season.findFirst({
       where: {
         AND: [
           { startYear: data.startYear },
@@ -88,21 +97,21 @@ export async function addLeagueSeason(
       league.name.toLowerCase().trim().split(" ").join("-")
     );
 
-    let exists = await prisma.leagueSeason.findUnique({ where: { slug } });
+    let exists = await prisma.season.findUnique({ where: { slug } });
     while (exists) {
       slug = generateSlug(
         league.name.toLowerCase().trim().split(" ").join("-")
       ); // Generate a new slug if the one exists
-      exists = await prisma.leagueSeason.findUnique({ where: { slug } });
+      exists = await prisma.season.findUnique({ where: { slug } });
     }
 
-    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
+    const flagUrlPath = await writeImageFile(data.flagUrl, "tournaments");
 
-    const leagueTeams = await prisma.leagueTeam.findMany({
+    const teams = await prisma.team.findMany({
       where: {
         id: {
           in: formData
-            .getAll("leagueTeams")
+            .getAll("teams")
             .toString()
             .split(",")
             .map((a) => +a),
@@ -110,7 +119,19 @@ export async function addLeagueSeason(
       },
     });
 
-    await prisma.leagueSeason.create({
+    const hostingCountries = await prisma.country.findMany({
+      where: {
+        id: {
+          in: formData
+            .getAll("hostingCountries")
+            .toString()
+            .split(",")
+            .map((a) => +a),
+        },
+      },
+    });
+
+    await prisma.season.create({
       data: {
         leagueId: +data.leagueId,
         startYear: +data.startYear,
@@ -119,11 +140,16 @@ export async function addLeagueSeason(
           data.startYear === data.endYear
             ? data.startYear.toString()
             : `${data.startYear.toString()}-${data.endYear.toString()}`,
-        logoUrl: logoUrlPath,
+        flagUrl: flagUrlPath,
         teams: {
-          connect: leagueTeams,
+          connect: teams,
         },
-        currentStage: LeagueStages.Scheduled,
+        hostingCountries: {
+          connect: hostingCountries,
+        },
+        winnerId: data.winnerId ? +data.winnerId : null,
+        titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
+        currentStage: data.currentStage || "",
         slug,
       },
     });
@@ -140,8 +166,12 @@ export async function addLeagueSeason(
         leagueId: errorMap["leagueId"]?.[0],
         startYear: errorMap["startYear"]?.[0],
         endYear: errorMap["endYear"]?.[0],
-        logoUrl: errorMap["logoUrl"]?.[0],
+        flagUrl: errorMap["flagUrl"]?.[0],
         teams: errorMap["teams"]?.[0],
+        hostingCountries: errorMap["hostingCountries"]?.[0],
+        winnerId: errorMap["winnerId"]?.[0],
+        titleHolderId: errorMap["titleHolderId"]?.[0],
+        currentStage: errorMap["currentStage"]?.[0],
       },
     };
   }
@@ -163,7 +193,12 @@ export async function updateLeagueSeason(
         startYear: result.error.formErrors.fieldErrors.startYear?.[0],
         endYear: result.error.formErrors.fieldErrors.endYear?.[0],
         teams: result.error.formErrors.fieldErrors.teams?.[0],
-        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
+        winnerId: result.error.formErrors.fieldErrors.winnerId?.[0],
+        titleHolderId: result.error.formErrors.fieldErrors.titleHolderId?.[0],
+        currentStage: result.error.formErrors.fieldErrors.currentStage?.[0],
+        hostingCountries:
+          result.error.formErrors.fieldErrors.hostingCountries?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -179,7 +214,7 @@ export async function updateLeagueSeason(
       };
     }
 
-    const existedSeason = await prisma.leagueSeason.findFirst({
+    const existedSeason = await prisma.season.findFirst({
       where: {
         AND: [
           { startYear: data.startYear },
@@ -198,24 +233,24 @@ export async function updateLeagueSeason(
       };
     }
 
-    const currentLeagueSeason = await prisma.leagueSeason.findUnique({
+    const currentSeason = await prisma.season.findUnique({
       where: { id },
-      include: { teams: true },
+      include: { teams: true, hostingCountries: true },
     });
 
-    if (currentLeagueSeason == null) return notFound();
+    if (currentSeason == null) return notFound();
 
-    const logoUrlPath = await deleteAndWriteImageFile(
-      data.logoUrl,
+    const flagUrlPath = await deleteAndWriteImageFile(
+      data.flagUrl,
       "tournaments",
-      currentLeagueSeason.logoUrl
+      currentSeason.flagUrl
     );
 
-    const leagueTeams = await prisma.leagueTeam.findMany({
+    const teams = await prisma.team.findMany({
       where: {
         id: {
           in: formData
-            .getAll("leagueTeams")
+            .getAll("teams")
             .toString()
             .split(",")
             .map((a) => +a),
@@ -223,7 +258,19 @@ export async function updateLeagueSeason(
       },
     });
 
-    await prisma.leagueSeason.update({
+    const hostingCountries = await prisma.country.findMany({
+      where: {
+        id: {
+          in: formData
+            .getAll("hostingCountries")
+            .toString()
+            .split(",")
+            .map((a) => +a),
+        },
+      },
+    });
+
+    await prisma.season.update({
       where: { id },
       data: {
         leagueId: +data.leagueId,
@@ -233,11 +280,16 @@ export async function updateLeagueSeason(
           data.startYear === data.endYear
             ? data.startYear.toString()
             : `${data.startYear.toString()}-${data.endYear.toString()}`,
-        logoUrl: logoUrlPath,
+        flagUrl: flagUrlPath,
         teams: {
-          disconnect: currentLeagueSeason?.teams,
-          connect: leagueTeams,
+          connect: teams,
         },
+        hostingCountries: {
+          connect: hostingCountries,
+        },
+        winnerId: data.winnerId ? +data.winnerId : null,
+        titleHolderId: data.titleHolderId ? +data.titleHolderId : null,
+        currentStage: data.currentStage || "",
       },
     });
 
@@ -253,8 +305,12 @@ export async function updateLeagueSeason(
         leagueId: errorMap["leagueId"]?.[0],
         startYear: errorMap["startYear"]?.[0],
         endYear: errorMap["endYear"]?.[0],
-        logoUrl: errorMap["logoUrl"]?.[0],
+        flagUrl: errorMap["flagUrl"]?.[0],
         teams: errorMap["teams"]?.[0],
+        hostingCountries: errorMap["hostingCountries"]?.[0],
+        winnerId: errorMap["winnerId"]?.[0],
+        titleHolderId: errorMap["titleHolderId"]?.[0],
+        currentStage: errorMap["currentStage"]?.[0],
       },
     };
   }
@@ -278,13 +334,13 @@ export async function updateLeagueSeasonCurrentStage(
 
     const data = result.data;
 
-    const currentLeagueSeason = await prisma.leagueSeason.findUnique({
+    const currentSeason = await prisma.season.findUnique({
       where: { id },
     });
 
-    if (currentLeagueSeason == null) return notFound();
+    if (currentSeason == null) return notFound();
 
-    await prisma.leagueSeason.update({
+    await prisma.season.update({
       where: { id },
       data: {
         currentStage: data.currentStage,

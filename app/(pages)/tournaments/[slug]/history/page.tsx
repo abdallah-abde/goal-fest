@@ -1,7 +1,7 @@
 import prisma from "@/lib/db";
 
-import TournamentsHistory from "@/components/lists/TournamentsHistory";
-import { TournamentStages } from "@/types/enums";
+import LeaguesHistory from "@/components/lists/LeaguesHistory";
+import { LeagueStages } from "@/types/enums";
 
 export default async function TournamentsHistoryPage({
   params,
@@ -22,7 +22,7 @@ export default async function TournamentsHistoryPage({
       tournament: {
         id: edition.tournament.id,
       },
-      currentStage: TournamentStages.Finished,
+      currentStage: LeagueStages.Finished,
     },
     include: {
       tournament: true,
@@ -33,7 +33,7 @@ export default async function TournamentsHistoryPage({
   });
 
   return (
-    <TournamentsHistory
+    <LeaguesHistory
       type="tournaments"
       tournamentOrLeague={edition.tournament}
       editionsOrSeasons={editions}

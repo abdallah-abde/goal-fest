@@ -10,7 +10,7 @@ export async function GET(
 ) {
   const { slug } = params;
 
-  const season = await prisma.leagueSeason.findUnique({
+  const season = await prisma.season.findUnique({
     where: { slug },
     include: { league: true, teams: true, groups: true },
   });
@@ -39,7 +39,7 @@ export async function GET(
       },
     ]);
   } else {
-    const groups = await prisma.leagueGroup.findMany({
+    const groups = await prisma.group.findMany({
       where: {
         season: {
           slug,

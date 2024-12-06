@@ -3,7 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-export default function LoadingComponents() {
+export default function Skeletons() {
   return (
     <div>
       <Skeleton className="h-[50px] w-[100px] rounded-xl mb-3" />
@@ -97,7 +97,7 @@ export function MatchesSkeleton() {
   );
 }
 
-export function TournamentsSkeleton() {
+export function LeaguesSkeleton() {
   return (
     <div className="flex flex-col md:flex-wrap md:flex-row gap-4 py-24">
       {Array.from({ length: 6 }).map((a, _) => (

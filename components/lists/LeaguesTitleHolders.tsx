@@ -1,11 +1,6 @@
 import Image from "next/image";
 
-import {
-  Tournament,
-  TournamentEdition,
-  League,
-  LeagueSeason,
-} from "@prisma/client";
+import { League, Season } from "@prisma/client";
 
 import * as _ from "lodash";
 
@@ -13,11 +8,7 @@ import PageHeader from "@/components/PageHeader";
 
 import { Badge } from "@/components/ui/badge";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
-}
-
-interface LeagueSeasonProps extends LeagueSeason {
+interface SeasonProps extends Season {
   league: League;
 }
 
@@ -28,14 +19,12 @@ interface WinnerProps {
   year: number;
 }
 
-export default function TournamentsTitleHolders({
-  editionOrSeason,
+export default function LeaguesTitleHolders({
+  season,
   winners,
-  type,
 }: {
-  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
+  season: SeasonProps;
   winners: WinnerProps[];
-  type: "tournaments" | "leagues";
 }) {
   const results = Object.entries(_.groupBy(winners, "teamName")).sort(
     (a, b) => {
@@ -47,14 +36,9 @@ export default function TournamentsTitleHolders({
     }
   );
 
-  const tournamentORLeagueName =
-    type === "tournaments"
-      ? (editionOrSeason as TournamentEditionProps).tournament.name
-      : (editionOrSeason as LeagueSeasonProps).league.name;
-
   return (
     <>
-      <PageHeader label={`${tournamentORLeagueName} Title Holders`} />
+      <PageHeader label={`${season.league.name} Title Holders`} />
       {results &&
         results.length > 0 &&
         results.map(([teamName, data]) => (
@@ -68,7 +52,7 @@ export default function TournamentsTitleHolders({
                 height={40}
                 src={data[0].flagUrl}
                 alt={teamName + " Flag"}
-                className="col-start-1 max-xs:w-8 max-xs:h-8"
+                className="aspect-video object-contain"
               />
             )}
             <Badge

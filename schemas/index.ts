@@ -34,7 +34,7 @@ export const CountrySchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
   code: z.string().optional(),
-  type: z.string().min(1, { message: "Type is required!" }),
+  continent: z.string().min(1, { message: "Continent is required!" }),
 });
 
 export const TeamSchema = z.object({
@@ -195,9 +195,12 @@ export const knockoutMatchScoreSchema = z.object({
 
 export const LeagueSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
-  logoUrl: ImageSchema.optional(),
+  flagUrl: ImageSchema.optional(),
   countryId: z.union([z.coerce.number().optional(), z.string()]),
-  type: z.string().min(1, { message: "Type is required!" }),
+  continent: z.string().min(1, { message: "Continent is required!" }),
+  isDomestic: z.string().min(1, { message: "Is Domestic is required!" }),
+  isClubs: z.string().min(1, { message: "Is Clubs is required!" }),
+  isPopular: z.string().min(1, { message: "Is Popular is required!" }),
 });
 
 export const SeasonSchema = z.object({
@@ -221,8 +224,12 @@ export const SeasonSchema = z.object({
         new Date().getFullYear() + 10
       } `,
     }),
-  logoUrl: ImageSchema.optional(),
+  flagUrl: ImageSchema.optional(),
   teams: z.string().optional(),
+  hostingCountries: z.string().optional(),
+  currentStage: z.string().optional(),
+  winnerId: z.union([z.coerce.number().optional(), z.string()]),
+  titleHolderId: z.union([z.coerce.number().optional(), z.string()]),
 });
 
 export const LeagueTeamSchema = z.object({

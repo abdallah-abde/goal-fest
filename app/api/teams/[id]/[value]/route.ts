@@ -1,23 +1,23 @@
 import prisma from "@/lib/db";
-import { TournamentTypes } from "@/types/enums";
+import { Continents } from "@/types/enums";
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string; value: string } }
 ) {
-  const tournament = await prisma.tournament.findUnique({
+  const league = await prisma.league.findUnique({
     where: { id: +params.id },
   });
 
-  if (!tournament) {
+  if (!league) {
     return Response.json([]);
   }
 
   const where = {
     name: { contains: params.value },
-    ...(tournament.type === TournamentTypes.International
+    ...(league.continent === Continents.International
       ? {}
-      : { type: tournament.type }),
+      : { continent: league.continent }),
   };
 
   const res = await prisma.team

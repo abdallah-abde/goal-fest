@@ -43,7 +43,7 @@ export async function getAllTournamentMatchesRounds(slug: string) {
 
 export async function getAllLeagueMatchesRounds(slug: string) {
   // Fetch distinct rounds from League Match
-  const rounds = await prisma.leagueMatch.findMany({
+  const rounds = await prisma.match.findMany({
     where: {
       season: {
         slug,

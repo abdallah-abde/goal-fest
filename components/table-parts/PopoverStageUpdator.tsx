@@ -20,7 +20,7 @@ import {
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
 
-import { TournamentStages, LeagueStages } from "@/types/enums";
+import { LeagueStages } from "@/types/enums";
 
 import { updateTournamentEditionCurrentStage } from "@/actions/editions";
 import { updateLeagueSeasonCurrentStage } from "@/actions/seasons";
@@ -69,7 +69,7 @@ export default function PopoverStageUpdator({
                 </SelectTrigger>
                 <SelectContent>
                   {Object.values(
-                    type === "tournaments" ? TournamentStages : LeagueStages
+                    type === "tournaments" ? LeagueStages : LeagueStages
                   ).map((opt) => (
                     <SelectItem value={opt} key={opt}>
                       {opt}

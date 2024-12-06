@@ -1,15 +1,11 @@
 import Image from "next/image";
 
-import { NeutralMatch } from "@/types";
+import { MatchProps } from "@/types";
 
 import { getFormattedTime } from "@/lib/getFormattedDate";
 import { EmptyImageUrls, MatchStatusOptions } from "@/types/enums";
 
-export default function CategorizedMatchCard({
-  match,
-}: {
-  match: NeutralMatch;
-}) {
+export default function CategorizedMatchCard({ match }: { match: MatchProps }) {
   const {
     homeTeam,
     awayTeam,
@@ -31,7 +27,7 @@ export default function CategorizedMatchCard({
           width={80}
           height={80}
           src={homeTeam?.flagUrl || EmptyImageUrls.Team}
-          alt={homeTeam?.name + " Flag" || "Team Flag"}
+          alt="team"
           className="aspect-video object-contain"
         />
         <>
@@ -95,7 +91,7 @@ export default function CategorizedMatchCard({
           width={80}
           height={80}
           src={awayTeam?.flagUrl || EmptyImageUrls.Team}
-          alt={awayTeam?.name + " Flag" || "Team Flag"}
+          alt="team"
           className="aspect-video object-contain"
         />
         <p className="flex-1 text-sm">{awayTeam?.name || ""}</p>

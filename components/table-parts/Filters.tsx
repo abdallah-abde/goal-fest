@@ -62,12 +62,14 @@ interface FiltersProps {
   flagFilters?: FlagFilter[];
   listFilters?: ListFilter[];
   filterByDate?: Datefilter | null;
+  textFilters?: Datefilter[];
 }
 
 export default function Filters({
   flagFilters = [],
   listFilters = [],
   filterByDate,
+  textFilters = [],
 }: FiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -106,6 +108,18 @@ export default function Filters({
 
       replace(`${pathname}?${params.toString()}`);
     }
+  };
+
+  const handleTextChanged = (fieldName: string, value: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (value === "all" || value === "") {
+      params.delete(fieldName);
+    } else {
+      params.set(fieldName, value);
+    }
+
+    replace(`${pathname}?${params.toString()}`);
   };
 
   return (
@@ -172,6 +186,26 @@ export default function Filters({
                       </span>
                     </div>
                   )}
+
+                  {textFilters.map((list, idx) => {
+                    const fieldParam = searchParams.get(list.fieldName);
+
+                    if (fieldParam) {
+                      return (
+                        <div key={idx} className="flex items-center">
+                          <BadgeCheck className="mr-2" size={15} />{" "}
+                          <span>
+                            {list.title}:
+                            <span className="text-muted-foreground ml-1">
+                              {fieldParam}
+                            </span>
+                          </span>
+                        </div>
+                      );
+                    } else {
+                      return <></>;
+                    }
+                  })}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -211,6 +245,7 @@ export default function Filters({
                 </CardContent>
               </Card>
             ))}
+
           {listFilters.length > 0 &&
             listFilters.map((listFilter, index) => (
               <Card key={index} className="p-2">
@@ -242,6 +277,7 @@ export default function Filters({
                 </CardContent>
               </Card>
             ))}
+
           {filterByDate && (
             <Card className="p-2">
               <CardTitle className="text-sm">{filterByDate.title}</CardTitle>
@@ -258,6 +294,26 @@ export default function Filters({
               </CardContent>
             </Card>
           )}
+
+          {textFilters?.length > 0 &&
+            textFilters?.map((filter, idx) => (
+              <Card className="p-2" key={idx}>
+                <CardTitle className="text-sm">{filter.title}</CardTitle>
+                <CardContent className="py-2">
+                  <Input
+                    type="text"
+                    id={filter.fieldName}
+                    name={filter.fieldName}
+                    defaultValue={
+                      searchParams.get(filter.fieldName) || undefined
+                    }
+                    onChange={(e) =>
+                      handleTextChanged(filter.fieldName, e.target.value)
+                    }
+                  />
+                </CardContent>
+              </Card>
+            ))}
         </div>
       </PopoverContent>
     </Popover>

@@ -2,46 +2,25 @@ import prisma from "@/lib/db";
 
 export async function calculateTeamStatsByGroup(
   teamId: number,
-  groupId: number,
-  type: "tournaments" | "leagues"
+  groupId: number
 ) {
-  const homeMatches =
-    type === "tournaments"
-      ? await prisma.match.findMany({
-          where: {
-            homeTeamId: teamId,
-            groupId: groupId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        })
-      : await prisma.leagueMatch.findMany({
-          where: {
-            homeTeamId: teamId,
-            groupId: groupId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        });
+  const homeMatches = await prisma.match.findMany({
+    where: {
+      homeTeamId: teamId,
+      groupId: groupId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
+  });
 
-  const awayMatches =
-    type === "tournaments"
-      ? await prisma.match.findMany({
-          where: {
-            awayTeamId: teamId,
-            groupId: groupId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        })
-      : await prisma.leagueMatch.findMany({
-          where: {
-            awayTeamId: teamId,
-            groupId: groupId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        });
+  const awayMatches = await prisma.match.findMany({
+    where: {
+      awayTeamId: teamId,
+      groupId: groupId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
+  });
 
   let played = homeMatches.length + awayMatches.length;
   let won = 0;
@@ -95,48 +74,23 @@ export async function calculateTeamStatsByGroup(
   };
 }
 
-export async function calculateTeamStatsBySlug(
-  teamId: number,
-  slug: string,
-  type: "tournaments" | "leagues"
-) {
-  const homeMatches =
-    type === "tournaments"
-      ? await prisma.match.findMany({
-          where: {
-            tournamentEdition: { slug },
-            homeTeamId: teamId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        })
-      : await prisma.leagueMatch.findMany({
-          where: {
-            season: { slug },
-            homeTeamId: teamId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        });
-
-  const awayMatches =
-    type === "tournaments"
-      ? await prisma.match.findMany({
-          where: {
-            tournamentEdition: { slug },
-            awayTeamId: teamId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        })
-      : await prisma.leagueMatch.findMany({
-          where: {
-            season: { slug },
-            awayTeamId: teamId,
-            homeGoals: { not: null },
-            awayGoals: { not: null },
-          },
-        });
+export async function calculateTeamStatsBySlug(teamId: number, slug: string) {
+  const homeMatches = await prisma.match.findMany({
+    where: {
+      season: { slug },
+      homeTeamId: teamId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
+  });
+  const awayMatches = await prisma.match.findMany({
+    where: {
+      season: { slug },
+      awayTeamId: teamId,
+      homeGoals: { not: null },
+      awayGoals: { not: null },
+    },
+  });
 
   let played = homeMatches.length + awayMatches.length;
   let won = 0;

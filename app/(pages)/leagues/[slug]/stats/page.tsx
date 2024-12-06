@@ -1,7 +1,4 @@
 import prisma from "@/lib/db";
-import { Prisma } from "@prisma/client";
-
-import { TotalCleanSheetsProps, TotalGoalsProps } from "@/types/totalStats";
 
 import PageHeader from "@/components/PageHeader";
 import TeamsStats from "@/components/lists/cards/stats/TeamsStats";
@@ -18,9 +15,9 @@ export default async function LeaguesStatsPage({
   params: { slug: string };
 }) {
   const { slug } = params;
-  const [leagueSeason, teamsGoalsScored, teamsGoalsAgainst, teamsCleanSheets] =
+  const [season, teamsGoalsScored, teamsGoalsAgainst, teamsCleanSheets] =
     await Promise.all([
-      prisma.leagueSeason.findUnique({
+      prisma.season.findUnique({
         where: {
           slug,
         },
@@ -31,18 +28,16 @@ export default async function LeaguesStatsPage({
           titleHolder: true,
         },
       }),
-      await getTeamsGoalsScored(slug, undefined, "leagues"),
-      await getTeamsGoalsAgainst(slug, undefined, "leagues"),
-      await getTeamsCleanSheets(slug, undefined, "leagues"),
+      await getTeamsGoalsScored(slug, undefined),
+      await getTeamsGoalsAgainst(slug, undefined),
+      await getTeamsCleanSheets(slug, undefined),
     ]);
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
   return (
     <>
-      <PageHeader
-        label={`${leagueSeason.league.name} ${leagueSeason.year} Statistics`}
-      />
+      <PageHeader label={`${season.league.name} ${season.year} Statistics`} />
 
       <TeamsStats
         teamsGoalsScored={teamsGoalsScored}

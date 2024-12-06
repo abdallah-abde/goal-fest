@@ -27,7 +27,7 @@ import {
 } from "@/actions/groupMatches";
 
 import PageHeader from "@/components/PageHeader";
-import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
+import { MultipleSelectorLoadingIndicator } from "@/components/Skeletons";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";

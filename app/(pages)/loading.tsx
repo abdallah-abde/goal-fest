@@ -1,5 +1,5 @@
-import { TournamentsSkeleton } from "@/components/LoadingComponents";
+import { LeaguesSkeleton } from "@/components/Skeletons";
 
 export default function Loading() {
-  return <TournamentsSkeleton />;
+  return <LeaguesSkeleton />;
 }

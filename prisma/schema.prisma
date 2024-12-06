@@ -10,112 +10,112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Tournament {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  logoUrl            String?
-  type               String // e.g., 'international', 'europe', 'asia' ...
-  tournamentEditions TournamentEdition[]
-  isPopular          Boolean             @default(false)
-}
+// model Tournament {
+//   id                 Int                 @id @default(autoincrement())
+//   name               String
+//   logoUrl            String?
+//   type               String // e.g., 'international', 'europe', 'asia' ...
+//   tournamentEditions TournamentEdition[]
+//   isPopular          Boolean             @default(false)
+// }
 
-model TournamentEdition {
-  id               Int             @id @default(autoincrement())
-  startYear        Int
-  endYear          Int
-  year             String
-  logoUrl          String?
-  tournamentId     Int
-  tournament       Tournament      @relation(fields: [tournamentId], references: [id])
-  teams            Team[]
-  matches          Match[]
-  knockoutMatches  KnockoutMatch[]
-  groups           Group[]
-  hostingCountries Country[]
-  winner           Team?           @relation("winnerTeam", fields: [winnerId], references: [id])
-  winnerId         Int?
-  titleHolder      Team?           @relation("titleHolderTeam", fields: [titleHolderId], references: [id])
-  titleHolderId    Int?
-  currentStage     String?
-  slug             String          @unique
-}
+// model TournamentEdition {
+//   id               Int             @id @default(autoincrement())
+//   startYear        Int
+//   endYear          Int
+//   year             String
+//   logoUrl          String?
+//   tournamentId     Int
+//   tournament       Tournament      @relation(fields: [tournamentId], references: [id])
+//   teams            Team[]
+//   matches          Match[]
+//   knockoutMatches  KnockoutMatch[]
+//   groups           Group[]
+//   hostingCountries Country[]
+//   winner           Team?           @relation("winnerTeam", fields: [winnerId], references: [id])
+//   winnerId         Int?
+//   titleHolder      Team?           @relation("titleHolderTeam", fields: [titleHolderId], references: [id])
+//   titleHolderId    Int?
+//   currentStage     String?
+//   slug             String          @unique
+// }
 
-model Group {
-  id                  Int               @id @default(autoincrement())
-  name                String
-  tournamentEditionId Int
-  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
-  teams               Team[]
-  matches             Match[]
-}
+// model Group {
+//   id                  Int               @id @default(autoincrement())
+//   name                String
+//   tournamentEditionId Int
+//   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+//   teams               Team[]
+//   matches             Match[]
+// }
 
-model Team {
-  id                            Int                 @id @default(autoincrement())
-  name                          String
-  flagUrl                       String?
-  tournamentEditions            TournamentEdition[]
-  matchesHome                   Match[]             @relation("homeTeam")
-  matchesAway                   Match[]             @relation("awayTeam")
-  tournamentEditionWinners      TournamentEdition[] @relation("winnerTeam")
-  tournamentEditionTitleHolders TournamentEdition[] @relation("titleHolderTeam")
-  knockoutMatchesHome           KnockoutMatch[]     @relation("homeTeam")
-  knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
-  groups                        Group[]
-  code                          String?
-  isPopular                     Boolean             @default(false)
-  type                          String?
-}
+// model Team {
+//   id                            Int                 @id @default(autoincrement())
+//   name                          String
+//   flagUrl                       String?
+//   tournamentEditions            TournamentEdition[]
+//   matchesHome                   Match[]             @relation("homeTeam")
+//   matchesAway                   Match[]             @relation("awayTeam")
+//   tournamentEditionWinners      TournamentEdition[] @relation("winnerTeam")
+//   tournamentEditionTitleHolders TournamentEdition[] @relation("titleHolderTeam")
+//   knockoutMatchesHome           KnockoutMatch[]     @relation("homeTeam")
+//   knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
+//   groups                        Group[]
+//   code                          String?
+//   isPopular                     Boolean             @default(false)
+//   type                          String?
+// }
 
 model Country {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  flagUrl            String?
-  tournamentEditions TournamentEdition[]
-  leagues            League[]
-  leagueTeams        LeagueTeam[]
-  code               String?
-  type               String? // e.g., 'international', 'europe', 'asia' ...
+  id        Int      @id @default(autoincrement())
+  name      String
+  flagUrl   String?
+  seasons   Season[]
+  leagues   League[]
+  Teams     Team[]
+  code      String?
+  continent String? // e.g., 'europe', 'asia' ...
 }
 
-model Match {
-  id                  Int               @id @default(autoincrement())
-  homeTeam            Team              @relation("homeTeam", fields: [homeTeamId], references: [id])
-  homeTeamId          Int
-  awayTeam            Team              @relation("awayTeam", fields: [awayTeamId], references: [id])
-  awayTeamId          Int
-  homeGoals           Int?
-  awayGoals           Int?
-  date                DateTime?
-  tournamentEditionId Int
-  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
-  round               String?
-  isFeatured          Boolean           @default(false)
-  groupId             Int
-  group               Group             @relation(fields: [groupId], references: [id])
-  status              String?
-}
+// model Match {
+//   id                  Int               @id @default(autoincrement())
+//   homeTeam            Team              @relation("homeTeam", fields: [homeTeamId], references: [id])
+//   homeTeamId          Int
+//   awayTeam            Team              @relation("awayTeam", fields: [awayTeamId], references: [id])
+//   awayTeamId          Int
+//   homeGoals           Int?
+//   awayGoals           Int?
+//   date                DateTime?
+//   tournamentEditionId Int
+//   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+//   round               String?
+//   isFeatured          Boolean           @default(false)
+//   groupId             Int
+//   group               Group             @relation(fields: [groupId], references: [id])
+//   status              String?
+// }
 
-model KnockoutMatch {
-  id                  Int               @id @default(autoincrement())
-  homeTeam            Team?             @relation("homeTeam", fields: [homeTeamId], references: [id])
-  homeTeamId          Int?
-  awayTeam            Team?             @relation("awayTeam", fields: [awayTeamId], references: [id])
-  awayTeamId          Int?
-  homeGoals           Int?
-  awayGoals           Int?
-  homeExtraTimeGoals  Int?
-  awayExtraTimeGoals  Int?
-  homePenaltyGoals    Int?
-  awayPenaltyGoals    Int?
-  date                DateTime?
-  tournamentEditionId Int
-  tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
-  round               String?
-  homeTeamPlacehlder  String?
-  awayTeamPlacehlder  String?
-  isFeatured          Boolean           @default(false)
-  status              String?
-}
+// model KnockoutMatch {
+//   id                  Int               @id @default(autoincrement())
+//   homeTeam            Team?             @relation("homeTeam", fields: [homeTeamId], references: [id])
+//   homeTeamId          Int?
+//   awayTeam            Team?             @relation("awayTeam", fields: [awayTeamId], references: [id])
+//   awayTeamId          Int?
+//   homeGoals           Int?
+//   awayGoals           Int?
+//   homeExtraTimeGoals  Int?
+//   awayExtraTimeGoals  Int?
+//   homePenaltyGoals    Int?
+//   awayPenaltyGoals    Int?
+//   date                DateTime?
+//   tournamentEditionId Int
+//   tournamentEdition   TournamentEdition @relation(fields: [tournamentEditionId], references: [id])
+//   round               String?
+//   homeTeamPlacehlder  String?
+//   awayTeamPlacehlder  String?
+//   isFeatured          Boolean           @default(false)
+//   status              String?
+// }
 
 model User {
   id                    String                 @id @default(cuid())
@@ -192,59 +192,73 @@ model TwoFactorConfirmation {
 }
 
 model League {
-  id        Int            @id @default(autoincrement())
-  name      String
-  countryId Int?
-  country   Country?       @relation(fields: [countryId], references: [id])
-  logoUrl   String?
-  type      String // e.g., 'domestic', 'international', 'europe', 'asia' ...
-  seasons   LeagueSeason[]
-  isPopular Boolean        @default(false)
+  id         Int      @id @default(autoincrement())
+  name       String
+  countryId  Int?
+  country    Country? @relation(fields: [countryId], references: [id])
+  flagUrl    String?
+  isDomestic Boolean  @default(false)
+  isClubs    Boolean  @default(false)
+  continent  String // e.g., 'international', 'europe', 'asia' ...
+  seasons    Season[]
+  isPopular  Boolean  @default(false)
 }
 
-model LeagueSeason {
-  id              Int                   @id @default(autoincrement())
-  startYear       Int
-  endYear         Int
-  year            String
-  logoUrl         String?
-  leagueId        Int
-  league          League                @relation(fields: [leagueId], references: [id])
-  teams           LeagueTeam[]
-  matches         LeagueMatch[]
-  winner          LeagueTeam?           @relation("winnerLeagueTeam", fields: [winnerId], references: [id])
-  winnerId        Int?
-  titleHolder     LeagueTeam?           @relation("titleHolderLeagueTeam", fields: [titleHolderId], references: [id])
-  titleHolderId   Int?
-  currentStage    String?
-  slug            String                @unique
-  groups          LeagueGroup[]
-  knockoutMatches LeagueKnockoutMatch[]
+model Season {
+  id               Int       @id @default(autoincrement())
+  startYear        Int
+  endYear          Int
+  year             String
+  flagUrl          String?
+  leagueId         Int
+  league           League    @relation(fields: [leagueId], references: [id])
+  teams            Team[]
+  matches          Match[]
+  // knockoutMatches KnockoutMatch[]
+  winner           Team?     @relation("winnerTeams", fields: [winnerId], references: [id])
+  winnerId         Int?
+  titleHolder      Team?     @relation("titleHolderTeams", fields: [titleHolderId], references: [id])
+  titleHolderId    Int?
+  currentStage     String?
+  slug             String    @unique
+  groups           Group[]
+  hostingCountries Country[]
 }
 
-model LeagueMatch {
-  id         Int          @id @default(autoincrement())
-  homeTeam   LeagueTeam   @relation("homeTeam", fields: [homeTeamId], references: [id])
-  homeTeamId Int
-  awayTeam   LeagueTeam   @relation("awayTeam", fields: [awayTeamId], references: [id])
-  awayTeamId Int
-  homeGoals  Int?
-  awayGoals  Int?
-  date       DateTime?
-  seasonId   Int
-  season     LeagueSeason @relation(fields: [seasonId], references: [id])
-  round      String?
-  isFeatured Boolean      @default(false)
-  status     String?
-  groupId    Int?
-  group      LeagueGroup? @relation(fields: [groupId], references: [id])
+model Group {
+  id       Int     @id @default(autoincrement())
+  name     String
+  seasonId Int
+  season   Season  @relation(fields: [seasonId], references: [id])
+  teams    Team[]
+  matches  Match[]
 }
 
-model LeagueKnockoutMatch {
-  id                 Int          @id @default(autoincrement())
-  homeTeam           LeagueTeam?  @relation("homeTeam", fields: [homeTeamId], references: [id])
+model Team {
+  id           Int      @id @default(autoincrement())
+  name         String
+  flagUrl      String?
+  seasons      Season[]
+  matchesHome  Match[]  @relation("homeTeam")
+  matchesAway  Match[]  @relation("awayTeam")
+  winners      Season[] @relation("winnerTeams")
+  titleHolders Season[] @relation("titleHolderTeams")
+  // knockoutMatchesHome           KnockoutMatch[]     @relation("homeTeam")
+  // knockoutMatchesAway           KnockoutMatch[]     @relation("awayTeam")
+  groups       Group[]
+  code         String?
+  isPopular    Boolean  @default(false)
+  isClub       Boolean  @default(false)
+  continent    String?
+  countryId    Int?
+  country      Country? @relation(fields: [countryId], references: [id])
+}
+
+model Match {
+  id                 Int       @id @default(autoincrement())
+  homeTeam           Team?     @relation("homeTeam", fields: [homeTeamId], references: [id])
   homeTeamId         Int?
-  awayTeam           LeagueTeam?  @relation("awayTeam", fields: [awayTeamId], references: [id])
+  awayTeam           Team?     @relation("awayTeam", fields: [awayTeamId], references: [id])
   awayTeamId         Int?
   homeGoals          Int?
   awayGoals          Int?
@@ -254,38 +268,61 @@ model LeagueKnockoutMatch {
   awayPenaltyGoals   Int?
   date               DateTime?
   seasonId           Int
-  season             LeagueSeason @relation(fields: [seasonId], references: [id])
+  season             Season    @relation(fields: [seasonId], references: [id])
   round              String?
-  homeTeamPlacehlder String?
-  awayTeamPlacehlder String?
-  isFeatured         Boolean      @default(false)
+  isFeatured         Boolean   @default(false)
   status             String?
+  groupId            Int?
+  group              Group?    @relation(fields: [groupId], references: [id])
+  isKnockout         Boolean   @default(false)
 }
 
-model LeagueTeam {
-  id                     Int                   @id @default(autoincrement())
-  name                   String
-  flagUrl                String?
-  seasons                LeagueSeason[]
-  matchesHome            LeagueMatch[]         @relation("homeTeam")
-  matchesAway            LeagueMatch[]         @relation("awayTeam")
-  leagueTeamWinners      LeagueSeason[]        @relation("winnerLeagueTeam")
-  leagueTeamTitleHolders LeagueSeason[]        @relation("titleHolderLeagueTeam")
-  knockoutMatchesHome    LeagueKnockoutMatch[] @relation("homeTeam")
-  knockoutMatchesAway    LeagueKnockoutMatch[] @relation("awayTeam")
-  code                   String?
-  groups                 LeagueGroup[]
-  countryId              Int?
-  country                Country?              @relation(fields: [countryId], references: [id])
-  isPopular              Boolean               @default(false)
-  type                   String?
-}
+// model LeagueKnockoutMatch {
+//   id                 Int          @id @default(autoincrement())
+//   homeTeam           LeagueTeam?  @relation("homeTeam", fields: [homeTeamId], references: [id])
+//   homeTeamId         Int?
+//   awayTeam           LeagueTeam?  @relation("awayTeam", fields: [awayTeamId], references: [id])
+//   awayTeamId         Int?
+//   homeGoals          Int?
+//   awayGoals          Int?
+//   homeExtraTimeGoals Int?
+//   awayExtraTimeGoals Int?
+//   homePenaltyGoals   Int?
+//   awayPenaltyGoals   Int?
+//   date               DateTime?
+//   seasonId           Int
+//   season             LeagueSeason @relation(fields: [seasonId], references: [id])
+//   round              String?
+//   homeTeamPlacehlder String?
+//   awayTeamPlacehlder String?
+//   isFeatured         Boolean      @default(false)
+//   status             String?
+// }
 
-model LeagueGroup {
-  id       Int           @id @default(autoincrement())
-  name     String
-  seasonId Int
-  season   LeagueSeason  @relation(fields: [seasonId], references: [id])
-  teams    LeagueTeam[]
-  matches  LeagueMatch[]
-}
+// model LeagueTeam {
+//   id                     Int                   @id @default(autoincrement())
+//   name                   String
+//   flagUrl                String?
+//   seasons                LeagueSeason[]
+//   matchesHome            LeagueMatch[]         @relation("homeTeam")
+//   matchesAway            LeagueMatch[]         @relation("awayTeam")
+//   leagueTeamWinners      LeagueSeason[]        @relation("winnerLeagueTeam")
+//   leagueTeamTitleHolders LeagueSeason[]        @relation("titleHolderLeagueTeam")
+//   knockoutMatchesHome    LeagueKnockoutMatch[] @relation("homeTeam")
+//   knockoutMatchesAway    LeagueKnockoutMatch[] @relation("awayTeam")
+//   code                   String?
+//   groups                 LeagueGroup[]
+//   countryId              Int?
+//   country                Country?              @relation(fields: [countryId], references: [id])
+//   isPopular              Boolean               @default(false)
+//   type                   String?
+// }
+
+// model LeagueGroup {
+//   id       Int           @id @default(autoincrement())
+//   name     String
+//   seasonId Int
+//   season   LeagueSeason  @relation(fields: [seasonId], references: [id])
+//   teams    LeagueTeam[]
+//   matches  LeagueMatch[]
+// }

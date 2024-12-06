@@ -11,7 +11,7 @@ import { updateLeaguePopularStatus } from "@/actions/leagues";
 import { updateTournamentPopularStatus } from "@/actions/tournaments";
 
 import { Switch } from "@/components/ui/switch";
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 import { updateLeagueTeamPopularStatus } from "@/actions/leagueTeams";
 
 export default function FieldSwitcher({

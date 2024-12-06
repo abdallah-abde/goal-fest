@@ -8,50 +8,26 @@ import { sortGroupTeams } from "@/lib/sortGroupTeams";
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 
-import {
-  LeagueGroup,
-  League,
-  LeagueSeason,
-  TournamentEdition,
-  Tournament,
-  Group,
-} from "@prisma/client";
+import { League, Season, Group } from "@prisma/client";
 import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
 import { standingsHeaders } from "@/lib/data/standingsHeaders";
 import { EmptyImageUrls } from "@/types/enums";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
+interface SeasonProps extends Season {
+  league: League;
   groups: Group[];
 }
 
-interface LeagueSeasonProps extends LeagueSeason {
-  league: League;
-  groups: LeagueGroup[];
-}
-
 export default function StandingsTables({
-  editionOrSeason,
+  season,
   standings,
-  type,
 }: {
-  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
+  season: SeasonProps;
   standings: StandingTeams[];
-  type: "tournaments" | "leagues";
 }) {
   return (
     <>
-      <PageHeader
-        label={
-          type === "tournaments"
-            ? `${
-                (editionOrSeason as TournamentEditionProps)?.tournament.name
-              } ${editionOrSeason?.year} Standings`
-            : `${(editionOrSeason as LeagueSeasonProps)?.league.name} ${
-                editionOrSeason?.year
-              } Standings`
-        }
-      />
+      <PageHeader label={`${season?.league.name} ${season?.year} Standings`} />
 
       {standings.length > 0 ? (
         <div className="mb-8 last:mb-0">

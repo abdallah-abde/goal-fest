@@ -26,7 +26,7 @@ import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
 import PartsTitle from "@/components/home/PartsTitle";
 import PartsLink from "@/components/home/PartsLink";
 
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 import { EmptyImageUrls } from "@/types/enums";
 
 interface TableHeadProps {
@@ -34,14 +34,17 @@ interface TableHeadProps {
   className: string;
 }
 
-interface TournamentAndLeagueProps {
+interface SeasonProps {
   id: number;
   year: string;
-  logoUrl: string | null;
+  flagUrl: string | null;
   slug: string;
-  type: "leagues" | "tournaments";
-  tournamentOrLeagueName: string;
-  tournamentOrLeagueLogoUrl: string | null;
+  league: {
+    name: string;
+    flagUrl: string | null;
+    isClubs: boolean;
+    isDomestic: boolean;
+  };
 }
 
 interface StandingProps {
@@ -59,13 +62,13 @@ export default function Standings({
   values: TableHeadProps[];
   date: string;
 }) {
-  const [tournamentsAndLeagues, setTournamentsAndLeagues] = useState<
-    Array<TournamentAndLeagueProps>
-  >(new Array<TournamentAndLeagueProps>());
+  const [seasons, setSeasons] = useState<Array<SeasonProps>>(
+    new Array<SeasonProps>()
+  );
 
   const [standings, setStandings] = useState<Array<StandingProps>>([]);
 
-  const [record, setRecord] = useState<TournamentAndLeagueProps | null>(null);
+  const [record, setRecord] = useState<SeasonProps | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isStandingsLoading, setIsStandingsLoading] = useState(true);
@@ -77,7 +80,7 @@ export default function Standings({
       setIsStandingsLoading(true);
       if (record) {
         try {
-          if (record.type === "tournaments") {
+          if (!record.league.isClubs) {
             const res = await fetch(`/api/edition-standings/${record.slug}`);
             const data = await res.json();
 
@@ -111,7 +114,7 @@ export default function Standings({
         const res = await fetch(`/api/seasons/${date}/${location?.country}`);
         const data = await res.json();
 
-        setTournamentsAndLeagues(data);
+        setSeasons(data);
 
         if (data.length > 0) {
           setRecord(data[0]);
@@ -131,11 +134,11 @@ export default function Standings({
     return (
       <div className="flex gap-2 items-center">
         <LoadingSpinner />
-        <span>Loading Standings</span>
+        <span>Loading Standings...</span>
       </div>
     );
 
-  if (tournamentsAndLeagues.length === 0) return;
+  if (seasons.length === 0) return;
 
   return (
     <div className="space-y-2">
@@ -143,7 +146,7 @@ export default function Standings({
       <PartsTitle title={`Standings`} />
       <div className="w-full p-2 bg-primary/10 flex flex-col gap-2">
         <div className=" w-full gap-2 flex items-center text-xs">
-          {tournamentsAndLeagues.map((rec, idx) => (
+          {seasons.map((rec, idx) => (
             <Button
               key={idx}
               variant="outline"
@@ -151,7 +154,7 @@ export default function Standings({
               onClick={() => setRecord(rec)}
               disabled={rec === record}
             >
-              {rec.tournamentOrLeagueName}
+              {rec.league.name}
             </Button>
           ))}
         </div>
@@ -187,22 +190,22 @@ export default function Standings({
                       .map((stand, idx) => (
                         <TableRow key={idx} className="dashboard-table-row">
                           <TableCell className="text-left flex gap-2 items-center py-1">
-                              <>
-                                <Image
-                                  src={stand.flagUrl || EmptyImageUrls.Team}
-                                  width={35}
-                                  height={35}
-                                  alt={`${stand.name} flag`}
-                                  className="hidden max-xs:block aspect-video object-contain"
-                                />
-                                <Image
-                                  src={stand.flagUrl || EmptyImageUrls.Team}
-                                  width={50}
-                                  height={50}
-                                  alt={`${stand.name} flag`}
-                                  className="hidden xs:block aspect-video object-contain"
-                                />
-                              </>
+                            <>
+                              <Image
+                                src={stand.flagUrl || EmptyImageUrls.Team}
+                                width={35}
+                                height={35}
+                                alt={`${stand.name} flag`}
+                                className="hidden max-xs:block aspect-video object-contain"
+                              />
+                              <Image
+                                src={stand.flagUrl || EmptyImageUrls.Team}
+                                width={50}
+                                height={50}
+                                alt={`${stand.name} flag`}
+                                className="hidden xs:block aspect-video object-contain"
+                              />
+                            </>
                             <span className="hidden max-2xs:block">
                               {stand.code || ""}
                             </span>
@@ -241,7 +244,7 @@ export default function Standings({
               ))}
             {record && !isStandingsLoading && (
               <PartsLink
-                href={`/${record?.type}/${record?.slug}/standings`}
+                href={`/league/${record?.slug}/standings`}
                 label="See More"
               />
             )}
@@ -249,7 +252,7 @@ export default function Standings({
         ) : (
           <div className="flex gap-2 items-center">
             <LoadingSpinner />
-            <span>Loading Standings</span>
+            <span>Loading Standings...</span>
           </div>
         )}
       </div>

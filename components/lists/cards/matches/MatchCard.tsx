@@ -8,10 +8,28 @@ import { Badge } from "@/components/ui/badge";
 import { NeutralMatch } from "@/types";
 
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
-import { Team } from "@prisma/client";
-import { EmptyImageUrls } from "@/types/enums";
+import { Country, Group, League, Match, Season, Team } from "@prisma/client";
 
-export default function MatchCard({ match }: { match: NeutralMatch }) {
+interface MatchProps extends Match {
+  group: Group;
+  homeTeam: Team;
+  awayTeam: Team;
+  season: SeasonProps;
+}
+
+interface LeagueProps extends League {
+  country: Country | null;
+}
+
+interface SeasonProps extends Season {
+  league: LeagueProps;
+  teams: Team[];
+  groups: Group[];
+  winner: Team | null;
+  titleHolder: Team | null;
+}
+
+export default function MatchCard({ match }: { match: MatchProps }) {
   return (
     <Card key={match.id} className="rounded-lg bg-primary/10">
       <CardContent className="grid grid-cols-5 grid-rows-3 gap-2 pt-6">
@@ -34,9 +52,7 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
         >
           <Badge
             variant={match.round ? "secondary" : "destructive"}
-            className={
-              match.round ? `hover:bg-secondary` : `hover:bg-destructive`
-            }
+            className="hover:bg-secondary"
           >
             {match.round ? `${match.round}` : "No round info"}
           </Badge>
@@ -70,22 +86,18 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
         <div className="row-start-3 col-start-1 col-end-3 self-center">
           <Badge
             variant={match.date ? "default" : "destructive"}
-            className={`hidden sm:inline-block ${
-              match.date ? `hover:bg-primary` : `hover:bg-destructive`
-            }`}
+            className="hidden sm:inline-block hover:bg-primary"
           >
-            {match.localDate
-              ? getFormattedDate(match.localDate)
+            {match.date
+              ? getFormattedDate(match.date.toString())
               : "No date info"}
           </Badge>
           <Badge
             variant={match.date ? "default" : "destructive"}
-            className={`hidden max-sm:inline-block ${
-              match.date ? `hover:bg-primary` : `hover:bg-destructive`
-            }`}
+            className="hidden max-sm:inline-block hover:bg-primary"
           >
-            {match.localDate
-              ? getFormattedDate(match.localDate, true)
+            {match.date
+              ? getFormattedDate(match.date.toString(), true)
               : "No date info"}
           </Badge>
         </div>
@@ -94,9 +106,7 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
         <div className="row-start-3 col-start-4 col-end-6 self-center place-self-end">
           <Badge
             variant={match.date ? "default" : "destructive"}
-            className={`hidden sm:inline-block ${
-              match.date ? `hover:bg-primary` : `hover:bg-destructive`
-            }`}
+            className="hidden sm:inline-block hover:bg-primary"
           >
             {match.date
               ? getFormattedTime(match.date.toString(), false, true)
@@ -104,9 +114,7 @@ export default function MatchCard({ match }: { match: NeutralMatch }) {
           </Badge>
           <Badge
             variant={match.date ? "default" : "destructive"}
-            className={`hidden max-sm:inline-block ${
-              match.date ? `hover:bg-primary` : `hover:bg-destructive`
-            }`}
+            className="hidden max-sm:inline-block hover:bg-primary"
           >
             {match.date
               ? getFormattedTime(match.date.toString(), false, false)
@@ -143,13 +151,15 @@ function TeamLabel({
       <p className="hidden max-sm:inline-block text-[16px] font-bold">
         {!team ? placeholder : team.code ? team.code : team.name}
       </p>
-      <Image
-        src={team?.flagUrl || EmptyImageUrls.Team}
-        width={80}
-        height={80}
-        alt={`${team?.name} Flag` || "Team Flag"}
-        className="aspect-video object-contain"
-      />
+      {team && team.flagUrl && (
+        <Image
+          src={team?.flagUrl}
+          width={25}
+          height={25}
+          alt={`${team?.name} Flag`}
+          className="w-7 h-7 m-0"
+        />
+      )}
     </div>
   );
 }

@@ -4,16 +4,16 @@ import {
   Match,
   Group,
   Team,
-  KnockoutMatch,
-  TournamentEdition,
-  Tournament,
+  // KnockoutMatch,
+  // TournamentEdition,
+  // Tournament,
   Country,
-  LeagueMatch,
-  LeagueGroup,
-  LeagueTeam,
-  LeagueSeason,
+  // LeagueMatch,
+  // LeagueGroup,
+  // LeagueTeam,
+  Season,
   League,
-  LeagueKnockoutMatch,
+  // LeagueKnockoutMatch,
 } from "@prisma/client";
 
 import { useState } from "react";
@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import _ from "lodash";
+import { format } from "date-fns";
 
 import { GroupIcon, CalendarDays } from "lucide-react";
 
@@ -39,104 +40,104 @@ import {
   switchLeagueMatchesToNeutralMatches,
   switchLeagueKnockoutMatchesToNeutralMatches,
 } from "@/lib/data/switchers";
-import { sortMatches, sortMatchesByRound } from "@/lib/sortGroupTeams";
+import { sortMatches } from "@/lib/sortGroupTeams";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
-  teams: Team[];
-  groups: Group[];
-  winner: Team | null;
-  titleHolder: Team | null;
-  hostingCountries: Country[];
-}
+// interface TournamentEditionProps extends TournamentEdition {
+//   tournament: Tournament;
+//   teams: Team[];
+//   groups: Group[];
+//   winner: Team | null;
+//   titleHolder: Team | null;
+//   hostingCountries: Country[];
+// }
 
-interface KnockoutMatchProps extends KnockoutMatch {
-  homeTeam: Team | null;
-  awayTeam: Team | null;
-  tournamentEdition: TournamentEditionProps;
-}
+// interface KnockoutMatchProps extends KnockoutMatch {
+//   homeTeam: Team | null;
+//   awayTeam: Team | null;
+//   tournamentEdition: TournamentEditionProps;
+// }
 
 interface MatchProps extends Match {
   group: Group;
   homeTeam: Team;
   awayTeam: Team;
-  tournamentEdition: TournamentEditionProps;
+  season: SeasonProps;
 }
 
 interface LeagueProps extends League {
   country: Country | null;
 }
 
-interface LeagueSeasonProps extends LeagueSeason {
+interface SeasonProps extends Season {
   league: LeagueProps;
-  teams: LeagueTeam[];
-  groups: LeagueGroup[];
-  winner: LeagueTeam | null;
-  titleHolder: LeagueTeam | null;
+  teams: Team[];
+  groups: Group[];
+  winner: Team | null;
+  titleHolder: Team | null;
 }
 
-interface LeagueMatchProps extends LeagueMatch {
-  group: LeagueGroup | null;
-  homeTeam: LeagueTeam;
-  awayTeam: LeagueTeam;
-  season: LeagueSeasonProps;
-}
+// interface LeagueMatchProps extends LeagueMatch {
+//   group: LeagueGroup | null;
+//   homeTeam: LeagueTeam;
+//   awayTeam: LeagueTeam;
+//   season: LeagueSeasonProps;
+// }
 
-interface LeagueKnockoutMatchProps extends LeagueKnockoutMatch {
-  homeTeam: LeagueTeam | null;
-  awayTeam: LeagueTeam | null;
-  season: LeagueSeasonProps;
-}
+// interface LeagueKnockoutMatchProps extends LeagueKnockoutMatch {
+//   homeTeam: LeagueTeam | null;
+//   awayTeam: LeagueTeam | null;
+//   season: LeagueSeasonProps;
+// }
 
 export default function MatchesCards({
-  editionOrseason,
+  season,
   matches,
-  knockoutMatches,
+  // knockoutMatches,
   rounds,
-  type,
-}: {
-  editionOrseason: TournamentEditionProps | LeagueSeasonProps;
-  matches: MatchProps[] | LeagueMatchProps[];
-  knockoutMatches: KnockoutMatchProps[] | LeagueKnockoutMatchProps[];
+}: // type,
+{
+  season: SeasonProps;
+  matches: MatchProps[];
+  // knockoutMatches: KnockoutMatchProps[] | LeagueKnockoutMatchProps[];
   rounds: string[];
-  type: "tournaments" | "leagues";
+  // type: "tournaments" | "leagues";
 }) {
-  const allMatches: NeutralMatch[] =
-    type === "tournaments"
-      ? switchTournamentMatchesToNeutralMatches(matches as MatchProps[]).concat(
-          switchTournamentKnockoutMatchesToNeutralMatches(
-            knockoutMatches as KnockoutMatchProps[]
-          )
-        )
-      : switchLeagueMatchesToNeutralMatches(
-          matches as LeagueMatchProps[]
-        ).concat(
-          switchLeagueKnockoutMatchesToNeutralMatches(
-            knockoutMatches as LeagueKnockoutMatchProps[]
-          )
-        );
+  // const allMatches: NeutralMatch[] =
+  //   type === "tournaments"
+  //     ? switchTournamentMatchesToNeutralMatches(matches as MatchProps[]).concat(
+  //         switchTournamentKnockoutMatchesToNeutralMatches(
+  //           knockoutMatches as KnockoutMatchProps[]
+  //         )
+  //       )
+  //     : switchLeagueMatchesToNeutralMatches(
+  //         matches as LeagueMatchProps[]
+  //       ).concat(
+  //         switchLeagueKnockoutMatchesToNeutralMatches(
+  //           knockoutMatches as LeagueKnockoutMatchProps[]
+  //         )
+  //       );
 
   const [groupBy, setGroupBy] = useState<GroupByOptions>(
     GroupByOptions.ONLYDATE
   );
   const results = Object.entries(
+    // _.groupBy(matches.sort(sortMatches), groupBy)
     _.groupBy(
-      allMatches.sort(
-        groupBy === GroupByOptions.ONLYDATE ? sortMatches : sortMatchesByRound
-      ),
-      groupBy
+      matches,
+      groupBy === GroupByOptions.ONLYDATE
+        ? (match) => {
+            if (match.date) {
+              const dateOnly = format(new Date(match.date), "yyyy-MM-dd"); // Extract YYYY-MM-DD
+              return dateOnly;
+            }
+          }
+        : groupBy
     )
   );
 
   return (
     <>
-      <PageHeader
-        label={`${
-          type === "tournaments"
-            ? (editionOrseason as TournamentEditionProps).tournament.name
-            : (editionOrseason as LeagueSeasonProps).league.name
-        } ${editionOrseason.year} Matches`}
-      />
+      <PageHeader label={`${season.league.name} Matches`} />
       <div className="flex justify-end pb-2">
         <Button
           variant="outline"
@@ -160,8 +161,8 @@ export default function MatchesCards({
           )}
         </Button>
         <MatchesFilterDialog
-          teams={editionOrseason.teams}
-          groups={editionOrseason.groups}
+          teams={season.teams}
+          groups={season.groups}
           rounds={rounds}
         />
       </div>
@@ -172,8 +173,8 @@ export default function MatchesCards({
               <div key={index} className="w-full">
                 <ListTitle groupBy={groupBy} divider={divider} />
                 <div className="w-full space-y-2">
-                  {list.map((match: NeutralMatch) => (
-                    <MatchCard key={match.dbId} match={match} />
+                  {list.map((match) => (
+                    <MatchCard key={match.id} match={match} />
                   ))}
                 </div>
               </div>

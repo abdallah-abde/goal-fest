@@ -4,7 +4,7 @@ import {
   LeagueStages,
   LeagueTypes,
   MatchStatusOptions,
-  TournamentStages,
+  LeagueStages,
   TournamentTypes,
 } from "@/types/enums";
 

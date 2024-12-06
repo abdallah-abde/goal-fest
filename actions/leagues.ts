@@ -5,14 +5,17 @@ import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 import { ZodError } from "zod";
-import { LeagueTypes } from "@/types/enums";
+import { IsPopularOptions, LeagueTypes } from "@/types/enums";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
   name: string;
-  logoUrl?: string | null;
+  flagUrl?: string | null;
   countryId?: string | null;
-  type: string;
+  continent: string;
+  isDomestic: string;
+  isClubs: string;
+  isPopular: string;
 }
 
 interface ReturnType {
@@ -33,9 +36,12 @@ export async function addLeague(
     if (result.success === false) {
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
-        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isDomestic: result.error.formErrors.fieldErrors.isDomestic?.[0],
+        isClubs: result.error.formErrors.fieldErrors.isClubs?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -43,22 +49,25 @@ export async function addLeague(
 
     const data = result.data;
 
-    if (data.type === LeagueTypes.Domestic && data.countryId === 0) {
+    if (data.continent === LeagueTypes.Domestic && data.countryId === 0) {
       return {
         errors: undefined,
         success: false,
-        customError: `Country is required when Type is ${LeagueTypes.Domestic}`,
+        customError: `Country is required when Continent is ${LeagueTypes.Domestic}`,
       };
     }
 
-    const logoUrlPath = await writeImageFile(data.logoUrl, "tournaments");
+    const flagUrlPath = await writeImageFile(data.flagUrl, "tournaments");
 
     await prisma.league.create({
       data: {
         name: data.name,
-        logoUrl: logoUrlPath,
+        flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
-        type: data.type,
+        continent: data.continent,
+        isDomestic: data.isDomestic === IsPopularOptions.Yes ? true : false,
+        isClubs: data.isClubs === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -72,9 +81,12 @@ export async function addLeague(
       customError: null,
       errors: {
         name: errorMap["name"]?.[0],
-        logoUrl: errorMap["logoUrl"]?.[0],
+        flagUrl: errorMap["flagUrl"]?.[0],
         countryId: errorMap["countryId"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isDomestic: errorMap["isDomestic"]?.[0],
+        isClubs: errorMap["isClubs"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
   }
@@ -93,9 +105,12 @@ export async function updateLeague(
     if (result.success === false) {
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
-        logoUrl: result.error.formErrors.fieldErrors.logoUrl?.[0],
+        flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isDomestic: result.error.formErrors.fieldErrors.isDomestic?.[0],
+        isClubs: result.error.formErrors.fieldErrors.isClubs?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -103,11 +118,11 @@ export async function updateLeague(
 
     const data = result.data;
 
-    if (data.type === LeagueTypes.Domestic && data.countryId === 0) {
+    if (data.continent === LeagueTypes.Domestic && data.countryId === 0) {
       return {
         errors: undefined,
         success: false,
-        customError: `Country is required when Type is ${LeagueTypes.Domestic}`,
+        customError: `Country is required when Continent is ${LeagueTypes.Domestic}`,
       };
     }
 
@@ -115,19 +130,22 @@ export async function updateLeague(
 
     if (league == null) return notFound();
 
-    const logoUrlPath = await deleteAndWriteImageFile(
-      data.logoUrl,
+    const flagUrlPath = await deleteAndWriteImageFile(
+      data.flagUrl,
       "tournaments",
-      league.logoUrl
+      league.flagUrl
     );
 
     await prisma.league.update({
       where: { id },
       data: {
-        name: data.name.toString(),
-        logoUrl: logoUrlPath,
+        name: data.name,
+        flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
-        type: data.type.toString(),
+        continent: data.continent,
+        isDomestic: data.isDomestic === IsPopularOptions.Yes ? true : false,
+        isClubs: data.isClubs === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -141,9 +159,12 @@ export async function updateLeague(
       customError: null,
       errors: {
         name: errorMap["name"]?.[0],
-        logoUrl: errorMap["logoUrl"]?.[0],
+        flagUrl: errorMap["flagUrl"]?.[0],
         countryId: errorMap["countryId"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isDomestic: errorMap["isDomestic"]?.[0],
+        isClubs: errorMap["isClubs"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
   }

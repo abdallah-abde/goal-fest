@@ -20,8 +20,7 @@ export interface TotalCleanSheetsProps {
   teamName: string;
   teamCode: string;
   teamFlagUrl: string;
-  groupMatchesCleanSheets: number;
-  knockoutMatchesCleanSheets: number;
+  matchesCleanSheets: number;
 }
 
 // export interface LeagueTotalCleanSheetsProps {

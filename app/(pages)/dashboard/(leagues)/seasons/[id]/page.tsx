@@ -20,7 +20,5 @@ export default async function EditSeasonPage({
 
   if (!leagueSeason) throw new Error("Something went wrong");
 
-  return (
-    <SeasonForm leagueSeason={leagueSeason} leagues={leagues} teams={teams} />
-  );
+  return <SeasonForm season={leagueSeason} leagues={leagues} teams={teams} />;
 }

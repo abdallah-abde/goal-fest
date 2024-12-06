@@ -58,8 +58,8 @@ export default async function LeagueMatchesPage({
     ];
   }
 
-  const [leagueSeason, matches, knockoutMatches, rounds] = await Promise.all([
-    prisma.leagueSeason.findUnique({
+  const [season, matches, rounds] = await Promise.all([
+    prisma.season.findUnique({
       where: { slug },
       include: {
         league: {
@@ -73,73 +73,74 @@ export default async function LeagueMatchesPage({
         titleHolder: true,
       },
     }),
-    isAllGroups || groupId
-      ? prisma.leagueMatch.findMany({
-          where: {
-            season: {
-              slug,
-            },
-            ...groupMatchConditions,
-          },
+    // isAllGroups || groupId
+    // ?
+    prisma.match.findMany({
+      where: {
+        season: {
+          slug,
+        },
+        // ...groupMatchConditions,
+      },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        season: {
           include: {
-            homeTeam: true,
-            awayTeam: true,
-            season: {
+            league: {
               include: {
-                league: {
-                  include: {
-                    country: true,
-                  },
-                },
-                teams: true,
-                winner: true,
-                titleHolder: true,
-                groups: true,
+                country: true,
               },
             },
-            group: true,
+            teams: true,
+            winner: true,
+            titleHolder: true,
+            groups: true,
           },
-        })
-      : [],
-    isAllGroups
-      ? prisma.leagueKnockoutMatch.findMany({
-          where: {
-            season: {
-              slug,
-            },
-            ...knockoutMatchConditions,
-          },
-          include: {
-            homeTeam: true,
-            awayTeam: true,
-            season: {
-              include: {
-                league: {
-                  include: {
-                    country: true,
-                  },
-                },
-                teams: true,
-                winner: true,
-                titleHolder: true,
-                groups: true,
-              },
-            },
-          },
-        })
-      : [],
+        },
+        group: true,
+      },
+    }),
+    // : []
+    // isAllGroups
+    //   ? prisma.match.findMany({
+    //       where: {
+    //         season: {
+    //           slug,
+    //         },
+    //         ...knockoutMatchConditions,
+    //       },
+    //       include: {
+    //         homeTeam: true,
+    //         awayTeam: true,
+    //         season: {
+    //           include: {
+    //             league: {
+    //               include: {
+    //                 country: true,
+    //               },
+    //             },
+    //             teams: true,
+    //             winner: true,
+    //             titleHolder: true,
+    //             groups: true,
+    //           },
+    //         },
+    //       },
+    //     })
+    //   : [],
     getAllLeagueMatchesRounds(slug),
   ]);
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
   return (
     <MatchesCards
-      editionOrseason={leagueSeason}
+      season={season}
       matches={matches}
-      knockoutMatches={knockoutMatches}
+      // knockoutMatches={knockoutMatches}
       rounds={rounds}
-      type="leagues"
+      // type="leagues"
     />
   );
 }

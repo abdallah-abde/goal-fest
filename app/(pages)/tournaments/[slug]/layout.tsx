@@ -22,7 +22,7 @@ export default async function EditionsLayout({
       {edition && (
         <Sidebar
           source="tournaments"
-          logoUrl={edition.logoUrl || EmptyImageUrls.Tournament}
+          logoUrl={edition.logoUrl || EmptyImageUrls.League}
           name={`${edition.tournament.name} ${edition.year}`}
         />
       )}

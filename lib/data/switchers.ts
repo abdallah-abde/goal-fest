@@ -84,7 +84,7 @@ export function switchTournamentMatchToNeutralMatch(match: MatchProps) {
     editionOrSeasonLogoUrl:
       match.tournamentEdition.logoUrl ||
       match.tournamentEdition.tournament.logoUrl ||
-      EmptyImageUrls.Tournament,
+      EmptyImageUrls.League,
     editionOrSeasonSlug: match.tournamentEdition.slug,
     tournamentOrLeagueName: match.tournamentEdition.tournament.name,
     tournamentOrLeagueYear: match.tournamentEdition.year,
@@ -143,7 +143,7 @@ export function switchTournamentKnockoutMatchToNeutralMatch(
     editionOrSeasonLogoUrl:
       match.tournamentEdition.logoUrl ||
       match.tournamentEdition.tournament.logoUrl ||
-      EmptyImageUrls.Tournament,
+      EmptyImageUrls.League,
     editionOrSeasonSlug: match.tournamentEdition.slug,
     tournamentOrLeagueName: match.tournamentEdition
       ? match.tournamentEdition.tournament
@@ -214,7 +214,7 @@ export function switchLeagueMatchToNeutralMatch(match: LeagueMatchProps) {
     editionOrSeasonLogoUrl:
       match?.season?.logoUrl ||
       match?.season?.league?.logoUrl ||
-      EmptyImageUrls.Tournament,
+      EmptyImageUrls.League,
     editionOrSeasonSlug: match.season.slug,
     tournamentOrLeagueName: match.season?.league?.name,
     tournamentOrLeagueYear: match.season?.year,
@@ -276,7 +276,7 @@ export function switchLeagueKnockoutMatchToNeutralMatch(
     editionOrSeasonLogoUrl:
       match.season.logoUrl ||
       match.season.league.logoUrl ||
-      EmptyImageUrls.Tournament,
+      EmptyImageUrls.League,
     editionOrSeasonSlug: match.season.slug,
     tournamentOrLeagueName: match.season?.league?.name,
     tournamentOrLeagueYear: match.season?.year,

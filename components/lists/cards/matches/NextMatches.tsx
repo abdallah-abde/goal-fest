@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { NeutralMatch } from "@/types";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -9,24 +7,42 @@ import CardsSectionContainer from "@/components/lists/cards/templates/CardsSecti
 
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { EmptyImageUrls } from "@/types/enums";
+import { Country, Group, League, Match, Season, Team } from "@prisma/client";
 
-export default function NextMatches({
-  allMatches,
-}: {
-  allMatches: NeutralMatch[];
-}) {
+interface MatchProps extends Match {
+  group: Group;
+  homeTeam: Team;
+  awayTeam: Team;
+  season: SeasonProps;
+}
+
+interface SeasonProps extends Season {
+  league: LeagueProps;
+  teams: Team[];
+  groups: Group[];
+  winner: Team | null;
+  titleHolder: Team | null;
+  matches: MatchProps[];
+  hostingCountries: Country[];
+}
+
+interface LeagueProps extends League {
+  country: Country | null;
+}
+
+export default function NextMatches({ matches }: { matches: MatchProps[] }) {
   return (
     <>
-      {allMatches && allMatches.length > 0 && (
+      {matches && matches.length > 0 && (
         <CardsSectionContainer label="Next Matches">
-          {allMatches.map(
+          {matches.map(
             ({
               id,
               date,
               homeTeam,
               awayTeam,
-              homeTeamPlaceholder,
-              awayTeamPlaceholder,
+              // homeTeamPlaceholder,
+              // awayTeamPlaceholder,
               group,
               round,
             }) => (
@@ -60,10 +76,12 @@ export default function NextMatches({
                         className="aspect-video object-contain"
                       />
                       <span className="hidden sm:block font-bold">
-                        {homeTeam ? homeTeam.name : homeTeamPlaceholder}
+                        {/* {homeTeam ? homeTeam.name : homeTeamPlaceholder} */}
+                        {homeTeam?.name || ""}
                       </span>
                       <span className="hidden max-sm:block font-bold">
-                        {homeTeam ? homeTeam.code : homeTeamPlaceholder}
+                        {/* {homeTeam ? homeTeam.code : homeTeamPlaceholder} */}
+                        {homeTeam?.code || ""}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 py-2">
@@ -75,10 +93,12 @@ export default function NextMatches({
                         className="aspect-video object-contain"
                       />
                       <span className="hidden sm:block font-bold">
-                        {awayTeam ? awayTeam.name : awayTeamPlaceholder}
+                        {/* {awayTeam ? awayTeam.name : awayTeamPlaceholder} */}
+                        {awayTeam?.name || ""}
                       </span>
                       <span className="hidden max-sm:block font-bold">
-                        {awayTeam ? awayTeam.code : awayTeamPlaceholder}
+                        {/* {awayTeam ? awayTeam.code : awayTeamPlaceholder} */}
+                        {awayTeam?.code || ""}
                       </span>
                     </div>
                   </div>

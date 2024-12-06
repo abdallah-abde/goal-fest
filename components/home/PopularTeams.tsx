@@ -7,9 +7,10 @@ import PartsTitle from "@/components/home/PartsTitle";
 import { EmptyImageUrls } from "@/types/enums";
 
 export default async function PopularTeams() {
-  const leagueTeams = await prisma.leagueTeam.findMany({
+  const teams = await prisma.team.findMany({
     where: {
       isPopular: true,
+      isClub: true,
     },
     select: {
       name: true,
@@ -22,14 +23,14 @@ export default async function PopularTeams() {
     },
   });
 
-  if (leagueTeams.length === 0) return <></>;
+  if (teams.length === 0) return <></>;
 
   return (
     <div className="space-y-2">
       <PartsTitle title="Popular Teams" />
       <div className="bg-primary/10">
         <div className="flex flex-col items-start justify-center">
-          {leagueTeams.map(({ name, flagUrl, country }, idx) => (
+          {teams.map(({ name, flagUrl, country }, idx) => (
             <Link key={idx} href="#" className="w-full">
               <div className="w-full flex gap-4 items-center px-4 py-2 border-b border-primary/20 hover:bg-primary/20 transition duration-300">
                 <Image
@@ -42,7 +43,7 @@ export default async function PopularTeams() {
                   <p className="font-semibold text-sm">{name}</p>
                   {country && (
                     <p className="text-muted-foreground text-xs">
-                      {country.name}
+                      {country.name})
                     </p>
                   )}
                 </div>

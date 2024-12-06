@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { newVerification } from "@/actions/authActions";
 import { BadgeCheck, TriangleAlert } from "lucide-react";
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 
 export default function NewVerificationForm() {
   const searchParams = useSearchParams();

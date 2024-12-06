@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import { NeutralMatch } from "@/types";
+import Image from "next/image";
 
 import _ from "lodash";
+
+import { MatchProps } from "@/types";
 
 import {
   Accordion,
@@ -14,14 +15,13 @@ import {
 } from "@/components/ui/accordion";
 
 import PartsTitle from "@/components/home/PartsTitle";
-import CategorizedMatchesByTournamentOrLeague from "@/components/home/CategorizedMatchesByTournamentOrLeague";
+import CategorizedMatchesByLeagues from "@/components/home/CategorizedMatchesByLeagues";
 
-import { LoadingSpinner } from "@/components/LoadingComponents";
-import Image from "next/image";
+import { LoadingSpinner } from "@/components/Skeletons";
 import { EmptyImageUrls } from "@/types/enums";
 
 export default function CountriesMatches({ date }: { date: string }) {
-  const [allMatches, setAllMatches] = useState<Array<NeutralMatch>>([]);
+  const [matches, setMatches] = useState<Array<MatchProps>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function CountriesMatches({ date }: { date: string }) {
         const res = await fetch(`/api/matches/all/${date}`);
         const data = await res.json();
 
-        setAllMatches(data);
+        setMatches(data);
 
         setIsLoading(false);
       } catch (error) {
@@ -47,38 +47,52 @@ export default function CountriesMatches({ date }: { date: string }) {
     return (
       <div className="flex gap-2 items-center">
         <LoadingSpinner />
-        <span>Loading Matches By Countries</span>
+        <span>Loading Matches By Countries...</span>
       </div>
     );
 
-  if (allMatches.length === 0) return;
+  if (matches.length === 0) return;
 
-  const results = Object.entries(_.groupBy(allMatches, "country"));
+  const results = Object.entries(
+    _.groupBy(matches, "season.league.country.name")
+  );
 
   return (
     <div className="space-y-2 pb-24">
       <PartsTitle title={`League's and Tournament's Matches By Countries`} />
       <Accordion type="single" collapsible className="bg-primary/10">
-        {results.map(([countryName, list], idx) => (
-          <AccordionItem key={idx} value={countryName}>
-            <AccordionTrigger className="px-4 hover:no-underline">
-            <div className="flex gap-2 items-center">
-                <Image
-                  width={25}
-                  height={25}
-                  src={
-                    list[0].countryflagUrl || EmptyImageUrls.Country
-                  }
-                  alt={`${countryName} Flag`}
-                />
-                <p>{countryName}</p>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-0">
-              <CategorizedMatchesByTournamentOrLeague matches={list} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+        {results.map(([country, list], idx) => {
+          const {
+            season: {
+              league: {
+                country: { name: countryName, flagUrl: countryFlagUrl },
+              },
+            },
+          } = list[0];
+
+          return (
+            <AccordionItem key={idx} value={countryName}>
+              <AccordionTrigger className="px-4 hover:no-underline">
+                <div className="flex gap-2 items-center">
+                  {country && (
+                    <>
+                      <Image
+                        width={25}
+                        height={25}
+                        src={countryFlagUrl || EmptyImageUrls.Country}
+                        alt={`${countryName} Flag`}
+                      />
+                      <p>{countryName}</p>
+                    </>
+                  )}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-0">
+                <CategorizedMatchesByLeagues matches={list} />
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
       </Accordion>
     </div>
   );

@@ -4,23 +4,19 @@ export enum SortDirectionOptions {
 }
 
 export enum GroupByOptions {
-  STAGE = "stage",
-  ONLYDATE = "localDateOnlyDate", // Because we have Date in the Neutral Match Object
+  STAGE = "round",
+  ONLYDATE = "date", // Because we have Date in the Neutral Match Object
 }
 
-export enum TournamentStages {
+export enum LeagueStages {
   GroupsStage = "Groups Stage",
   RoundOf16 = "Round of 16",
   QuarterFinal = "Quarter Final",
   SemiFinal = "Semi Final",
   Final = "Final",
   Finished = "Finished",
-}
-
-export enum LeagueStages {
   Scheduled = "Scheduled",
   Running = "Running",
-  Finished = "Finished",
 }
 
 export enum TournamentTypes {
@@ -34,6 +30,7 @@ export enum TournamentTypes {
 }
 
 export enum Continents {
+  International = "International",
   Europe = "Europe",
   Asia = "Asia",
   Africa = "Africa",
@@ -75,5 +72,5 @@ export enum MatchStatusOptions {
 export enum EmptyImageUrls {
   Team = "/images/teams/team-empty-logo.png",
   Country = "/images/countries/empty-flag.png",
-  Tournament = "/images/tournaments/tournament-empty-logo.png",
+  League = "/images/tournaments/tournament-empty-logo.png",
 }

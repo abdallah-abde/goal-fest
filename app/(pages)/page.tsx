@@ -5,7 +5,7 @@ import PopularMatches from "@/components/home/PopularMatches";
 import CountriesMatches from "@/components/home/CountriesMatches";
 import FeaturedMatches from "@/components/home/FeaturedMatches";
 import Standings from "@/components/home/Standings";
-import PopulatTournamentsAndLeagues from "@/components/home/PopularTournamentsAndLeagues";
+import PopularLeagues from "@/components/home/PopularLeagues";
 import PopularTeams from "@/components/home/PopularTeams";
 
 import { standingsHeaders } from "@/lib/data/standingsHeaders";
@@ -38,8 +38,10 @@ export default async function HomePage({
         <div className="flex gap-2 pb-24">
           <div className="flex-1">
             {/* Popular Leagues */}
-            <Suspense fallback={<p>Loading Popular Torunaments and Leagues...</p>}>
-              <PopulatTournamentsAndLeagues />
+            <Suspense
+              fallback={<p>Loading Popular Torunaments and Leagues...</p>}
+            >
+              <PopularLeagues />
             </Suspense>
           </div>
           <div className="flex-1">

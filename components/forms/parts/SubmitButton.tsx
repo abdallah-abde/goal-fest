@@ -1,6 +1,6 @@
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 
 export default function SubmitButton({
   isDisabled = false,

@@ -11,7 +11,7 @@ export default async function LeaguesLayout({
 }) {
   const slug = params.slug;
 
-  const season = await prisma.leagueSeason.findUnique({
+  const season = await prisma.season.findUnique({
     where: { slug },
     include: { league: true },
   });
@@ -21,9 +21,9 @@ export default async function LeaguesLayout({
       {season && (
         <Sidebar
           source="leagues"
-          logoUrl={season?.logoUrl || null}
+          logoUrl={season?.flagUrl || null}
           name={
-            season?.logoUrl
+            season?.flagUrl
               ? `${season?.league?.name} ${season?.year}`
               : "Tournament Logo"
           }

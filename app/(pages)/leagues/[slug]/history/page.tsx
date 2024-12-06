@@ -1,8 +1,8 @@
 import prisma from "@/lib/db";
 
-import TournamentsHistory from "@/components/lists/TournamentsHistory";
+import LeaguesHistory from "@/components/lists/LeaguesHistory";
 
-import {TournamentStages} from '@/types/enums'
+import { LeagueStages } from "@/types/enums";
 
 export default async function LeaguesHistoryPage({
   params,
@@ -11,34 +11,29 @@ export default async function LeaguesHistoryPage({
 }) {
   const { slug } = params;
 
-  const leagueSeason = await prisma.leagueSeason.findFirst({
+  const season = await prisma.season.findFirst({
     where: { slug },
     select: { league: true },
   });
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
-  const league = leagueSeason.league;
+  const league = season.league;
 
-  const seasons = await prisma.leagueSeason.findMany({
+  const seasons = await prisma.season.findMany({
     where: {
       league: {
         id: league.id,
       },
-      currentStage: TournamentStages.Finished,
+      currentStage: LeagueStages.Finished,
     },
     include: {
       league: { include: { country: true } },
       winner: true,
       titleHolder: true,
+      hostingCountries: true,
     },
   });
 
-  return (
-    <TournamentsHistory
-      type="leagues"
-      tournamentOrLeague={league}
-      editionsOrSeasons={seasons}
-    />
-  );
+  return <LeaguesHistory league={league} seasons={seasons} />;
 }

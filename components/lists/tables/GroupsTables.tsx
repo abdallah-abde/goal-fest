@@ -12,59 +12,35 @@ import {
 
 import { cn } from "@/lib/utils";
 
-import { GroupWithTeams, LeagueGroupWithTeams } from "@/types";
+import { GroupWithTeams } from "@/types";
 import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import PageHeader from "@/components/PageHeader";
 import NoDataFoundComponent from "@/components/NoDataFoundComponent";
 import GroupsFilterDialog from "@/components/lists/tables/GroupsFilterDialog";
 
-import {
-  Group,
-  Tournament,
-  TournamentEdition,
-  LeagueGroup,
-  League,
-  LeagueSeason,
-} from "@prisma/client";
+import { Group, League, Season } from "@prisma/client";
 import StandingTableHeader from "@/components/table-parts/StandingTableHeader";
 import { standingsHeaders } from "@/lib/data/standingsHeaders";
 import { EmptyImageUrls } from "@/types/enums";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
+interface SeasonProps extends Season {
+  league: League;
   groups: Group[];
 }
 
-interface LeagueSeasonProps extends LeagueSeason {
-  league: League;
-  groups: LeagueGroup[];
-}
-
 export default function GroupsTables({
-  editionOrSeason,
+  season,
   groupsWithTeams,
-  type,
 }: {
-  editionOrSeason: TournamentEditionProps | LeagueSeasonProps;
-  groupsWithTeams?: GroupWithTeams[] | LeagueGroupWithTeams[];
-  type: "tournaments" | "leagues";
+  season: SeasonProps;
+  groupsWithTeams?: GroupWithTeams[];
 }) {
   return (
     <>
-      <PageHeader
-        label={
-          type === "tournaments"
-            ? `${
-                (editionOrSeason as TournamentEditionProps)?.tournament.name
-              } ${editionOrSeason?.year} Groups`
-            : `${(editionOrSeason as LeagueSeasonProps)?.league.name} ${
-                editionOrSeason?.year
-              } Groups`
-        }
-      />
+      <PageHeader label={`${season?.league.name} ${season?.year} Groups`} />
       <div className="flex justify-end pb-2">
-        <GroupsFilterDialog groups={editionOrSeason.groups} />
+        <GroupsFilterDialog groups={season.groups} />
       </div>
       {groupsWithTeams && groupsWithTeams.length > 1 ? (
         groupsWithTeams.map((group) => (
@@ -79,9 +55,7 @@ export default function GroupsTables({
               </TableCaption>
               {group.teams.length > 0 ? (
                 <>
-                  <TableHeader>
-                    <StandingTableHeader values={standingsHeaders} />
-                  </TableHeader>
+                  <StandingTableHeader values={standingsHeaders} />
                   <TableBody>
                     {group.teams.sort(sortGroupTeams).map((team) => (
                       <TableRow key={team.id} className="dashboard-table-row">
@@ -101,11 +75,13 @@ export default function GroupsTables({
                               alt={`${team.name} Flag` || "Team Flag"}
                               className="hidden xs:block aspect-video object-contain"
                             />
+                            <span className="hidden max-2xs:block">
+                              {team.code ? team.code : team.name}
+                            </span>
+                            <span className="hidden 2xs:block">
+                              {team.name}
+                            </span>
                           </>
-                          <span className="hidden max-2xs:block">
-                            {team.code ? team.code : team.name}
-                          </span>
-                          <span className="hidden 2xs:block">{team.name}</span>
                         </TableCell>
                         <TableCell className="py-4">
                           {team.stats.played}

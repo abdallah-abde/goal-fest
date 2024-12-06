@@ -22,13 +22,9 @@ import { Label } from "@/components/ui/label";
 import { Filter } from "lucide-react";
 
 import FormField from "@/components/forms/parts/FormField";
-import { Group, LeagueGroup } from "@prisma/client";
+import { Group } from "@prisma/client";
 
-export default function GroupsFilterDialog({
-  groups,
-}: {
-  groups: Group[] | LeagueGroup[];
-}) {
+export default function GroupsFilterDialog({ groups }: { groups: Group[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
 

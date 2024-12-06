@@ -1,6 +1,6 @@
 import FormField from "@/components/forms/parts/FormField";
 
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 
 import { Ban } from "lucide-react";
 
@@ -15,14 +15,14 @@ export default function FormFieldLoadingState({
 }) {
   return (
     <FormField>
-      <div className='form-field-loading-styles'>
+      <div className="form-field-loading-styles">
         {isLoading ? (
           <>
             <p>{label}</p>
             <LoadingSpinner />
           </>
         ) : (
-          <div className='p-3 rounded-md w-full bg-destructive/10 text-destructive self-end text-sm flex gap-2 items-center'>
+          <div className="p-3 rounded-md w-full bg-destructive/10 text-destructive self-end text-sm flex gap-2 items-center">
             <Ban size={20} />
             {notFoundText}
           </div>

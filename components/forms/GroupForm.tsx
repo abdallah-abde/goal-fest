@@ -11,7 +11,7 @@ import { Group, Team, Tournament, TournamentEdition } from "@prisma/client";
 import { addTournamentGroup, updateTournamentGroup } from "@/actions/groups";
 
 import PageHeader from "@/components/PageHeader";
-import { MultipleSelectorLoadingIndicator } from "@/components/LoadingComponents";
+import { MultipleSelectorLoadingIndicator } from "@/components/Skeletons";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";

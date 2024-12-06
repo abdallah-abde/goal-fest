@@ -8,22 +8,17 @@ import _ from "lodash";
 
 import useGeoLocation from "@/hooks/useGeoLocation";
 
-import {
-  LeagueSeasonProps,
-  NeutralMatch,
-  TournamentEditionProps,
-} from "@/types";
+import { MatchProps } from "@/types";
 
 import PartsTitle from "@/components/home/PartsTitle";
 import CategorizedMatchCard from "@/components/home/CategorizedMatchCard";
-import TorunamentOrLeagueAccordionLogo from "@/components/home/TorunamentOrLeagueAccordionLogo";
 
-import { LoadingSpinner } from "@/components/LoadingComponents";
+import { LoadingSpinner } from "@/components/Skeletons";
 import { EmptyImageUrls } from "@/types/enums";
 
 export default function PopularMatches({ date }: { date: string }) {
   const { location, loading: geoLocationLoading, error } = useGeoLocation();
-  const [allMatches, setAllMatches] = useState<Array<NeutralMatch>>([]);
+  const [matches, setMatches] = useState<Array<MatchProps>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,7 +31,7 @@ export default function PopularMatches({ date }: { date: string }) {
         );
         const data = await res.json();
 
-        setAllMatches(data);
+        setMatches(data);
 
         setIsLoading(false);
       } catch (error) {
@@ -52,27 +47,28 @@ export default function PopularMatches({ date }: { date: string }) {
     return (
       <div className="flex gap-2 items-center">
         <LoadingSpinner />
-        <span>Loading Popular Matches</span>
+        <span>Loading Popular Matches...</span>
       </div>
     );
 
-  if (allMatches.length === 0) return;
+  if (matches.length === 0) return;
 
-  const results = Object.entries(_.groupBy(allMatches, "fullTournamentName"));
+  const results = Object.entries(_.groupBy(matches, "season.league.name"));
 
   return (
     <div className="space-y-2">
       {/* popular League and tournament matches separated by leagues and tournaments, and filtered by date and country */}
       <PartsTitle title={`Popular League's and Tournament's Matches`} />
       <div className="space-y-2">
-        {results.map(([tournamentName, list], idx) => {
+        {results.map(([leagueName, list], idx) => {
           const {
-            editionOrSeason,
-            tournamentOrLeagueName,
-            matchOf,
-            fullTournamentName,
-            editionOrSeasonSlug,
-            editionOrSeasonLogoUrl,
+            season: {
+              hostingCountries,
+              flagUrl,
+              year,
+              slug,
+              league: { name, country },
+            },
           } = list[0];
 
           return (
@@ -83,53 +79,33 @@ export default function PopularMatches({ date }: { date: string }) {
                     <Image
                       width={25}
                       height={25}
-                      src={
-                        editionOrSeasonLogoUrl
-                      }
-                      alt={fullTournamentName
-                      }
+                      src={flagUrl || EmptyImageUrls.League}
+                      alt={`${name} ${year} Flag`}
                     />
-                    {/* <TorunamentOrLeagueAccordionLogo
-                      type={matchOf}
-                      editionOrSeason={editionOrSeason}
-                      altText={fullTournamentName}
-                    /> */}
                   </div>
                   <div className="flex flex-col justify-center items-start">
-                    <Link
-                      href={`/${matchOf}/${editionOrSeasonSlug}/info`}
-                      className="font-bold"
-                    >
-                      {tournamentOrLeagueName}
+                    <Link href={`/leagues/${slug}/info`} className="font-bold">
+                      {leagueName}
                     </Link>
-                    {matchOf === "tournaments" &&
-                      editionOrSeason &&
-                      (editionOrSeason as TournamentEditionProps)
-                        .hostingCountries.length > 0 && (
+                    {hostingCountries.length === 1 ? (
+                      <span className="text-xs text-muted-foreground">
+                        {`${hostingCountries[0].name}`}
+                      </span>
+                    ) : (
+                      hostingCountries.length > 1 && (
                         <span className="text-xs text-muted-foreground">
-                          {`${
-                            (editionOrSeason as TournamentEditionProps)
-                              .hostingCountries[0].name
-                          } ${
-                            (editionOrSeason as TournamentEditionProps)
-                              .hostingCountries.length > 1
-                              ? " and others..."
-                              : ""
-                          }`}
+                          {`${hostingCountries[0].name} and others...`}
                         </span>
-                      )}
-                    {matchOf === "leagues" &&
-                      editionOrSeason &&
-                      (editionOrSeason as LeagueSeasonProps).league &&
-                      (editionOrSeason as LeagueSeasonProps).league.country && (
-                        <span className="text-xs text-muted-foreground">
-                          {(editionOrSeason as LeagueSeasonProps).league.country
-                            ?.name || ""}
-                        </span>
-                      )}
+                      )
+                    )}
+                    {hostingCountries.length === 0 && country && (
+                      <span className="text-xs text-muted-foreground">
+                        {country.name}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <span className="text-xs">{editionOrSeason?.year || ""}</span>
+                <span className="text-xs">{year}</span>
               </div>
               <div>
                 {list.map((match, idx) => (

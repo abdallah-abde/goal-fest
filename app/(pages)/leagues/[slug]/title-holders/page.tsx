@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 
-import TournamentsTitleHolders from "@/components/lists/TournamentsTitleHolders";
+import LeaguesTitleHolders from "@/components/lists/LeaguesTitleHolders";
 
 interface WinnerProps {
   winnerId: number;
@@ -16,8 +16,8 @@ export default async function LeaguesTitleHoldersPage({
 }) {
   const { slug } = params;
 
-  const [leagueSeason, leagueWinners] = await Promise.all([
-    prisma.leagueSeason.findUnique({
+  const [season, winners] = await Promise.all([
+    prisma.season.findUnique({
       where: {
         slug,
       },
@@ -30,16 +30,10 @@ export default async function LeaguesTitleHoldersPage({
     }),
     prisma.$queryRaw<
       WinnerProps[]
-    >`SELECT winnerId, LeagueTeam.name as teamName, LeagueTeam.flagUrl, year from LeagueSeason, LeagueTeam where LeagueSeason.slug = ${slug} and winnerId = LeagueTeam.id and currentStage = 'Finished' order by year desc`,
+    >`SELECT winnerId, Team.name as teamName, Team.flagUrl, year from Season, Team where Season.slug = ${slug} and winnerId = Team.id and currentStage = 'Finished' order by year desc`,
   ]);
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
-  return (
-    <TournamentsTitleHolders
-      type="leagues"
-      editionOrSeason={leagueSeason}
-      winners={leagueWinners}
-    />
-  );
+  return <LeaguesTitleHolders season={season} winners={winners} />;
 }

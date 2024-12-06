@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 
-import TournamentsTitleHolders from "@/components/lists/TournamentsTitleHolders";
+import LeaguesTitleHolders from "@/components/lists/LeaguesTitleHolders";
 
 interface WinnerProps {
   winnerId: number;
@@ -37,7 +37,7 @@ export default async function TournamentsTitleHoldersPage({
   if (!edition) throw new Error("Something went wrong");
 
   return (
-    <TournamentsTitleHolders
+    <LeaguesTitleHolders
       type="tournaments"
       editionOrSeason={edition}
       winners={winners}

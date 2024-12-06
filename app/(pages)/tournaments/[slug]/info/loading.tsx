@@ -1,4 +1,4 @@
-import { EditionHomeSkeleton } from "@/components/LoadingComponents";
+import { EditionHomeSkeleton } from "@/components/Skeletons";
 
 export default function Loading() {
   return <EditionHomeSkeleton />;

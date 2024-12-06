@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions, TournamentStages } from "@/types/enums";
+import { SortDirectionOptions, LeagueStages } from "@/types/enums";
 
 import {
   Table,
@@ -125,7 +125,7 @@ export default async function DashboardEditionsPage({
       fieldName: "stage",
       searchParamName: "stage",
       placeholder: "Choose Stage...",
-      options: Object.values(TournamentStages),
+      options: Object.values(LeagueStages),
     },
   ];
 

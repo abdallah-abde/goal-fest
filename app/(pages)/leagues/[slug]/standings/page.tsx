@@ -21,7 +21,7 @@ export default async function LeaguesStandingsPage({
 
   const groupId = searchParams?.groupId || "all";
 
-  const leagueSeason = await prisma.leagueSeason.findUnique({
+  const season = await prisma.season.findUnique({
     where: { slug },
     include: {
       league: true,
@@ -30,31 +30,25 @@ export default async function LeaguesStandingsPage({
     },
   });
 
-  if (!leagueSeason) throw new Error("Something went wrong");
+  if (!season) throw new Error("Something went wrong");
 
   let standings;
 
   if (
-    !leagueSeason.groups ||
-    leagueSeason.groups.length === 0 ||
-    leagueSeason.groups.length === 1
+    !season.groups ||
+    season.groups.length === 0 ||
+    season.groups.length === 1
   ) {
     standings = await Promise.all(
-      leagueSeason.teams.map(async (team) => ({
+      season.teams.map(async (team) => ({
         ...team,
-        stats: await calculateTeamStatsBySlug(team.id, slug, "leagues"),
+        stats: await calculateTeamStatsBySlug(team.id, slug),
       }))
     );
 
-    return (
-      <StandingsTables
-        editionOrSeason={leagueSeason}
-        standings={standings}
-        type="leagues"
-      />
-    );
+    return <StandingsTables season={season} standings={standings} />;
   } else {
-    const groups = await prisma.leagueGroup.findMany({
+    const groups = await prisma.group.findMany({
       where: {
         season: {
           slug,
@@ -76,22 +70,12 @@ export default async function LeaguesStandingsPage({
         teams: await Promise.all(
           group.teams.map(async (team) => ({
             ...team,
-            stats: await calculateTeamStatsByGroup(
-              team.id,
-              group.id,
-              "leagues"
-            ),
+            stats: await calculateTeamStatsByGroup(team.id, group.id),
           }))
         ),
       }))
     );
 
-    return (
-      <GroupsTables
-        editionOrSeason={leagueSeason}
-        groupsWithTeams={standings}
-        type="leagues"
-      />
-    );
+    return <GroupsTables season={season} groupsWithTeams={standings} />;
   }
 }

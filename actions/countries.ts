@@ -11,7 +11,7 @@ interface Fields {
   name: string;
   flagUrl?: string | null;
   code?: string | null;
-  type?: string | null;
+  continent?: string | null;
 }
 
 interface ReturnType {
@@ -34,7 +34,7 @@ export async function addCountry(
         name: result.error.formErrors.fieldErrors.name?.[0],
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -61,7 +61,7 @@ export async function addCountry(
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
-        type: data.type,
+        continent: data.continent,
       },
     });
 
@@ -77,7 +77,7 @@ export async function addCountry(
         name: errorMap["name"]?.[0],
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
       },
     };
   }
@@ -98,7 +98,7 @@ export async function updateCountry(
         name: result.error.formErrors.fieldErrors.name?.[0],
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -134,7 +134,7 @@ export async function updateCountry(
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
-        type: data.type,
+        continent: data.continent,
       },
     });
 
@@ -150,7 +150,7 @@ export async function updateCountry(
         name: errorMap["name"]?.[0],
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
       },
     };
   }

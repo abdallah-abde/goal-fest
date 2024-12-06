@@ -1,6 +1,6 @@
 import _ from "lodash";
 import Image from "next/image";
-import { NeutralMatch } from "@/types";
+import { MatchProps } from "@/types";
 
 import {
   Accordion,
@@ -10,15 +10,15 @@ import {
 } from "@/components/ui/accordion";
 
 import CategorizedMatchCard from "@/components/home/CategorizedMatchCard";
-import TorunamentOrLeagueAccordionLogo from "@/components/home/TorunamentOrLeagueAccordionLogo";
 import PartsLink from "@/components/home/PartsLink";
+import { EmptyImageUrls } from "@/types/enums";
 
-export default function CategorizedMatchesByTournamentOrLeague({
+export default function CategorizedMatchesByLeagues({
   matches,
 }: {
-  matches: NeutralMatch[];
+  matches: MatchProps[];
 }) {
-  const results = Object.entries(_.groupBy(matches, "fullTournamentName"));
+  const results = Object.entries(_.groupBy(matches, "season.league.name"));
 
   return (
     <Accordion
@@ -28,12 +28,12 @@ export default function CategorizedMatchesByTournamentOrLeague({
     >
       {results.map(([tournamentName, list], idx) => {
         const {
-          editionOrSeason,
-          editionOrSeasonLogoUrl,
-          editionOrSeasonSlug,
-          matchOf,
-          tournamentOrLeagueName,
-          fullTournamentName,
+          season: {
+            slug,
+            flagUrl,
+            year,
+            league: { name },
+          },
         } = list[0];
 
         return (
@@ -44,16 +44,11 @@ export default function CategorizedMatchesByTournamentOrLeague({
                   <Image
                     width={25}
                     height={25}
-                    src={editionOrSeasonLogoUrl}
-                    alt={fullTournamentName}
+                    src={flagUrl || EmptyImageUrls.League}
+                    alt={`${name} ${year} Flag`}
                   />
-                  {/* <TorunamentOrLeagueAccordionLogo
-                    type={matchOf}
-                    editionOrSeason={editionOrSeason}
-                    altText={fullTournamentName}
-                  /> */}
                 </div>
-                <p className="flex-1">{tournamentOrLeagueName}</p>
+                <p className="flex-1">{name}</p>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-0">
@@ -61,7 +56,7 @@ export default function CategorizedMatchesByTournamentOrLeague({
                 <CategorizedMatchCard key={idx} match={match} />
               ))}
               <PartsLink
-                href={`/${matchOf}/${editionOrSeasonSlug}/standings`}
+                href={`/league/${slug}/standings`}
                 label="See Standings"
               />
             </AccordionContent>

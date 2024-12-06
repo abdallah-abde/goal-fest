@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 
 import FormField from "@/components/forms/parts/FormField";
-import { Group, Team, LeagueGroup, LeagueTeam } from "@prisma/client";
+import { Group, Team } from "@prisma/client";
 import { ChangeEvent } from "react";
 
 export default function MatchesFilterDialog({
@@ -31,8 +31,8 @@ export default function MatchesFilterDialog({
   groups,
   rounds,
 }: {
-  teams: Team[] | LeagueTeam[];
-  groups: Group[] | LeagueGroup[];
+  teams: Team[];
+  groups: Group[];
   rounds: string[];
 }) {
   const searchParams = useSearchParams();

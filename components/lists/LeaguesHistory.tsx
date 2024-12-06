@@ -2,57 +2,41 @@ import prisma from "@/lib/db";
 
 import Image from "next/image";
 
-import {
-  Country,
-  Team,
-  Tournament,
-  TournamentEdition,
-  League,
-  LeagueSeason,
-  LeagueTeam,
-} from "@prisma/client";
+import { Country, League, Season, Team } from "@prisma/client";
 
 import PageHeader from "@/components/PageHeader";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyImageUrls } from "@/types/enums";
 
-interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
+interface SeasonProps extends Season {
+  league: LeagueProps;
   winner: Team | null;
   titleHolder: Team | null;
   hostingCountries: Country[];
-}
-
-interface LeagueSeasonProps extends LeagueSeason {
-  league: LeagueProps;
-  winner: LeagueTeam | null;
-  titleHolder: LeagueTeam | null;
 }
 
 interface LeagueProps extends League {
   country: Country | null;
 }
 
-export default async function TournamentsHistory({
-  tournamentOrLeague,
-  editionsOrSeasons,
-  type,
+export default async function LeaguesHistory({
+  league,
+  seasons,
 }: {
-  tournamentOrLeague: Tournament | League;
-  editionsOrSeasons: TournamentEditionProps[] | LeagueSeasonProps[];
-  type: "tournaments" | "leagues";
+  league: League;
+  seasons: SeasonProps[];
 }) {
-  async function getScore(edition: TournamentEditionProps) {
-    const finalMatch = await prisma.knockoutMatch.findFirst({
+  async function getScore(season: SeasonProps) {
+    const finalMatch = await prisma.match.findFirst({
       where: {
-        tournamentEdition: {
-          slug: edition.slug,
+        season: {
+          slug: season.slug,
         },
         round: "Final",
       },
       include: {
-        tournamentEdition: {
+        season: {
           include: { winner: true },
         },
         homeTeam: true,
@@ -72,7 +56,7 @@ export default async function TournamentsHistory({
     const homeScore = homeGoals + homeExtraGoals + homePenalty;
     const awayScore = awayGoals + awayExtraGoals + awayPenalty;
 
-    if (finalMatch.tournamentEdition?.winner?.id === finalMatch.homeTeam?.id) {
+    if (finalMatch.season?.winner?.id === finalMatch.homeTeam?.id) {
       if (finalMatch.homeGoals === finalMatch.awayGoals) {
         if (homeExtraGoals === awayExtraGoals) {
           return `${finalMatch.awayTeam?.name} [ ${
@@ -105,13 +89,16 @@ export default async function TournamentsHistory({
 
   return (
     <>
-      <PageHeader label={`${tournamentOrLeague.name} History`} />
-      {editionsOrSeasons.map((editionOrSeason) => {
-        const { id, year, logoUrl, winner } = editionOrSeason;
-        const hostingCountries =
-          type === "tournaments"
-            ? (editionOrSeason as TournamentEditionProps).hostingCountries
-            : null;
+      <PageHeader label={`${league.name} History`} />
+      {seasons.map((season) => {
+        const {
+          id,
+          year,
+          flagUrl,
+          winner,
+          hostingCountries,
+          league: { isDomestic },
+        } = season;
 
         return (
           <div
@@ -121,8 +108,8 @@ export default async function TournamentsHistory({
             <Image
               width={125}
               height={125}
-              src={logoUrl || EmptyImageUrls.Tournament}
-              alt={`${tournamentOrLeague.name} ${year} Logo`}
+              src={flagUrl || EmptyImageUrls.League}
+              alt={`${league.name} ${year} Flag`}
               className="aspect-video object-contain"
             />
             <div className="flex flex-col gap-2 flex-1">
@@ -181,8 +168,7 @@ export default async function TournamentsHistory({
                         variant="outline"
                         className="border-0 text-[12px] sm:text-sm text-ring"
                       >
-                        {type === "tournaments" &&
-                          getScore(editionOrSeason as TournamentEditionProps)}
+                        {!isDomestic && getScore(season)}
                       </Badge>
                     </div>
                   )}

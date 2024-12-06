@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { EditionSchema, CurrentStageSchema } from "@/schemas";
-import { TournamentStages } from "@/types/enums";
+import { LeagueStages } from "@/types/enums";
 import { generateSlug } from "@/lib/generateSlug";
 import { ZodError } from "zod";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
@@ -147,7 +147,7 @@ export async function addTournamentEdition(
         teams: {
           connect: ts,
         },
-        currentStage: TournamentStages.GroupsStage,
+        currentStage: LeagueStages.GroupsStage,
         slug,
       },
     });

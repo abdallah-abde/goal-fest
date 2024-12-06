@@ -35,20 +35,20 @@ export default async function DashboardCountriesPage({
     query?: string | null;
     sortDir?: SortDirectionOptions | null;
     sortField?: string | null;
-    type?: string | null;
+    continent?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
-  const typeCondition = searchParams?.type || "all";
+  const continentCondition = searchParams?.continent || "all";
 
   const where = {
     OR: [{ name: { contains: query } }, { code: { contains: query } }],
-    ...(typeCondition !== "all"
+    ...(continentCondition !== "all"
       ? {
-          type: typeCondition,
+          continent: continentCondition,
         }
       : {}),
   };
@@ -58,8 +58,8 @@ export default async function DashboardCountriesPage({
       ? { name: sortDir }
       : sortField === "code"
       ? { code: sortDir }
-      : sortField === "type"
-      ? { type: sortDir }
+      : sortField === "continent"
+      ? { continent: sortDir }
       : {}),
   };
 
@@ -83,15 +83,15 @@ export default async function DashboardCountriesPage({
   const sortingList = [
     { label: "Name", fieldName: "name" },
     { label: "Code", fieldName: "code" },
-    { label: "Type", fieldName: "type" },
+    { label: "Continent", fieldName: "continent" },
   ];
 
   const listFilters = [
     {
-      title: "Type",
-      fieldName: "type",
-      searchParamName: "type",
-      placeholder: "Choose Type...",
+      title: "Continent",
+      fieldName: "continent",
+      searchParamName: "continent",
+      placeholder: "Choose Continent...",
       options: Object.values(Continents),
     },
   ];
@@ -111,19 +111,21 @@ export default async function DashboardCountriesPage({
             <TableRow className="dashboard-head-table-row">
               <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">Code</TableHead>
-              <TableHead className="dashboard-head-table-cell">Type</TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Continent
+              </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {countries.map(({ id, name, code, type }) => (
+            {countries.map(({ id, name, code, continent }) => (
               <TableRow key={id} className="dashboard-table-row">
                 <TableCell className="dashboard-table-cell">{name}</TableCell>
                 <TableCell className="dashboard-table-cell">
                   {code || <NotProvidedSpan />}
                 </TableCell>
                 <TableCell className="dashboard-table-cell">
-                  {type || <NotProvidedSpan />}
+                  {continent || <NotProvidedSpan />}
                 </TableCell>
                 <TableCell>
                   <FormDialog id={id} />

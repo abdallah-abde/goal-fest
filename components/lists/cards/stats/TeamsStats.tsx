@@ -17,9 +17,10 @@ export default function TeamsStats({
 }) {
   return (
     <>
-      {(teamsGoalsScored.length > 0 ||
+      {/* {(teamsGoalsScored.length > 0 ||
         teamsGoalsAgainst.length > 0 ||
-        teamsCleanSheets.length > 0) && (
+        teamsCleanSheets.length > 0) && ( */}
+      {teamsGoalsScored.length > 0 && (
         <CardsSectionContainer label={label}>
           {teamsGoalsScored && (
             <TotalGoalsCard

@@ -40,16 +40,16 @@ export default function CountryForm({ country }: { country?: Country | null }) {
     if (formState.success) {
       formRef.current?.reset();
       if (country == null) {
-        setTypeValue(undefined);
-        setTypeKey(+new Date());
+        setContinentValue(undefined);
+        setContinentKey(+new Date());
       }
     }
   }, [formState]);
 
-  const [typeValue, setTypeValue] = useState<string | undefined>(
-    country?.type || undefined
+  const [continentValue, setContinentValue] = useState<string | undefined>(
+    country?.continent || undefined
   );
-  const [typeKey, setTypeKey] = useState(+new Date());
+  const [continentKey, setContinentKey] = useState(+new Date());
 
   return (
     <div className="overflow-auto px-4">
@@ -77,7 +77,7 @@ export default function CountryForm({ country }: { country?: Country | null }) {
           <FormFieldError error={formState.errors?.name} />
         </FormField>
         <FormField>
-          <Label htmlFor="code">Country Code</Label>
+          <Label htmlFor="code">Code</Label>
           <Input
             type="text"
             id="code"
@@ -87,24 +87,26 @@ export default function CountryForm({ country }: { country?: Country | null }) {
           <FormFieldError error={formState.errors?.code} />
         </FormField>
         <FormField>
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="continent">Continent</Label>
           <Select
-            name="type"
-            key={typeKey}
-            defaultValue={(typeValue && typeValue.toString()) || undefined}
+            name="continent"
+            key={continentKey}
+            defaultValue={
+              (continentValue && continentValue.toString()) || undefined
+            }
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Choose Type" />
+              <SelectValue placeholder="Choose Continent" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(Continents).map((type) => (
-                <SelectItem value={type} key={type}>
-                  {type}
+              {Object.values(Continents).map((continent) => (
+                <SelectItem value={continent} key={continent}>
+                  {continent}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <FormFieldError error={formState.errors?.type} />
+          <FormFieldError error={formState.errors?.continent} />
         </FormField>
         <FormField>
           <Label htmlFor="flagUrl">Flag</Label>
