@@ -215,9 +215,9 @@ export default function Filters({
           </TooltipProvider>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-64">
+      <PopoverContent className="overflow-auto w-[640px]">
         <p className="text-muted-foreground pb-1">Filters</p>
-        <div className="space-y-2">
+        <div className="flex justify-center items-stretch gap-2 flex-wrap *:w-[280px]">
           {flagFilters.length > 0 &&
             flagFilters.map((flag, idx) => (
               <Card key={idx} className="p-2">

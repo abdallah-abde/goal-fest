@@ -39,7 +39,7 @@ export async function addLeagueGroup(
 
     const data = result.data;
 
-    const group = await prisma.leagueGroup.findFirst({
+    const group = await prisma.group.findFirst({
       where: { name: data.name, seasonId: +data.seasonId },
     });
 
@@ -51,7 +51,7 @@ export async function addLeagueGroup(
       };
     }
 
-    const ts = await prisma.leagueTeam.findMany({
+    const ts = await prisma.team.findMany({
       where: {
         id: {
           in: formData
@@ -63,7 +63,7 @@ export async function addLeagueGroup(
       },
     });
 
-    await prisma.leagueGroup.create({
+    await prisma.group.create({
       data: {
         name: data.name,
         seasonId: +data.seasonId,
@@ -112,7 +112,7 @@ export async function updateLeagueGroup(
 
     const data = result.data;
 
-    const group = await prisma.leagueGroup.findFirst({
+    const group = await prisma.group.findFirst({
       where: {
         AND: [
           { name: data.name, seasonId: +data.seasonId },
@@ -129,14 +129,14 @@ export async function updateLeagueGroup(
       };
     }
 
-    const currentGroup = await prisma.leagueGroup.findUnique({
+    const currentGroup = await prisma.group.findUnique({
       where: { id },
       include: { teams: true },
     });
 
     if (currentGroup == null) return notFound();
 
-    const ts = await prisma.leagueTeam.findMany({
+    const ts = await prisma.team.findMany({
       where: {
         id: {
           in: formData
@@ -148,7 +148,7 @@ export async function updateLeagueGroup(
       },
     });
 
-    await prisma.leagueGroup.update({
+    await prisma.group.update({
       where: { id },
       data: {
         name: data.name,

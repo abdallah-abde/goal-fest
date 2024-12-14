@@ -58,9 +58,9 @@ import { sortMatches } from "@/lib/sortGroupTeams";
 // }
 
 interface MatchProps extends Match {
-  group: Group;
-  homeTeam: Team;
-  awayTeam: Team;
+  group: Group | null;
+  homeTeam: Team | null;
+  awayTeam: Team | null;
   season: SeasonProps;
 }
 

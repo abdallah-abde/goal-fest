@@ -11,9 +11,9 @@ import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { Country, Group, League, Match, Season, Team } from "@prisma/client";
 
 interface MatchProps extends Match {
-  group: Group;
-  homeTeam: Team;
-  awayTeam: Team;
+  group: Group | null;
+  homeTeam: Team | null;
+  awayTeam: Team | null;
   season: SeasonProps;
 }
 
@@ -61,7 +61,7 @@ export default function MatchCard({ match }: { match: MatchProps }) {
         {/* Home Team information */}
         <TeamLabel
           team={match.homeTeam || null}
-          placeholder={match.homeTeamPlaceholder || ""}
+          placeholder={match.homeTeamPlacehlder || ""}
           isHome={true}
         />
 
@@ -78,7 +78,7 @@ export default function MatchCard({ match }: { match: MatchProps }) {
         {/* Away Team information */}
         <TeamLabel
           team={match.awayTeam || null}
-          placeholder={match.awayTeamPlaceholder || ""}
+          placeholder={match.awayTeamPlacehlder || ""}
           isHome={false}
         />
 

@@ -10,10 +10,10 @@ import { EmptyImageUrls } from "@/types/enums";
 import { Country, Group, League, Match, Season, Team } from "@prisma/client";
 
 interface MatchProps extends Match {
-  group: Group;
-  homeTeam: Team;
-  awayTeam: Team;
-  season: SeasonProps;
+  group: Group | null;
+  homeTeam: Team | null;
+  awayTeam: Team | null;
+  // season: SeasonProps;
 }
 
 interface SeasonProps extends Season {

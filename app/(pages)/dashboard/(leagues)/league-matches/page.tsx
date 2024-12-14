@@ -55,8 +55,16 @@ export default async function DashboardLeagueMatchesPage({
     sortDir?: SortDirectionOptions | null;
     sortField?: string | null;
     isFeatured?: string | null;
+    isKnockout?: string | null;
     status?: string | null;
     date?: string | null;
+    continent?: string | null;
+    country?: string | null;
+    league?: string | null;
+    season?: string | null;
+    group?: string | null;
+    round?: string | null;
+    team?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
@@ -64,8 +72,16 @@ export default async function DashboardLeagueMatchesPage({
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "date";
   const isFeaturedCondition = searchParams?.isFeatured;
+  const isKnockoutCondition = searchParams?.isKnockout;
   const statusCondition = searchParams?.status || "all";
   const dateCondition = searchParams?.date || undefined;
+  const continentCondition = searchParams?.continent || "all";
+  const countryCondition = searchParams?.country || "all";
+  const leagueCondition = searchParams?.league || "all";
+  const seasonCondition = searchParams?.season || "all";
+  const groupCondition = searchParams?.group || "all";
+  const roundCondition = searchParams?.round || "all";
+  const teamCondition = searchParams?.team || "all";
 
   let startAndEndDates;
   if (dateCondition) startAndEndDates = getStartAndEndDates(dateCondition);
@@ -73,17 +89,92 @@ export default async function DashboardLeagueMatchesPage({
   const where = {
     OR: [
       { season: { league: { country: { name: { contains: query } } } } },
+      { season: { league: { continent: { contains: query } } } },
       { season: { league: { name: { contains: query } } } },
       { season: { year: { contains: query } } },
       { homeTeam: { name: { contains: query } } },
       { awayTeam: { name: { contains: query } } },
       { group: { name: { contains: query } } },
       { round: { contains: query } },
+      {
+        season: {
+          hostingCountries: {
+            some: {
+              name: {
+                contains: query,
+              },
+            },
+          },
+        },
+      },
     ],
+    ...(teamCondition !== "all"
+      ? {
+          OR: [
+            {
+              homeTeam: { name: teamCondition },
+            },
+            {
+              awayTeam: { name: teamCondition },
+            },
+          ],
+        }
+      : {}),
+    ...(groupCondition !== "all"
+      ? {
+          group: { name: groupCondition },
+        }
+      : {}),
+    ...(roundCondition !== "all"
+      ? {
+          round: roundCondition,
+        }
+      : {}),
+    ...(leagueCondition !== "all"
+      ? {
+          season: { league: { name: leagueCondition } },
+        }
+      : {}),
+    ...(seasonCondition !== "all"
+      ? {
+          season: { year: seasonCondition },
+        }
+      : {}),
+    ...(continentCondition !== "all"
+      ? {
+          season: { league: { continent: continentCondition } },
+        }
+      : {}),
+    ...(countryCondition !== "all"
+      ? {
+          OR: [
+            {
+              season: { league: { country: { name: countryCondition } } },
+            },
+            {
+              season: {
+                hostingCountries: {
+                  some: {
+                    name: countryCondition,
+                  },
+                },
+              },
+            },
+          ],
+        }
+      : {}),
     ...(isFeaturedCondition
       ? {
           isFeatured:
             isFeaturedCondition === FlagFilterOptions.Yes.toLowerCase()
+              ? true
+              : false,
+        }
+      : {}),
+    ...(isKnockoutCondition
+      ? {
+          isKnockout:
+            isKnockoutCondition === FlagFilterOptions.Yes.toLowerCase()
               ? true
               : false,
         }
@@ -106,6 +197,8 @@ export default async function DashboardLeagueMatchesPage({
   const orderBy = {
     ...(sortField === "country"
       ? { season: { league: { country: { name: sortDir } } } }
+      : sortField === "continent"
+      ? { season: { league: { continent: sortDir } } }
       : sortField === "league"
       ? { season: { league: { name: sortDir } } }
       : sortField === "season"
@@ -120,6 +213,8 @@ export default async function DashboardLeagueMatchesPage({
       ? { round: sortDir }
       : sortField === "isFeatured"
       ? { isFeatured: sortDir }
+      : sortField === "isKnockout"
+      ? { isKnockout: sortDir }
       : sortField === "date"
       ? { date: sortDir }
       : sortField === "status"
@@ -127,13 +222,13 @@ export default async function DashboardLeagueMatchesPage({
       : {}),
   };
 
-  const totalMatchesCount = await prisma.leagueMatch.count({
+  const totalMatchesCount = await prisma.match.count({
     where: { ...where },
   });
 
   const totalPages = Math.ceil(totalMatchesCount / PAGE_RECORDS_COUNT);
 
-  const leagueMatches = await prisma.leagueMatch.findMany({
+  const matches = await prisma.match.findMany({
     where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
@@ -156,6 +251,7 @@ export default async function DashboardLeagueMatchesPage({
 
   const sortingList = [
     { label: "Country", fieldName: "country" },
+    { label: "Continent", fieldName: "continent" },
     { label: "League", fieldName: "league" },
     { label: "Season", fieldName: "season" },
     { label: "Home Team", fieldName: "homeTeam" },
@@ -165,6 +261,10 @@ export default async function DashboardLeagueMatchesPage({
     {
       label: "Is Featured",
       fieldName: "isFeatured",
+    },
+    {
+      label: "Is Knockout",
+      fieldName: "isKnockout",
     },
     { label: "Date", fieldName: "date" },
     { label: "Status", fieldName: "status" },
@@ -176,6 +276,26 @@ export default async function DashboardLeagueMatchesPage({
       defaultValue: "all",
       fieldName: "isFeatured",
       searchParamName: "isFeatured",
+      options: [
+        {
+          label: "All",
+          value: "all",
+        },
+        {
+          label: "Yes",
+          value: "yes",
+        },
+        {
+          label: "No",
+          value: "no",
+        },
+      ],
+    },
+    {
+      title: "Is Knockout",
+      defaultValue: "all",
+      fieldName: "isKnockout",
+      searchParamName: "isKnockout",
       options: [
         {
           label: "All",
@@ -203,9 +323,37 @@ export default async function DashboardLeagueMatchesPage({
     },
   ];
 
+  const textFilters = [
+    {
+      title: "Country",
+      fieldName: "country",
+      searchParamName: "country",
+    },
+    {
+      title: "League",
+      fieldName: "league",
+      searchParamName: "league",
+    },
+    {
+      title: "Season",
+      fieldName: "season",
+      searchParamName: "season",
+    },
+    {
+      title: "Group",
+      fieldName: "group",
+      searchParamName: "group",
+    },
+    {
+      title: "Team",
+      fieldName: "team",
+      searchParamName: "team",
+    },
+  ];
+
   return (
     <>
-      <PageHeader label="Leagues Matches List" />
+      <PageHeader label="Matches List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="date" />
         <Filters
@@ -216,11 +364,12 @@ export default async function DashboardLeagueMatchesPage({
             fieldName: "date",
             searchParamName: "date",
           }}
+          textFilters={textFilters}
         />
-        <SearchFieldComponent placeholder="Search by league names, years, group names, rounds, teams ..." />
+        <SearchFieldComponent placeholder="Search by league names, years, continents, countries, group names, rounds, teams ..." />
         <FormDialog id={null} />
       </div>
-      {leagueMatches.length > 0 ? (
+      {matches.length > 0 ? (
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row text-[12px]">
@@ -246,6 +395,10 @@ export default async function DashboardLeagueMatchesPage({
                 <span className="hidden sm:block">Round</span>
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
+                <span className="hidden max-sm:block">Con</span>
+                <span className="hidden sm:block">Continent</span>
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
                 <span className="hidden max-sm:block">Cou</span>
                 <span className="hidden sm:block">Country</span>
               </TableHead>
@@ -261,13 +414,16 @@ export default async function DashboardLeagueMatchesPage({
                 Is Featured
               </TableHead>
               <TableHead className="dashboard-head-table-cell">
+                Is Knockout
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">
                 Status
               </TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="text-[11px] sm:text-[12px]">
-            {leagueMatches.map(
+            {matches.map(
               ({
                 id,
                 homeTeam,
@@ -280,13 +436,25 @@ export default async function DashboardLeagueMatchesPage({
                 season,
                 isFeatured,
                 status,
+                isKnockout,
+                awayTeamPlacehlder,
+                homeTeamPlacehlder,
+                awayExtraTimeGoals,
+                homeExtraTimeGoals,
+                awayPenaltyGoals,
+                homePenaltyGoals,
               }) => {
-                const homeTeamName = homeTeam.name;
-                const homeTeamCode = homeTeam.code || homeTeam.name;
-                const awayTeamName = awayTeam.name;
-                const awayTeamCode = awayTeam.code || awayTeam.name;
+                const homeTeamName = !isKnockout
+                  ? homeTeam?.name || ""
+                  : homeTeam?.name || homeTeamPlacehlder || "";
+                const homeTeamCode = homeTeam?.code || "";
+                const awayTeamName = !isKnockout
+                  ? awayTeam?.name || ""
+                  : awayTeam?.name || awayTeamPlacehlder || "";
+                const awayTeamCode = awayTeam?.code || "";
                 const leagueName = season.league.name;
                 const seasonName = season.year;
+                const continent = season.league.continent;
                 const countryName = season.league.country?.name;
                 const roundName = round;
                 const groupName = group?.name;
@@ -313,14 +481,18 @@ export default async function DashboardLeagueMatchesPage({
                         id={id}
                         homeTeamName={homeTeamName}
                         awayTeamName={awayTeamName}
-                        tournamentName={leagueName}
-                        editionName={seasonName}
+                        leagueName={leagueName}
+                        seasonName={seasonName}
                         roundName={roundName || ""}
                         groupName={groupName || ""}
                         date={matchDate}
                         homeGoals={homeGoals}
                         awayGoals={awayGoals}
-                        type="leagueMatches"
+                        homeExtraTimeGoals={homeExtraTimeGoals}
+                        awayExtraTimeGoals={awayExtraTimeGoals}
+                        homePenaltyGoals={homePenaltyGoals}
+                        awayPenaltyGoals={awayPenaltyGoals}
+                        isKnockout={isKnockout}
                       />
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
@@ -331,6 +503,9 @@ export default async function DashboardLeagueMatchesPage({
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
                       {roundName || <NotProvidedSpan />}
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      {continent}
                     </TableCell>
                     <TableCell className="dashboard-table-cell">
                       {countryName || <NotProvidedSpan />}
@@ -353,6 +528,22 @@ export default async function DashboardLeagueMatchesPage({
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Click to update featured status</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell className="dashboard-table-cell">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <FieldSwitcher
+                              id={id}
+                              type="leagueMatches"
+                              value={isKnockout}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Click to update knockout status</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -388,37 +579,37 @@ export default async function DashboardLeagueMatchesPage({
           <DashboardTableFooter
             totalCount={totalMatchesCount}
             totalPages={totalPages}
-            colSpan={12}
+            colSpan={14}
           />
         </Table>
       ) : (
-        <NoDataFoundComponent message="No League Matches Found" />
+        <NoDataFoundComponent message="No Matches Found" />
       )}
     </>
   );
 }
 
 async function FormDialog({ id }: { id: number | null }) {
-  const leagueMatch = id
-    ? await prisma.leagueMatch.findUnique({
+  const match = id
+    ? await prisma.match.findUnique({
         where: { id },
         include: {
           homeTeam: { include: { country: true } },
           awayTeam: { include: { country: true } },
           group: true,
           season: {
-            include: { league: { include: { country: true } } },
+            include: { groups: true, league: { include: { country: true } } },
           },
         },
       })
     : null;
 
-  if (id && !leagueMatch) throw new Error("Something went wrong");
+  if (id && !match) throw new Error("Something went wrong");
 
   return (
     <Dialog>
       <DialogTrigger>
-        {leagueMatch == null ? (
+        {match == null ? (
           <Button variant="outline" size="icon">
             <Plus className="size-5" />
           </Button>
@@ -429,7 +620,7 @@ async function FormDialog({ id }: { id: number | null }) {
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueMatchForm leagueMatch={leagueMatch} />
+        <LeagueMatchForm match={match} />
       </DialogContent>
     </Dialog>
   );

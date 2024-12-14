@@ -18,49 +18,48 @@ import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { X } from "lucide-react";
 
-import { updateGroupMatchScore } from "@/actions/groupMatches";
 import { updateLeagueMatchScore } from "@/actions/leagueMatches";
 
 export default function PopoverMatchScoreUpdator({
   id,
-  type,
   homeTeamName,
   awayTeamName,
-  tournamentName,
-  editionName,
+  leagueName,
+  seasonName,
   roundName,
   groupName,
   date,
   homeGoals,
   awayGoals,
+  homeExtraTimeGoals,
+  awayExtraTimeGoals,
+  homePenaltyGoals,
+  awayPenaltyGoals,
+  isKnockout,
   children,
 }: {
   id: number;
-  type: string;
   homeTeamName: string;
   awayTeamName: string;
-  tournamentName: string;
-  editionName: string;
+  leagueName: string;
+  seasonName: string;
   roundName: string;
   groupName: string;
   date: string;
   homeGoals: number | null;
   awayGoals: number | null;
+  homeExtraTimeGoals: number | null;
+  awayExtraTimeGoals: number | null;
+  homePenaltyGoals: number | null;
+  awayPenaltyGoals: number | null;
+  isKnockout: boolean;
   children: React.ReactNode;
 }) {
   const searchParams = useSearchParams();
 
-  const [error, action] = useFormState(
-    type === "leagueMatches"
-      ? updateLeagueMatchScore.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        })
-      : updateGroupMatchScore.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        }),
-    null
+  const [formState, formAction] = useFormState(
+    updateLeagueMatchScore.bind(null, id),
+    { errors: undefined, success: false, customError: null }
   );
 
   const [onlyDate, onlyTime] = date.split(";");
@@ -78,10 +77,10 @@ export default function PopoverMatchScoreUpdator({
               <div className="flex gap-2 items-start justify-between border-b pb-2">
                 <div className="flex flex-col items-center justify-center">
                   <span className="text-[16px] text-muted-background">
-                    {tournamentName}
+                    {leagueName}
                   </span>
                   <span className="text-[12px] text-muted-foreground">
-                    ({editionName})
+                    ({seasonName})
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-2">
@@ -118,7 +117,7 @@ export default function PopoverMatchScoreUpdator({
               </div>
             </div>
           </div>
-          <form action={action} className="flex flex-col gap-4">
+          <form action={formAction} className="flex flex-col gap-4">
             <div className="flex gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -130,7 +129,35 @@ export default function PopoverMatchScoreUpdator({
                     className="h-8"
                   />
                 </div>
-                <FormFieldError error={error?.homeGoals} />
+                <FormFieldError error={formState.errors?.homeGoals} />
+                {isKnockout && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="homeExtraTimeGoals">ET</Label>
+                      <Input
+                        id="homeExtraTimeGoals"
+                        name="homeExtraTimeGoals"
+                        defaultValue={homeExtraTimeGoals?.toString() || ""}
+                        className="h-8"
+                      />
+                    </div>
+                    <FormFieldError
+                      error={formState.errors?.homeExtraTimeGoals}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="homePenaltyGoals">PT</Label>
+                      <Input
+                        id="homePenaltyGoals"
+                        name="homePenaltyGoals"
+                        defaultValue={homePenaltyGoals?.toString() || ""}
+                        className="h-8"
+                      />
+                    </div>
+                    <FormFieldError
+                      error={formState.errors?.homePenaltyGoals}
+                    />
+                  </>
+                )}
               </div>
               <div className="flex flex-col gap-2 justify-end">
                 <div className="flex flex-row-reverse items-center gap-2">
@@ -142,7 +169,35 @@ export default function PopoverMatchScoreUpdator({
                     className="h-8 text-end"
                   />
                 </div>
-                <FormFieldError error={error?.awayGoals} />
+                <FormFieldError error={formState.errors?.awayGoals} />
+                {isKnockout && (
+                  <>
+                    <div className="flex flex-row-reverse items-center gap-2">
+                      <Label htmlFor="awayExtraTimeGoals">ET</Label>
+                      <Input
+                        id="awayExtraTimeGoals"
+                        name="awayExtraTimeGoals"
+                        defaultValue={awayExtraTimeGoals?.toString() || ""}
+                        className="h-8 text-end"
+                      />
+                    </div>
+                    <FormFieldError
+                      error={formState.errors?.awayExtraTimeGoals}
+                    />
+                    <div className="flex flex-row-reverse items-center gap-2">
+                      <Label htmlFor="awayPenaltyGoals">PT</Label>
+                      <Input
+                        id="awayPenaltyGoals"
+                        name="awayPenaltyGoals"
+                        defaultValue={awayPenaltyGoals?.toString() || ""}
+                        className="h-8 text-end"
+                      />
+                    </div>
+                    <FormFieldError
+                      error={formState.errors?.awayPenaltyGoals}
+                    />
+                  </>
+                )}
               </div>
             </div>
             <Separator />

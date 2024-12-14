@@ -6,13 +6,16 @@ import { notFound } from "next/navigation";
 import { LeagueTeamSchema } from "@/schemas";
 import { ZodError } from "zod";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
+import { IsPopularOptions } from "@/types/enums";
 
 interface Fields {
   name: string;
   flagUrl?: string | null;
   countryId?: string | null;
   code?: string | null;
-  type: string;
+  continent: string;
+  isPopular: string;
+  isClub: string;
 }
 
 interface ReturnType {
@@ -36,7 +39,9 @@ export async function addLeagueTeam(
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+        isClub: result.error.formErrors.fieldErrors.isClub?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -44,7 +49,7 @@ export async function addLeagueTeam(
 
     const data = result.data;
 
-    const team = await prisma.leagueTeam.findFirst({
+    const team = await prisma.team.findFirst({
       where: { name: data.name },
     });
 
@@ -58,13 +63,15 @@ export async function addLeagueTeam(
 
     const flagUrlPath = await writeImageFile(data.flagUrl, "teams");
 
-    await prisma.leagueTeam.create({
+    await prisma.team.create({
       data: {
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
-        type: data.type,
+        continent: data.continent,
+        isClub: data.isClub === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -81,7 +88,9 @@ export async function addLeagueTeam(
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
         countryId: errorMap["countryId"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isClub: errorMap["isClub"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
   }
@@ -103,7 +112,9 @@ export async function updateLeagueTeam(
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
         countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+        isClub: result.error.formErrors.fieldErrors.isClub?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -111,7 +122,7 @@ export async function updateLeagueTeam(
 
     const data = result.data;
 
-    const existedTeam = await prisma.leagueTeam.findFirst({
+    const existedTeam = await prisma.team.findFirst({
       where: { AND: [{ name: data.name }, { id: { not: id } }] },
     });
 
@@ -123,7 +134,7 @@ export async function updateLeagueTeam(
       };
     }
 
-    const team = await prisma.leagueTeam.findUnique({ where: { id } });
+    const team = await prisma.team.findUnique({ where: { id } });
 
     if (team == null) return notFound();
 
@@ -133,14 +144,16 @@ export async function updateLeagueTeam(
       team.flagUrl
     );
 
-    await prisma.leagueTeam.update({
+    await prisma.team.update({
       where: { id },
       data: {
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
         countryId: data.countryId ? +data.countryId : null,
-        type: data.type,
+        continent: data.continent,
+        isClub: data.isClub === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -157,7 +170,9 @@ export async function updateLeagueTeam(
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
         countryId: errorMap["countryId"]?.[0],
-        type: errorMap["type"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isClub: errorMap["isClub"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
   }
@@ -168,13 +183,13 @@ export async function updateLeagueTeamPopularStatus(
   isPopular: boolean
 ) {
   try {
-    const currentLeagueTeam = await prisma.leagueTeam.findUnique({
+    const currentteam = await prisma.team.findUnique({
       where: { id },
     });
 
-    if (currentLeagueTeam == null) return notFound();
+    if (currentteam == null) return notFound();
 
-    await prisma.leagueTeam.update({
+    await prisma.team.update({
       where: { id },
       data: {
         isPopular: !isPopular,

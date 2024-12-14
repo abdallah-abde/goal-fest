@@ -6,13 +6,7 @@ import { useFormState } from "react-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import {
-  LeagueGroup,
-  LeagueTeam,
-  League,
-  LeagueSeason,
-  Country,
-} from "@prisma/client";
+import { Group, Team, League, Season, Country } from "@prisma/client";
 
 import { addLeagueGroup, updateLeagueGroup } from "@/actions/leagueGroups";
 
@@ -31,14 +25,22 @@ import MultipleSelector, {
   Option,
 } from "@/components/ui/multiple-selector";
 
-import { searchLeague, searchSeason } from "@/lib/api-functions";
+import {
+  searchLeague,
+  searchSeason,
+  searchSeasonTeam,
+} from "@/lib/api-functions";
 
-interface GroupProps extends LeagueGroup {
-  season: LeagueSeasonProps;
-  teams: LeagueTeam[];
+interface GroupProps extends Group {
+  season: SeasonProps;
+  teams: TeamProps[];
 }
 
-interface LeagueSeasonProps extends LeagueSeason {
+interface TeamProps extends Team {
+  country: Country | null;
+}
+
+interface SeasonProps extends Season {
   league: LeagueProps;
 }
 
@@ -62,8 +64,8 @@ export default function LeagueGroupForm({
     if (formState.success) {
       formRef.current?.reset();
       if (group == null) {
-        setSelectedTeams([]);
         setTeamsKey(+new Date());
+        setSelectedTeams([]);
       }
     }
   }, [formState]);
@@ -76,12 +78,12 @@ export default function LeagueGroupForm({
             label: `${group.season.league.name} ${
               group.season.league.country
                 ? `(${group.season.league.country.name})`
-                : `(${group.season.league.type})`
+                : `(${group.season.league.continent})`
             }`,
             value: `${group.season.league.name} ${
               group.season.league.country
                 ? `(${group.season.league.country.name})`
-                : `(${group.season.league.type})`
+                : `(${group.season.league.continent})`
             }`,
           },
         ]
@@ -90,8 +92,8 @@ export default function LeagueGroupForm({
 
   useEffect(() => {
     if (group == null) {
-      setSelectedSeason([]);
       setSeasonsKey(+new Date());
+      setSelectedSeason([]);
     }
   }, [selectedLeague, group]);
 
@@ -111,9 +113,13 @@ export default function LeagueGroupForm({
 
   const seasonsRef = useRef<MultipleSelectorRef>(null);
 
-  const [teams, setTeams] = useState<LeagueTeam[] | null>(null);
+  const [teams, setTeams] = useState<Option[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
+  const [league, setLeague] = useState<League | null>(null);
+
+  const [isLeagueLoading, setIsLeagueLoading] = useState(false);
 
   useEffect(() => {
     async function getTeams() {
@@ -125,14 +131,29 @@ export default function LeagueGroupForm({
         );
         const data = await res.json();
 
-        setTeams(data.teams);
+        setTeams(data);
       } else {
         setTeams([]);
       }
       setIsTeamsLoading(false);
     }
 
+    async function getLeague() {
+      setIsLeagueLoading(true);
+
+      if (selectedLeague.length > 0) {
+        const res = await fetch("/api/league/" + selectedLeague[0].dbValue);
+        const data = await res.json();
+
+        setLeague(data);
+      } else {
+        setLeague(null);
+      }
+      setIsLeagueLoading(false);
+    }
+
     getTeams();
+    getLeague();
   }, [selectedSeason]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
@@ -142,8 +163,8 @@ export default function LeagueGroupForm({
     group
       ? group.teams.map((a) => {
           return {
-            label: a.name,
-            value: a.name,
+            label: `${a.name} (${a.continent})`,
+            value: `${a.name} (${a.continent})`,
             dbValue: a.id.toString(),
           };
         })
@@ -152,11 +173,11 @@ export default function LeagueGroupForm({
 
   return (
     <div className="overflow-auto px-4">
-      <PageHeader label={group ? "Edit League Group" : "Add League Group"} />
+      <PageHeader label={group ? "Edit Group" : "Add Group"} />
 
       <FormSuccessMessage
         success={formState.success}
-        message={`League Group has been ${
+        message={`Group has been ${
           group == null ? "added" : "updated"
         } successfully`}
       />
@@ -189,7 +210,7 @@ export default function LeagueGroupForm({
             loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedLeague}
             value={selectedLeague}
-            disabled={!!group}
+            // disabled={!!group}
           />
         </FormField>
 
@@ -220,7 +241,8 @@ export default function LeagueGroupForm({
             ref={seasonsRef}
             onChange={setSelectedSeason}
             value={selectedSeason}
-            disabled={!!group || selectedLeague.length === 0}
+            // disabled={!!group || selectedLeague.length === 0}
+            disabled={selectedLeague.length === 0}
           />
         </FormField>
 
@@ -234,55 +256,54 @@ export default function LeagueGroupForm({
           />
           <FormFieldError error={formState.errors?.name} />
         </FormField>
-        {teams && teams.length > 0 && !isTeamsLoading ? (
-          <FormField>
-            <Label htmlFor="teams">Teams</Label>
-            <Input
-              type="hidden"
-              id="teams"
-              name="teams"
-              value={
-                selectedTeams
-                  ?.map((a) => {
-                    return a.dbValue;
-                  })
-                  .join(",") || ""
-              }
-            />
-            <MultipleSelector
-              className="form-multiple-selector-styles"
-              ref={teamsRef}
-              key={teamsKey}
-              defaultOptions={teams.map(({ id, name }) => {
-                return {
-                  label: name,
-                  value: name,
-                  dbValue: id.toString(),
-                };
-              })}
-              placeholder="Select teams"
-              emptyIndicator={
-                <MultipleSelectorEmptyIndicator label="No teams found" />
-              }
-              loadingIndicator={<MultipleSelectorLoadingIndicator />}
-              onChange={setSelectedTeams}
-              value={selectedTeams}
-            />
-            <FormFieldError error={formState.errors?.teams} />
-          </FormField>
-        ) : (
+        {/* {teams && teams.length > 0 && !isTeamsLoading ? ( */}
+        <FormField>
+          <Label htmlFor="teams">Teams</Label>
+          <Input
+            type="hidden"
+            id="teams"
+            name="teams"
+            value={
+              selectedTeams
+                ?.map((a) => {
+                  return a.dbValue;
+                })
+                .join(",") || ""
+            }
+          />
+          <MultipleSelector
+            ref={teamsRef}
+            key={teamsKey}
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            options={teams || []}
+            placeholder="Select teams"
+            emptyIndicator={
+              <MultipleSelectorEmptyIndicator label="No teams found" />
+            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
+            onChange={setSelectedTeams}
+            value={selectedTeams}
+            disabled={selectedLeague.length === 0}
+          />
+          <FormFieldError error={formState.errors?.teams} />
+        </FormField>
+        {/* ) : (
           <FormFieldLoadingState
             isLoading={isTeamsLoading}
             label="Loading Teams..."
             notFoundText="There is no teams, add some!"
-          />
-        )}
+          /> */}
+        {/* )} */}
 
         <SubmitButton
           isDisabled={
             selectedLeague.length === 0 ||
             selectedSeason.length === 0 ||
-            isTeamsLoading
+            isTeamsLoading ||
+            isLeagueLoading
           }
         />
       </form>

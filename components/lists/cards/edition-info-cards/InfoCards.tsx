@@ -15,10 +15,10 @@ import NextMatches from "@/components/lists/cards/matches/NextMatches";
 import TeamOrCountryCard from "@/components/lists/cards/edition-info-cards/TeamOrCountryCard";
 
 interface MatchProps extends Match {
-  group: Group;
-  homeTeam: Team;
-  awayTeam: Team;
-  season: SeasonProps;
+  group: Group | null;
+  homeTeam: Team | null;
+  awayTeam: Team | null;
+  // season: SeasonProps;
 }
 
 interface SeasonProps extends Season {

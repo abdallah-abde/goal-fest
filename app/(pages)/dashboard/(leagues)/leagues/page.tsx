@@ -257,7 +257,7 @@ export default async function DashboardleaguesPage({
           textFilters={textFilters}
         />
         <SearchFieldComponent placeholder="Search by league name, country, continent ..." />
-        <FormDialog countries={countries} id={null} />
+        <FormDialog id={null} />
       </div>
       {leagues.length > 0 ? (
         <Table className="dashboard-table">
@@ -350,7 +350,7 @@ export default async function DashboardleaguesPage({
                     </TooltipProvider>
                   </TableCell>
                   <TableCell>
-                    <FormDialog countries={countries} id={id} />
+                    <FormDialog id={id} />
                   </TableCell>
                 </TableRow>
               )
@@ -369,16 +369,13 @@ export default async function DashboardleaguesPage({
   );
 }
 
-async function FormDialog({
-  countries,
-  id,
-}: {
-  countries: Country[];
-  id: number | null;
-}) {
+async function FormDialog({ id }: { id: number | null }) {
   const league = id
     ? await prisma.league.findUnique({
         where: { id },
+        include: {
+          country: true,
+        },
       })
     : null;
 
@@ -398,7 +395,7 @@ async function FormDialog({
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueForm countries={countries} league={league} />
+        <LeagueForm league={league} />
       </DialogContent>
     </Dialog>
   );

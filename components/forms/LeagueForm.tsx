@@ -29,13 +29,22 @@ import { Eraser } from "lucide-react";
 import { Continents, IsPopularOptions } from "@/types/enums";
 import FormCustomErrorMessage from "@/components/forms/parts/FormCustomErrorMessage";
 import FormSuccessMessage from "@/components/forms/parts/FormSuccessMessage";
+import MultipleSelector, {
+  MultipleSelectorRef,
+  Option,
+} from "../ui/multiple-selector";
+import { searchCountry } from "@/lib/api-functions";
+import MultipleSelectorEmptyIndicator from "./parts/MultipleSelectorEmptyIndicator";
+import { MultipleSelectorLoadingIndicator } from "../Skeletons";
+
+interface LeagueProps extends League {
+  country: Country | null;
+}
 
 export default function LeagueForm({
   league,
-  countries,
 }: {
-  league?: League | null;
-  countries: Country[];
+  league?: LeagueProps | null;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -51,9 +60,6 @@ export default function LeagueForm({
         setContinentValue(undefined);
         setContinentKey(+new Date());
 
-        setCountryValue(undefined);
-        setCountryKey(+new Date());
-
         setIsPopularValue(IsPopularOptions.No);
         setIsPopularKey(+new Date());
 
@@ -62,9 +68,31 @@ export default function LeagueForm({
 
         setIsDomesticValue(IsPopularOptions.No);
         setIsDomesticKey(+new Date());
+
+        // setCountryValue(undefined);
+        setCountryKey(+new Date());
+        setSelectedCountry([]);
       }
+
+      // countryRef.current?.clearSelected();
     }
   }, [formState]);
+
+  console.log(league);
+
+  const [selectedCountry, setSelectedCountry] = useState<Option[]>(
+    league
+      ? [
+          {
+            dbValue: league.countryId?.toString(),
+            label: `${league.country?.name} (${league.country?.continent})`,
+            value: `${league.country?.name} (${league.country?.continent})`,
+          },
+        ]
+      : []
+  );
+
+  const countryRef = useRef<MultipleSelectorRef | null>(null);
 
   const [countryValue, setCountryValue] = useState<number | undefined>(
     league?.countryId || undefined
@@ -144,45 +172,38 @@ export default function LeagueForm({
           </Select>
           <FormFieldError error={formState.errors?.continent} />
         </FormField>
+
         <FormField>
           <Label htmlFor="countryId">Country</Label>
-          <div>
-            <div className="flex items-center gap-2">
-              <Select
-                name="countryId"
-                key={countryKey}
-                defaultValue={
-                  (countryValue && countryValue.toString()) || undefined
-                }
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Choose Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map(({ id, name }) => (
-                    <SelectItem value={id.toString()} key={id}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                type="button"
-                className="bg-secondary/50 hover:bg-primary/50 transition duration-300"
-                variant="outline"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCountryValue(undefined);
-                  setCountryKey(+new Date());
-                }}
-              >
-                <Eraser strokeWidth="1.5px" />
-              </Button>
-            </div>
-            <FormFieldError error={formState.errors?.countryId} />
-          </div>
+          <Input
+            type="hidden"
+            id="countryId"
+            name="countryId"
+            value={selectedCountry[0]?.dbValue || ""}
+          />
+          <MultipleSelector
+            ref={countryRef}
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchCountry(value);
+              return res;
+            }}
+            maxSelected={1}
+            placeholder="Select country"
+            emptyIndicator={
+              <MultipleSelectorEmptyIndicator label="No countries found" />
+            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
+            onChange={setSelectedCountry}
+            value={selectedCountry}
+            // disabled={!!league}
+          />
+          <FormFieldError error={formState.errors?.countryId} />
         </FormField>
+
         <FormField>
           <Label htmlFor="flagUrl">Flag</Label>
           <Input type="file" id="flagUrl" name="flagUrl" />

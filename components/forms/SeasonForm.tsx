@@ -13,7 +13,10 @@ import { Season, League, Team, Country } from "@prisma/client";
 import { addLeagueSeason, updateLeagueSeason } from "@/actions/seasons";
 
 import PageHeader from "@/components/PageHeader";
-import { MultipleSelectorLoadingIndicator } from "@/components/Skeletons";
+import {
+  LoadingSpinner,
+  MultipleSelectorLoadingIndicator,
+} from "@/components/Skeletons";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
@@ -27,14 +30,23 @@ import MultipleSelector, {
   Option,
 } from "@/components/ui/multiple-selector";
 
-import { searchLeague } from "@/lib/api-functions";
+import {
+  searchCountry,
+  searchLeague,
+  searchLeagueCountry,
+  searchLeagueTeam,
+} from "@/lib/api-functions";
 
 interface SeasonProps extends Season {
   league: LeagueProps;
-  teams: Team[];
-  winner?: Team | null;
-  titleHolder?: Team | null;
+  teams: TeamProps[];
+  winner?: TeamProps | null;
+  titleHolder?: TeamProps | null;
   hostingCountries: Country[];
+}
+
+interface TeamProps extends Team {
+  country: Country | null;
 }
 
 interface LeagueProps extends League {
@@ -57,8 +69,17 @@ export default function SeasonForm({
     if (formState.success) {
       formRef.current?.reset();
       if (season == null) {
-        setSelectedTeams([]);
         setTeamsKey(+new Date());
+        setSelectedTeams([]);
+
+        setCountriesKey(+new Date());
+        setSelectedCountries([]);
+
+        setWinnerKey(+new Date());
+        setSelectedWinner([]);
+
+        setTitleHolderKey(+new Date());
+        setSelectedTitleHolder([]);
       }
     }
   }, [formState]);
@@ -83,9 +104,16 @@ export default function SeasonForm({
       : []
   );
 
+  const [winnerKey, setWinnerKey] = useState(+new Date());
+  const [titleHolderKey, setTitleHolderKey] = useState(+new Date());
+
   const [teams, setTeams] = useState<Team[] | null>(null);
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+
+  const [league, setLeague] = useState<League | null>(null);
+
+  const [isLeagueLoading, setIsLeagueLoading] = useState(false);
 
   useEffect(() => {
     async function getTeams() {
@@ -104,7 +132,22 @@ export default function SeasonForm({
       setIsTeamsLoading(false);
     }
 
+    async function getLeague() {
+      setIsLeagueLoading(true);
+
+      if (selectedLeague.length > 0) {
+        const res = await fetch("/api/league/" + selectedLeague[0].dbValue);
+        const data = await res.json();
+
+        setLeague(data);
+      } else {
+        setLeague(null);
+      }
+      setIsLeagueLoading(false);
+    }
+
     getTeams();
+    getLeague();
   }, [selectedLeague]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
@@ -112,10 +155,10 @@ export default function SeasonForm({
 
   const [selectedTeams, setSelectedTeams] = useState<Option[]>(
     season
-      ? season.teams.map(({ id, name }) => {
+      ? season.teams.map(({ id, name, country, continent }) => {
           return {
-            label: name,
-            value: name,
+            label: `${name} (${continent})`,
+            value: `${name} (${continent})`,
             dbValue: id.toString(),
           };
         })
@@ -166,8 +209,16 @@ export default function SeasonForm({
       ? [
           {
             dbValue: season.winnerId.toString(),
-            label: `${season.winner?.name}`,
-            value: `${season.winner?.name}`,
+            label: `${season.winner?.name} (${
+              season.winner?.isClub
+                ? season.winner?.country?.name
+                : season.winner?.continent
+            })`,
+            value: `${season.winner?.name} (${
+              season.winner?.isClub
+                ? season.winner?.country?.name
+                : season.winner?.continent
+            })`,
           },
         ]
       : []
@@ -178,30 +229,28 @@ export default function SeasonForm({
       ? [
           {
             dbValue: season.titleHolderId.toString(),
-            label: `${season.titleHolder?.name}`,
-            value: `${season.titleHolder?.name}`,
+            label: `${season.titleHolder?.name} (${
+              season.titleHolder?.isClub
+                ? season.titleHolder?.country?.name
+                : season.titleHolder?.continent
+            })`,
+            value: `${season.titleHolder?.name} (${
+              season.titleHolder?.isClub
+                ? season.titleHolder?.country?.name
+                : season.titleHolder?.continent
+            })`,
           },
         ]
       : []
   );
 
-  const searchTeam = async (value: string): Promise<Option[]> => {
-    return new Promise(async (resolve) => {
-      const res = await fetch(
-        `/api/teams/${selectedLeague[0].dbValue}/${value}`
-      );
-      const data = await res.json();
-      resolve(data);
-    });
-  };
-
   return (
     <div className="overflow-auto px-4">
-      <PageHeader label={season ? "Edit League Season" : "Add Season"} />
+      <PageHeader label={season ? "Edit Season" : "Add Season"} />
 
       <FormSuccessMessage
         success={formState.success}
-        message={`League Season has been ${
+        message={`Season has been ${
           season == null ? "added" : "updated"
         } successfully`}
       />
@@ -234,7 +283,7 @@ export default function SeasonForm({
             loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedLeague}
             value={selectedLeague}
-            disabled={!!season}
+            // disabled={!!season}
           />
           <FormFieldError error={formState.errors?.leagueId} />
         </FormField>
@@ -289,12 +338,19 @@ export default function SeasonForm({
             value={selectedWinner[0]?.dbValue || ""}
           />
           <MultipleSelector
+            key={winnerKey}
             className="form-multiple-selector-styles"
             hideClearAllButton
             hidePlaceholderWhenSelected
             badgeClassName="text-primary"
             onSearch={async (value) => {
-              const res = await searchTeam(value);
+              const res = await searchLeagueTeam(
+                value,
+                league?.continent || "",
+                league?.countryId || null,
+                league?.isClubs || false,
+                league?.isDomestic || false
+              );
               return res;
             }}
             maxSelected={1}
@@ -303,6 +359,7 @@ export default function SeasonForm({
             loadingIndicator={<MultipleSelectorLoadingIndicator />}
             onChange={setSelectedWinner}
             value={selectedWinner}
+            disabled={selectedLeague.length === 0}
           />
           <FormFieldError error={formState.errors?.winnerId} />
         </FormField>
@@ -316,12 +373,19 @@ export default function SeasonForm({
             value={selectedTitleHolder[0]?.dbValue || ""}
           />
           <MultipleSelector
+            key={titleHolderKey}
             className="form-multiple-selector-styles"
             hideClearAllButton
             hidePlaceholderWhenSelected
             badgeClassName="text-primary"
             onSearch={async (value) => {
-              const res = await searchTeam(value);
+              const res = await searchLeagueTeam(
+                value,
+                league?.continent || "",
+                league?.countryId || null,
+                league?.isClubs || false,
+                league?.isDomestic || false
+              );
               return res;
             }}
             maxSelected={1}
@@ -336,11 +400,14 @@ export default function SeasonForm({
             }
             onChange={setSelectedTitleHolder}
             value={selectedTitleHolder}
+            disabled={selectedLeague.length === 0}
           />
           <FormFieldError error={formState.errors?.titleHolderId} />
         </FormField>
 
-        {countries && countries.length > 0 && !isCountriesLoading ? (
+        {isLeagueLoading && <LoadingSpinner />}
+
+        {league && league.isDomestic === false && (
           <FormField>
             <Label htmlFor="hostingCountries">Hosting Countries</Label>
             <Input
@@ -356,39 +423,75 @@ export default function SeasonForm({
               }
             />
             <MultipleSelector
-              className="form-multiple-selector-styles"
               ref={countriesRef}
               key={countriesKey}
-              defaultOptions={countries.map(({ id, name }) => {
-                return {
-                  label: name,
-                  value: name,
-                  dbValue: id.toString(),
-                };
-              })}
-              placeholder="Select countries"
+              className="form-multiple-selector-styles"
+              hideClearAllButton
+              hidePlaceholderWhenSelected
+              badgeClassName="text-primary"
+              onSearch={async (value) => {
+                const res = await searchLeagueCountry(value, league.continent);
+                return res;
+              }}
+              placeholder="Select country"
               emptyIndicator={
-                <p className="empty-indicator">No countries found.</p>
+                <MultipleSelectorEmptyIndicator label="No countries found" />
               }
-              loadingIndicator={
-                <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
-                  Loading...
-                </p>
-              }
+              loadingIndicator={<MultipleSelectorLoadingIndicator />}
               onChange={setSelectedCountries}
               value={selectedCountries}
+              disabled={selectedLeague.length === 0}
+
+              // disabled={!!league}
             />
             <FormFieldError error={formState.errors?.hostingCountries} />
           </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isCountriesLoading}
-            label="Loading Countries..."
-            notFoundText="There is no countries, add some!"
-          />
         )}
 
-        {teams && teams.length > 0 && !isTeamsLoading ? (
+        <FormField>
+          <Label htmlFor="teams">Teams</Label>
+          <Input
+            type="hidden"
+            id="teams"
+            name="teams"
+            value={
+              selectedTeams
+                ?.map((a) => {
+                  return a.dbValue;
+                })
+                .join(",") || ""
+            }
+          />
+          <MultipleSelector
+            ref={teamsRef}
+            key={teamsKey}
+            className="form-multiple-selector-styles"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            badgeClassName="text-primary"
+            onSearch={async (value) => {
+              const res = await searchLeagueTeam(
+                value,
+                league?.continent || "",
+                league?.countryId || null,
+                league?.isClubs || false,
+                league?.isDomestic || false
+              );
+              return res;
+            }}
+            placeholder="Select team"
+            emptyIndicator={
+              <MultipleSelectorEmptyIndicator label="No teams found" />
+            }
+            loadingIndicator={<MultipleSelectorLoadingIndicator />}
+            onChange={setSelectedTeams}
+            value={selectedTeams}
+            disabled={selectedLeague.length === 0}
+          />
+          <FormFieldError error={formState.errors?.teams} />
+        </FormField>
+
+        {/* {teams && teams.length > 0 && !isTeamsLoading ? (
           <FormField>
             <Label htmlFor="teams">Teams</Label>
             <Input
@@ -430,9 +533,14 @@ export default function SeasonForm({
             label="Loading Teams..."
             notFoundText="There is no teams, add some!"
           />
-        )}
+        )} */}
         <SubmitButton
-          isDisabled={selectedLeague.length === 0 || isTeamsLoading}
+          isDisabled={
+            selectedLeague.length === 0 ||
+            isTeamsLoading ||
+            isCountriesLoading ||
+            isLeagueLoading
+          }
         />
       </form>
     </div>

@@ -4,7 +4,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const data = await prisma.leagueGroup.findUnique({
+  const data = await prisma.group.findUnique({
     where: { id: +params.id },
     select: {
       teams: {

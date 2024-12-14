@@ -123,6 +123,18 @@ export const GroupMatchSchema = z.object({
 export const MatchScoreSchema = z.object({
   homeGoals: z.coerce.number({ message: "Please enter a valid number" }),
   awayGoals: z.coerce.number({ message: "Please enter a valid number" }),
+  homeExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  homePenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayPenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
 });
 
 export const MatchStatusSchema = z.object({
@@ -196,7 +208,10 @@ export const knockoutMatchScoreSchema = z.object({
 export const LeagueSchema = z.object({
   name: z.string().min(1, { message: "Name is required!" }),
   flagUrl: ImageSchema.optional(),
-  countryId: z.union([z.coerce.number().optional(), z.string()]),
+  countryId: z.coerce
+    .number()
+    .int()
+    .refine((data) => data > 0, { message: "Country is required" }),
   continent: z.string().min(1, { message: "Continent is required!" }),
   isDomestic: z.string().min(1, { message: "Is Domestic is required!" }),
   isClubs: z.string().min(1, { message: "Is Clubs is required!" }),
@@ -240,7 +255,9 @@ export const LeagueTeamSchema = z.object({
     .number()
     .int()
     .refine((data) => data > 0, { message: "Country is required" }),
-  type: z.string().min(1, { message: "Type is required!" }),
+  continent: z.string().min(1, { message: "Continent is required!" }),
+  isClub: z.string().min(1, { message: "Is Club is required!" }),
+  isPopular: z.string().min(1, { message: "Is Popular is required!" }),
 });
 
 export const LeagueGroupSchema = z.object({
@@ -267,6 +284,18 @@ export const LeagueMatchSchema = z.object({
   awayGoals: z.coerce
     .number({ message: "Please enter a valid number" })
     .optional(),
+  homeExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayExtraTimeGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  homePenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
+  awayPenaltyGoals: z.coerce
+    .number({ message: "Please enter a valid number" })
+    .optional(),
   date: z.union([z.coerce.date().optional(), z.string()]),
   seasonId: z.coerce
     .number()
@@ -274,6 +303,13 @@ export const LeagueMatchSchema = z.object({
     .refine((data) => data > 0, { message: "Season is required" }),
   round: z.string().optional(),
   groupId: z.union([z.coerce.number().optional(), z.string()]),
+  homeTeamPlacehlder: z
+    .string()
+    .min(2, { message: "Home Team Placeholder is required" }),
+  awayTeamPlacehlder: z
+    .string()
+    .min(2, { message: "Away Team Placeholder is required" }),
+  isKnockout: z.string().min(1, { message: "Is Knockout is required!" }),
 });
 
 export const LeagueKnockoutMatchSchema = z.object({

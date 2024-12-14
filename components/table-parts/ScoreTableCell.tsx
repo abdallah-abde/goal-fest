@@ -12,27 +12,48 @@ export default function ScoreTableCell({
   id,
   homeTeamName,
   awayTeamName,
-  tournamentName,
-  editionName,
+  leagueName,
+  seasonName,
   roundName,
   groupName,
   date,
   homeGoals,
   awayGoals,
-  type,
+  homeExtraTimeGoals,
+  awayExtraTimeGoals,
+  homePenaltyGoals,
+  awayPenaltyGoals,
+  isKnockout,
 }: {
   id: number;
   homeTeamName: string;
   awayTeamName: string;
-  tournamentName: string;
-  editionName: string;
+  leagueName: string;
+  seasonName: string;
   roundName: string;
   groupName: string;
   date: string;
   homeGoals: number | null;
   awayGoals: number | null;
-  type: "matches" | "leagueMatches";
+  homeExtraTimeGoals: number | null;
+  awayExtraTimeGoals: number | null;
+  homePenaltyGoals: number | null;
+  awayPenaltyGoals: number | null;
+  isKnockout: boolean;
 }) {
+  const mainTimeGoals =
+    homeGoals && awayGoals ? `${homeGoals} - ${awayGoals}` : null;
+
+  const extraTimeGoals =
+    homeExtraTimeGoals && awayExtraTimeGoals
+      ? `${homeExtraTimeGoals} - ${awayExtraTimeGoals}`
+      : null;
+
+  const penaltyTimeGoals =
+    homePenaltyGoals && awayPenaltyGoals
+      ? `${homePenaltyGoals} - ${awayPenaltyGoals}`
+      : null;
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -41,21 +62,39 @@ export default function ScoreTableCell({
             id={id}
             homeTeamName={homeTeamName}
             awayTeamName={awayTeamName}
-            tournamentName={tournamentName}
-            editionName={editionName}
+            leagueName={leagueName}
+            seasonName={seasonName}
             roundName={roundName}
             groupName={groupName}
             date={date}
             homeGoals={homeGoals}
             awayGoals={awayGoals}
-            type={type}
+            homeExtraTimeGoals={homeExtraTimeGoals}
+            awayExtraTimeGoals={awayExtraTimeGoals}
+            homePenaltyGoals={homePenaltyGoals}
+            awayPenaltyGoals={awayPenaltyGoals}
+            isKnockout={isKnockout}
           >
             <span className="hover:underline">
-              {homeGoals === null && awayGoals === null ? (
+              {mainTimeGoals ? (
                 <NotProvidedSpan hover={true}>#NP</NotProvidedSpan>
               ) : (
                 <>
-                  {homeGoals} - {awayGoals}
+                  <span>{mainTimeGoals}</span>
+                  {isKnockout ? (
+                    extraTimeGoals && penaltyTimeGoals ? (
+                      <>
+                        <span>{`ET: ${extraTimeGoals}`}</span>
+                        <span>{`PT: ${penaltyTimeGoals}`}</span>
+                      </>
+                    ) : extraTimeGoals ? (
+                      <span>{`ET: ${extraTimeGoals}`}</span>
+                    ) : (
+                      <></>
+                    )
+                  ) : (
+                    <></>
+                  )}
                 </>
               )}
             </span>

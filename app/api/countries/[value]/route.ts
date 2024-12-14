@@ -2,17 +2,19 @@ import prisma from "@/lib/db";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string; value: string } }
+  { params }: { params: { value: string } }
 ) {
-  const res = await prisma.group
+  const res = await prisma.country
     .findMany({
-      where: { seasonId: +params.id, name: { contains: params.value } },
+      where: {
+        name: { contains: params.value },
+      },
     })
     .then((data) =>
       data.map((a) => {
         return {
-          label: `${a.name}`,
-          value: `${a.name}`,
+          label: `${a.name} (${a.continent})`,
+          value: `${a.name} (${a.continent})`,
           dbValue: a.id.toString(),
         };
       })

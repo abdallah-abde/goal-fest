@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { LeagueStages, SortDirectionOptions } from "@/types/enums";
+import { Continents, LeagueStages, SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -196,6 +196,13 @@ export default async function DashboardSeasonsPage({
       placeholder: "Choose Stage...",
       options: Object.values(LeagueStages),
     },
+    {
+      title: "Continent",
+      fieldName: "continent",
+      searchParamName: "continent",
+      placeholder: "Choose Continent...",
+      options: Object.values(Continents),
+    },
   ];
 
   const textFilters = [
@@ -204,11 +211,11 @@ export default async function DashboardSeasonsPage({
       fieldName: "country",
       searchParamName: "country",
     },
-    {
-      title: "Continent",
-      fieldName: "continent",
-      searchParamName: "continent",
-    },
+    // {
+    //   title: "Continent",
+    //   fieldName: "continent",
+    //   searchParamName: "continent",
+    // },
     {
       title: "Winner",
       fieldName: "winner",
@@ -326,10 +333,22 @@ async function FormDialog({ id }: { id: number | null }) {
         where: { id },
         include: {
           league: { include: { country: true } },
-          teams: true,
+          teams: {
+            include: {
+              country: true,
+            },
+          },
           hostingCountries: true,
-          winner: true,
-          titleHolder: true,
+          winner: {
+            include: {
+              country: true,
+            },
+          },
+          titleHolder: {
+            include: {
+              country: true,
+            },
+          },
         },
       })
     : null;

@@ -4,7 +4,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string; value: string } }
 ) {
-  const res = await prisma.leagueSeason
+  const res = await prisma.season
     .findMany({
       where: {
         leagueId: +params.id,

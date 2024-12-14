@@ -1,7 +1,7 @@
 "use client";
 
 import { Command as CommandPrimitive, useCommandState } from "cmdk";
-import { X } from "lucide-react";
+import { Option, X } from "lucide-react";
 import * as React from "react";
 import { forwardRef, useEffect } from "react";
 
@@ -82,6 +82,7 @@ interface MultipleSelectorProps {
 export interface MultipleSelectorRef {
   selectedValue: Option[];
   input: HTMLInputElement;
+  clearSelected: () => void;
 }
 
 export function useDebounce<T>(value: T, delay?: number): T {
@@ -211,14 +212,21 @@ const MultipleSelector = React.forwardRef<
     const [inputValue, setInputValue] = React.useState("");
     const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
+    const clearSelected = React.useCallback(() => {
+      setSelected([]);
+      onChange?.([]);
+      setOptions([]);
+    }, [onChange]);
+
     React.useImperativeHandle(
       ref,
       () => ({
         selectedValue: [...selected],
         input: inputRef.current as HTMLInputElement,
         focus: () => inputRef.current?.focus(),
+        clearSelected,
       }),
-      [selected]
+      [selected, clearSelected]
     );
 
     const handleUnselect = React.useCallback(

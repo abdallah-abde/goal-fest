@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
-import { SortDirectionOptions } from "@/types/enums";
+import { Continents, SortDirectionOptions } from "@/types/enums";
 
 import {
   Table,
@@ -24,6 +24,7 @@ import NotProvidedSpan from "@/components/NotProvidedSpan";
 import LeagueGroupForm from "@/components/forms/LeagueGroupForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Filters from "@/components/table-parts/Filters";
 
 export default async function DashboardLeagueGroupsPage({
   searchParams,
@@ -33,25 +34,80 @@ export default async function DashboardLeagueGroupsPage({
     query?: string | null;
     sortDir?: SortDirectionOptions | null;
     sortField?: string | null;
+    continent?: string | null;
+    country?: string | null;
+    league?: string | null;
+    season?: string | null;
   };
 }) {
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
   const sortDir = searchParams?.sortDir || SortDirectionOptions.ASC;
   const sortField = searchParams?.sortField || "name";
+  const continentCondition = searchParams?.continent || "all";
+  const countryCondition = searchParams?.country || "all";
+  const leagueCondition = searchParams?.league || "all";
+  const seasonCondition = searchParams?.season || "all";
 
   const where = {
     OR: [
+      { name: { contains: query } },
       { season: { league: { country: { name: { contains: query } } } } },
       { season: { league: { name: { contains: query } } } },
       { season: { year: { contains: query } } },
-      { name: { contains: query } },
+      { season: { league: { continent: { contains: query } } } },
+      {
+        season: {
+          hostingCountries: {
+            some: {
+              name: {
+                contains: query,
+              },
+            },
+          },
+        },
+      },
     ],
+    ...(leagueCondition !== "all"
+      ? {
+          season: { league: { name: leagueCondition } },
+        }
+      : {}),
+    ...(seasonCondition !== "all"
+      ? {
+          season: { year: seasonCondition },
+        }
+      : {}),
+    ...(continentCondition !== "all"
+      ? {
+          season: { league: { continent: continentCondition } },
+        }
+      : {}),
+    ...(countryCondition !== "all"
+      ? {
+          OR: [
+            {
+              season: { league: { country: { name: countryCondition } } },
+            },
+            {
+              season: {
+                hostingCountries: {
+                  some: {
+                    name: countryCondition,
+                  },
+                },
+              },
+            },
+          ],
+        }
+      : {}),
   };
 
   const orderBy = {
     ...(sortField === "country"
       ? { season: { league: { country: { name: sortDir } } } }
+      : sortField === "continent"
+      ? { season: { league: { continent: sortDir } } }
       : sortField === "league"
       ? { season: { league: { name: sortDir } } }
       : sortField === "season"
@@ -61,7 +117,7 @@ export default async function DashboardLeagueGroupsPage({
       : {}),
   };
 
-  const totalGroupsCount = await prisma.leagueGroup.count({
+  const totalGroupsCount = await prisma.group.count({
     where: {
       ...where,
     },
@@ -69,7 +125,7 @@ export default async function DashboardLeagueGroupsPage({
 
   const totalPages = Math.ceil(totalGroupsCount / PAGE_RECORDS_COUNT);
 
-  const groups = await prisma.leagueGroup.findMany({
+  const groups = await prisma.group.findMany({
     where: { ...where },
     skip: (currentPage - 1) * PAGE_RECORDS_COUNT,
     take: PAGE_RECORDS_COUNT,
@@ -90,25 +146,56 @@ export default async function DashboardLeagueGroupsPage({
 
   const sortingList = [
     { label: "Country", fieldName: "country" },
+    { label: "Continent", fieldName: "continent" },
     { label: "League", fieldName: "league" },
     { label: "Season", fieldName: "season" },
     { label: "Name", fieldName: "name" },
   ];
 
-  const leagues = await prisma.league.findMany();
+  const listFilters = [
+    {
+      title: "Continent",
+      fieldName: "continent",
+      searchParamName: "continent",
+      placeholder: "Choose Continent...",
+      options: Object.values(Continents),
+    },
+  ];
+
+  const textFilters = [
+    {
+      title: "Country",
+      fieldName: "country",
+      searchParamName: "country",
+    },
+    {
+      title: "League",
+      fieldName: "league",
+      searchParamName: "league",
+    },
+    {
+      title: "Season",
+      fieldName: "season",
+      searchParamName: "season",
+    },
+  ];
 
   return (
     <>
       <PageHeader label="Leagues Groups List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="league" />
-        <SearchFieldComponent placeholder="Search by league names, years, countries, group names ..." />
+        <Filters listFilters={listFilters} textFilters={textFilters} />
+        <SearchFieldComponent placeholder="Search by league names, years, countries, continents, group names ..." />
         <FormDialog id={null} />
       </div>
       {groups.length > 0 ? (
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
+              <TableHead className="dashboard-head-table-cell">
+                Continent
+              </TableHead>
               <TableHead className="dashboard-head-table-cell">
                 Country
               </TableHead>
@@ -125,6 +212,9 @@ export default async function DashboardLeagueGroupsPage({
           <TableBody>
             {groups.map(({ id, name, season }) => (
               <TableRow key={id} className="dashboard-table-row">
+                <TableCell className="dashboard-table-cell">
+                  {season.league.continent}
+                </TableCell>
                 <TableCell className="dashboard-table-cell">
                   {season.league.country?.name || <NotProvidedSpan />}
                 </TableCell>
@@ -144,7 +234,7 @@ export default async function DashboardLeagueGroupsPage({
           <DashboardTableFooter
             totalCount={totalGroupsCount}
             totalPages={totalPages}
-            colSpan={5}
+            colSpan={6}
           />
         </Table>
       ) : (
@@ -155,8 +245,8 @@ export default async function DashboardLeagueGroupsPage({
 }
 
 async function FormDialog({ id }: { id: number | null }) {
-  const leagueGroup = id
-    ? await prisma.leagueGroup.findUnique({
+  const group = id
+    ? await prisma.group.findUnique({
         where: { id },
         include: {
           teams: true,
@@ -173,12 +263,12 @@ async function FormDialog({ id }: { id: number | null }) {
       })
     : null;
 
-  if (id && !leagueGroup) throw new Error("Something went wrong");
+  if (id && !group) throw new Error("Something went wrong");
 
   return (
     <Dialog>
       <DialogTrigger>
-        {leagueGroup == null ? (
+        {group == null ? (
           <Button variant="outline" size="icon">
             <Plus className="size-5" />
           </Button>
@@ -189,7 +279,7 @@ async function FormDialog({ id }: { id: number | null }) {
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueGroupForm group={leagueGroup} />
+        <LeagueGroupForm group={group} />
       </DialogContent>
     </Dialog>
   );

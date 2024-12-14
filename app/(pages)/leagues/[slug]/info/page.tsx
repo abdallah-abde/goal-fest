@@ -40,7 +40,7 @@ export default async function LeaguesInfoPage({
               group: true,
               homeTeam: true,
               awayTeam: true,
-              season: true,
+              // season: true,
             },
           },
         },

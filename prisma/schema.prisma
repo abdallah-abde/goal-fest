@@ -275,6 +275,8 @@ model Match {
   groupId            Int?
   group              Group?    @relation(fields: [groupId], references: [id])
   isKnockout         Boolean   @default(false)
+  homeTeamPlacehlder String?
+  awayTeamPlacehlder String?
 }
 
 // model LeagueKnockoutMatch {

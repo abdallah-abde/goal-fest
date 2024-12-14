@@ -21,10 +21,22 @@ export async function GET(
         .includes(league.country?.name)
     : false;
 
-  const where =
-    league.countryId && !isContinent
+  // const countryCondition =
+  //   league.countryId && !isContinent
+  //     ? { countryId: league.countryId }
+  //     : { continent: league.continent };
+
+  const countryCondition =
+    league.countryId && league.isDomestic
       ? { countryId: league.countryId }
       : { continent: league.continent };
+
+  const isClubsCondition = { isClub: league.isClubs };
+
+  const where = {
+    ...countryCondition,
+    ...isClubsCondition,
+  };
 
   const res = await prisma.team.findMany({
     where: {
