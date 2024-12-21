@@ -170,8 +170,8 @@ export default async function DashboardSeasonsPage({
   });
 
   const sortingList = [
-    { label: "Country", fieldName: "country" },
     { label: "Continent", fieldName: "continent" },
+    { label: "Country", fieldName: "country" },
     { label: "Name", fieldName: "name" },
     { label: "Year", fieldName: "year" },
     {
@@ -211,11 +211,11 @@ export default async function DashboardSeasonsPage({
       fieldName: "country",
       searchParamName: "country",
     },
-    // {
-    //   title: "Continent",
-    //   fieldName: "continent",
-    //   searchParamName: "continent",
-    // },
+    {
+      title: "League",
+      fieldName: "league",
+      searchParamName: "league",
+    },
     {
       title: "Winner",
       fieldName: "winner",
@@ -290,11 +290,7 @@ export default async function DashboardSeasonsPage({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger>
-                          <PopoverStageUpdator
-                            id={id}
-                            stage={currentStage}
-                            type="leagues"
-                          >
+                          <PopoverStageUpdator id={id} stage={currentStage}>
                             <span className="hover:underline">
                               {currentStage || <NotProvidedSpan hover={true} />}
                             </span>

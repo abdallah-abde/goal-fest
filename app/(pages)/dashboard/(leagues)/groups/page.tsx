@@ -21,7 +21,7 @@ import DashboardTableFooter from "@/components/table-parts/DashboardTableFooter"
 import SortByList from "@/components/table-parts/SortByList";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 
-import LeagueGroupForm from "@/components/forms/LeagueGroupForm";
+import GroupForm from "@/components/forms/GroupForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Filters from "@/components/table-parts/Filters";
@@ -104,10 +104,10 @@ export default async function DashboardLeagueGroupsPage({
   };
 
   const orderBy = {
-    ...(sortField === "country"
-      ? { season: { league: { country: { name: sortDir } } } }
-      : sortField === "continent"
+    ...(sortField === "continent"
       ? { season: { league: { continent: sortDir } } }
+      : sortField === "country"
+      ? { season: { league: { country: { name: sortDir } } } }
       : sortField === "league"
       ? { season: { league: { name: sortDir } } }
       : sortField === "season"
@@ -145,8 +145,8 @@ export default async function DashboardLeagueGroupsPage({
   });
 
   const sortingList = [
-    { label: "Country", fieldName: "country" },
     { label: "Continent", fieldName: "continent" },
+    { label: "Country", fieldName: "country" },
     { label: "League", fieldName: "league" },
     { label: "Season", fieldName: "season" },
     { label: "Name", fieldName: "name" },
@@ -182,7 +182,7 @@ export default async function DashboardLeagueGroupsPage({
 
   return (
     <>
-      <PageHeader label="Leagues Groups List" />
+      <PageHeader label="Groups List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="league" />
         <Filters listFilters={listFilters} textFilters={textFilters} />
@@ -249,7 +249,11 @@ async function FormDialog({ id }: { id: number | null }) {
     ? await prisma.group.findUnique({
         where: { id },
         include: {
-          teams: true,
+          teams: {
+            include: {
+              country: true,
+            },
+          },
           season: {
             include: {
               league: {
@@ -279,7 +283,7 @@ async function FormDialog({ id }: { id: number | null }) {
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueGroupForm group={group} />
+        <GroupForm group={group} />
       </DialogContent>
     </Dialog>
   );

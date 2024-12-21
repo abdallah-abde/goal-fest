@@ -1,14 +1,4 @@
-import {
-  Country,
-  Group,
-  Team,
-  TournamentEdition,
-  Tournament,
-  LeagueSeason,
-  League,
-  LeagueTeam,
-  LeagueGroup,
-} from "@prisma/client";
+import { Country, Group, Team, Season, League } from "@prisma/client";
 
 export interface TeamStats {
   played: number;
@@ -29,67 +19,12 @@ export interface GroupWithTeams extends Group {
   teams: TeamWithStats[];
 }
 
-export interface StandingLeagueTeams extends LeagueTeam {
-  stats: TeamStats;
-}
-
 export interface StandingTeams extends Team {
   stats: TeamStats;
 }
 
-export interface TournamentEditionProps extends TournamentEdition {
-  tournament: Tournament;
-  teams: Team[];
-  winner: Team | null;
-  titleHolder: Team | null;
-  hostingCountries: Country[];
-}
-
 interface LeagueProps extends League {
   country: Country | null;
-}
-
-interface LeagueSeasonProps extends LeagueSeason {
-  league: LeagueProps;
-}
-
-export interface NeutralMatch {
-  dbId: number;
-  id: string;
-  type:
-    | "TOURNAMENT_MATCH"
-    | "TOURNAMENT_KNOCKOUT_MATCH"
-    | "LEAGUE_MATCH"
-    | "LEAGUE_KNOCKOUT_MATCH";
-  editionOrSeason: TournamentEditionProps | LeagueSeasonProps | null;
-  // season: LeagueSeasonProps | null;
-  editionOrSeasonLogoUrl: string;
-  editionOrSeasonSlug: string;
-  tournamentOrLeagueName: string;
-  tournamentOrLeagueYear: string;
-  country: string;
-  countryflagUrl: string | null;
-  fullTournamentName: string;
-  homeTeam?: Team | LeagueTeam | null; // Not null in matches just in knockout
-  awayTeam?: Team | LeagueTeam | null; // Not null in matches just in knockout
-  homeGoals?: number | null;
-  awayGoals?: number | null;
-  homeExtraTimeGoals?: number | null; // Not existed in matches just in knockout
-  awayExtraTimeGoals?: number | null; // Not existed in matches just in knockout
-  homePenaltyGoals?: number | null; // Not existed in matches just in knockout
-  awayPenaltyGoals?: number | null; // Not existed in matches just in knockout
-  date?: Date | null;
-  onlyDate?: string | null;
-  localDate?: string | null;
-  localTime?: string | null;
-  localDateOnlyDate?: string | null;
-  group?: Group | LeagueGroup | null; // Not existed in knockout just in matches
-  round?: string | null;
-  homeTeamPlaceholder?: string | null; // Not existed in matches just in knockout
-  awayTeamPlaceholder?: string | null; // Not existed in matches just in knockout
-  stage: string; // Not existed in matches or knockout
-  status: string | null;
-  matchOf: "tournaments" | "leagues";
 }
 
 export interface TableHeadProps {

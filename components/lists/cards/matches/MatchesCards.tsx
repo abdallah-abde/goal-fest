@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Match,
-  Group,
-  Team,
-  // KnockoutMatch,
-  // TournamentEdition,
-  // Tournament,
-  Country,
-  // LeagueMatch,
-  // LeagueGroup,
-  // LeagueTeam,
-  Season,
-  League,
-  // LeagueKnockoutMatch,
-} from "@prisma/client";
+import { Match, Group, Team, Country, Season, League } from "@prisma/client";
 
 import { useState } from "react";
 
@@ -31,41 +17,14 @@ import MatchesFilterDialog from "@/components/lists/cards/matches/MatchesFilterD
 import ListTitle from "@/components/lists/ListTitle";
 import PageHeader from "@/components/PageHeader";
 
-import { NeutralMatch } from "@/types";
 import { GroupByOptions } from "@/types/enums";
-
-import {
-  switchTournamentMatchesToNeutralMatches,
-  switchTournamentKnockoutMatchesToNeutralMatches,
-  switchLeagueMatchesToNeutralMatches,
-  switchLeagueKnockoutMatchesToNeutralMatches,
-} from "@/lib/data/switchers";
-import { sortMatches } from "@/lib/sortGroupTeams";
-
-// interface TournamentEditionProps extends TournamentEdition {
-//   tournament: Tournament;
-//   teams: Team[];
-//   groups: Group[];
-//   winner: Team | null;
-//   titleHolder: Team | null;
-//   hostingCountries: Country[];
-// }
-
-// interface KnockoutMatchProps extends KnockoutMatch {
-//   homeTeam: Team | null;
-//   awayTeam: Team | null;
-//   tournamentEdition: TournamentEditionProps;
-// }
+import { LeagueProps } from "@/types";
 
 interface MatchProps extends Match {
   group: Group | null;
   homeTeam: Team | null;
   awayTeam: Team | null;
   season: SeasonProps;
-}
-
-interface LeagueProps extends League {
-  country: Country | null;
 }
 
 interface SeasonProps extends Season {
@@ -76,52 +35,19 @@ interface SeasonProps extends Season {
   titleHolder: Team | null;
 }
 
-// interface LeagueMatchProps extends LeagueMatch {
-//   group: LeagueGroup | null;
-//   homeTeam: LeagueTeam;
-//   awayTeam: LeagueTeam;
-//   season: LeagueSeasonProps;
-// }
-
-// interface LeagueKnockoutMatchProps extends LeagueKnockoutMatch {
-//   homeTeam: LeagueTeam | null;
-//   awayTeam: LeagueTeam | null;
-//   season: LeagueSeasonProps;
-// }
-
 export default function MatchesCards({
   season,
   matches,
-  // knockoutMatches,
   rounds,
-}: // type,
-{
+}: {
   season: SeasonProps;
   matches: MatchProps[];
-  // knockoutMatches: KnockoutMatchProps[] | LeagueKnockoutMatchProps[];
   rounds: string[];
-  // type: "tournaments" | "leagues";
 }) {
-  // const allMatches: NeutralMatch[] =
-  //   type === "tournaments"
-  //     ? switchTournamentMatchesToNeutralMatches(matches as MatchProps[]).concat(
-  //         switchTournamentKnockoutMatchesToNeutralMatches(
-  //           knockoutMatches as KnockoutMatchProps[]
-  //         )
-  //       )
-  //     : switchLeagueMatchesToNeutralMatches(
-  //         matches as LeagueMatchProps[]
-  //       ).concat(
-  //         switchLeagueKnockoutMatchesToNeutralMatches(
-  //           knockoutMatches as LeagueKnockoutMatchProps[]
-  //         )
-  //       );
-
   const [groupBy, setGroupBy] = useState<GroupByOptions>(
     GroupByOptions.ONLYDATE
   );
   const results = Object.entries(
-    // _.groupBy(matches.sort(sortMatches), groupBy)
     _.groupBy(
       matches,
       groupBy === GroupByOptions.ONLYDATE

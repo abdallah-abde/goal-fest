@@ -33,7 +33,7 @@ import Filters from "@/components/table-parts/Filters";
 import NotProvidedSpan from "@/components/NotProvidedSpan";
 import FieldSwitcher from "@/components/table-parts/FieldSwitcher";
 
-import LeagueTeamForm from "@/components/forms/LeagueTeamForm";
+import TeamForm from "@/components/forms/TeamForm";
 
 import { Country } from "@prisma/client";
 import { Pencil, Plus } from "lucide-react";
@@ -128,10 +128,9 @@ export default async function DashboardLeagueTeamsPage({
   });
 
   const sortingList = [
-    { label: "Country", fieldName: "country" },
     { label: "Continent", fieldName: "continent" },
+    { label: "Country", fieldName: "country" },
     { label: "Name", fieldName: "name" },
-    { label: "Type", fieldName: "type" },
     { label: "Code", fieldName: "code" },
     {
       label: "Is Popular",
@@ -208,7 +207,7 @@ export default async function DashboardLeagueTeamsPage({
 
   return (
     <>
-      <PageHeader label="League Teams List" />
+      <PageHeader label="Teams List" />
       <div className="dashboard-search-and-add">
         <SortByList list={sortingList} defaultField="name" />
         <Filters
@@ -261,8 +260,9 @@ export default async function DashboardLeagueTeamsPage({
                         <TooltipTrigger>
                           <FieldSwitcher
                             id={id}
-                            type="leagueTeams"
+                            type="teams"
                             value={isPopular}
+                            field="isPopular"
                           />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -277,8 +277,9 @@ export default async function DashboardLeagueTeamsPage({
                         <TooltipTrigger>
                           <FieldSwitcher
                             id={id}
-                            type="leagueTeams"
+                            type="teams"
                             value={isClub}
+                            field="isClub"
                           />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -332,7 +333,7 @@ async function FormDialog({ id }: { id: number | null }) {
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueTeamForm team={team} />
+        <TeamForm team={team} />
       </DialogContent>
     </Dialog>
   );

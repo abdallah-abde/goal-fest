@@ -59,7 +59,7 @@ export default function CountriesMatches({ date }: { date: string }) {
 
   return (
     <div className="space-y-2 pb-24">
-      <PartsTitle title={`League's and Tournament's Matches By Countries`} />
+      <PartsTitle title={`League's Matches By Countries`} />
       <Accordion type="single" collapsible className="bg-primary/10">
         {results.map(([country, list], idx) => {
           const {

@@ -18,7 +18,7 @@ import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { X } from "lucide-react";
 
-import { updateLeagueMatchScore } from "@/actions/leagueMatches";
+import { updateMatchScore } from "@/actions/matches";
 
 export default function PopoverMatchScoreUpdator({
   id,
@@ -58,7 +58,7 @@ export default function PopoverMatchScoreUpdator({
   const searchParams = useSearchParams();
 
   const [formState, formAction] = useFormState(
-    updateLeagueMatchScore.bind(null, id),
+    updateMatchScore.bind(null, id),
     { errors: undefined, success: false, customError: null }
   );
 

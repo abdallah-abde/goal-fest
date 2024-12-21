@@ -26,7 +26,7 @@ export default function CategorizedMatchesByLeagues({
       collapsible
       className="bg-primary/15 first:border-t-2 border-primary/50"
     >
-      {results.map(([tournamentName, list], idx) => {
+      {results.map(([leagueName, list], idx) => {
         const {
           season: {
             slug,
@@ -37,7 +37,7 @@ export default function CategorizedMatchesByLeagues({
         } = list[0];
 
         return (
-          <AccordionItem key={idx} value={tournamentName}>
+          <AccordionItem key={idx} value={leagueName}>
             <AccordionTrigger className="px-4 pl-6 hover:no-underline">
               <div className="flex items-center gap-2">
                 <div>

@@ -13,12 +13,12 @@ import TeamsStats from "@/components/lists/cards/stats/TeamsStats";
 import InfoCard from "@/components/lists/cards/edition-info-cards/SingleInfoCard";
 import NextMatches from "@/components/lists/cards/matches/NextMatches";
 import TeamOrCountryCard from "@/components/lists/cards/edition-info-cards/TeamOrCountryCard";
+import { LeagueProps } from "@/types";
 
 interface MatchProps extends Match {
   group: Group | null;
   homeTeam: Team | null;
   awayTeam: Team | null;
-  // season: SeasonProps;
 }
 
 interface SeasonProps extends Season {
@@ -29,10 +29,6 @@ interface SeasonProps extends Season {
   titleHolder: Team | null;
   matches: MatchProps[];
   hostingCountries: Country[];
-}
-
-interface LeagueProps extends League {
-  country: Country | null;
 }
 
 export default function InfoCards({
@@ -49,59 +45,6 @@ export default function InfoCards({
   const { year, teams, currentStage, titleHolder, winner, matches } = season;
 
   let counter = 0;
-
-  // const allMatches: NeutralMatch[] =
-  //   type === "tournaments"
-  //     ? switchTournamentMatchesToNeutralMatches(
-  //         (matches as MatchProps[]).filter((a) => {
-  //           if (
-  //             a.date &&
-  //             a.date > new Date("July 05, 2024 21:00:00") &&
-  //             counter < 3
-  //           ) {
-  //             counter++;
-  //             return a;
-  //           }
-  //         })
-  //       ).concat(
-  //         switchTournamentKnockoutMatchesToNeutralMatches(
-  //           (knockoutMatches as KnockoutMatchProps[]).filter((a) => {
-  //             if (
-  //               a.date &&
-  //               a.date > new Date("July 05, 2024 21:00:00") &&
-  //               counter < 3
-  //             ) {
-  //               counter++;
-  //               return a;
-  //             }
-  //           })
-  //         )
-  //       )
-  //     : switchLeagueMatchesToNeutralMatches(
-  //         (matches as LeagueMatchProps[]).filter((a) => {
-  //           if (
-  //             a.date &&
-  //             a.date > new Date("July 05, 2024 21:00:00") &&
-  //             counter < 3
-  //           ) {
-  //             counter++;
-  //             return a;
-  //           }
-  //         })
-  //       ).concat(
-  //         switchLeagueKnockoutMatchesToNeutralMatches(
-  //           (knockoutMatches as LeagueKnockoutMatchProps[]).filter((a) => {
-  //             if (
-  //               a.date &&
-  //               a.date > new Date("July 05, 2024 21:00:00") &&
-  //               counter < 3
-  //             ) {
-  //               counter++;
-  //               return a;
-  //             }
-  //           })
-  //         )
-  //       );
 
   return (
     <>

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 
 import { Group, Team, League, Season, Country } from "@prisma/client";
 
-import { addLeagueGroup, updateLeagueGroup } from "@/actions/leagueGroups";
+import { addGroup, updateGroup } from "@/actions/groups";
 
 import PageHeader from "@/components/PageHeader";
 import { MultipleSelectorLoadingIndicator } from "@/components/Skeletons";
@@ -25,11 +25,8 @@ import MultipleSelector, {
   Option,
 } from "@/components/ui/multiple-selector";
 
-import {
-  searchLeague,
-  searchSeason,
-  searchSeasonTeam,
-} from "@/lib/api-functions";
+import { searchLeague, searchSeason } from "@/lib/api-functions";
+import { LeagueProps } from "@/types";
 
 interface GroupProps extends Group {
   season: SeasonProps;
@@ -44,19 +41,11 @@ interface SeasonProps extends Season {
   league: LeagueProps;
 }
 
-interface LeagueProps extends League {
-  country: Country | null;
-}
-
-export default function LeagueGroupForm({
-  group,
-}: {
-  group?: GroupProps | null;
-}) {
+export default function GroupForm({ group }: { group?: GroupProps | null }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [formState, formAction] = useFormState(
-    group == null ? addLeagueGroup : updateLeagueGroup.bind(null, group.id),
+    group == null ? addGroup : updateGroup.bind(null, group.id),
     { errors: undefined, success: false, customError: null }
   );
 
@@ -102,8 +91,8 @@ export default function LeagueGroupForm({
       ? [
           {
             dbValue: group.seasonId.toString(),
-            label: `${group.season.league.name} ${group.season.year}`,
-            value: `${group.season.league.name} ${group.season.year}`,
+            label: `${group.season.league.name} (${group.season.year})`,
+            value: `${group.season.league.name} (${group.season.year})`,
           },
         ]
       : []
@@ -117,9 +106,9 @@ export default function LeagueGroupForm({
 
   const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
-  const [league, setLeague] = useState<League | null>(null);
+  // const [league, setLeague] = useState<League | null>(null);
 
-  const [isLeagueLoading, setIsLeagueLoading] = useState(false);
+  // const [isLeagueLoading, setIsLeagueLoading] = useState(false);
 
   useEffect(() => {
     async function getTeams() {
@@ -138,22 +127,22 @@ export default function LeagueGroupForm({
       setIsTeamsLoading(false);
     }
 
-    async function getLeague() {
-      setIsLeagueLoading(true);
+    // async function getLeague() {
+    //   setIsLeagueLoading(true);
 
-      if (selectedLeague.length > 0) {
-        const res = await fetch("/api/league/" + selectedLeague[0].dbValue);
-        const data = await res.json();
+    //   if (selectedLeague.length > 0) {
+    //     const res = await fetch("/api/league/" + selectedLeague[0].dbValue);
+    //     const data = await res.json();
 
-        setLeague(data);
-      } else {
-        setLeague(null);
-      }
-      setIsLeagueLoading(false);
-    }
+    //     setLeague(data);
+    //   } else {
+    //     setLeague(null);
+    //   }
+    //   setIsLeagueLoading(false);
+    // }
 
     getTeams();
-    getLeague();
+    // getLeague();
   }, [selectedSeason]);
 
   const teamsRef = useRef<MultipleSelectorRef>(null);
@@ -163,8 +152,8 @@ export default function LeagueGroupForm({
     group
       ? group.teams.map((a) => {
           return {
-            label: `${a.name} (${a.continent})`,
-            value: `${a.name} (${a.continent})`,
+            label: `${a.name} (${a.isClub ? a.country?.name : a.continent})`,
+            value: `${a.name} (${a.isClub ? a.country?.name : a.continent})`,
             dbValue: a.id.toString(),
           };
         })
@@ -302,8 +291,7 @@ export default function LeagueGroupForm({
           isDisabled={
             selectedLeague.length === 0 ||
             selectedSeason.length === 0 ||
-            isTeamsLoading ||
-            isLeagueLoading
+            isTeamsLoading
           }
         />
       </form>

@@ -5,7 +5,6 @@ import {
   authRoutes,
   apiPrefix,
   DEFAULT_LOGIN_REDIRECT,
-  tournamentsPublicPrefix,
   leaguesPublicPrefix,
 } from "@/routes";
 
@@ -18,9 +17,6 @@ export default auth((req) => {
   const isAPIAuthRoute = nextUrl.pathname.startsWith(apiPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-  const isTournamentRoute = nextUrl.pathname.startsWith(
-    tournamentsPublicPrefix
-  );
   const isLeagueRoute = nextUrl.pathname.startsWith(leaguesPublicPrefix);
 
   if (isAPIAuthRoute) return null;
@@ -32,7 +28,7 @@ export default auth((req) => {
     return null;
   }
 
-  if (!isLoggedIn && !isPublicRoute && !isTournamentRoute && !isLeagueRoute) {
+  if (!isLoggedIn && !isPublicRoute && !isLeagueRoute) {
     return Response.redirect(new URL("/auth/login", nextUrl));
   }
 

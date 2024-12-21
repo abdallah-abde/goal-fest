@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import * as _ from "lodash";
 
-import { Team, KnockoutMatch, TournamentEdition } from "@prisma/client";
+import { Team, Match, Season } from "@prisma/client";
 
 import {
   Bracket,
@@ -18,8 +18,8 @@ import {
 
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 
-interface KnockoutMatchProps extends KnockoutMatch {
-  tournamentEdition: TournamentEdition;
+interface MatchProps extends Match {
+  season: Season;
   homeTeam: Team | null;
   awayTeam: Team | null;
 }
@@ -27,7 +27,7 @@ interface KnockoutMatchProps extends KnockoutMatch {
 export default function KnockoutBrackets({
   matches,
 }: {
-  matches: KnockoutMatchProps[];
+  matches: MatchProps[];
 }) {
   const results = Object.entries(_.groupBy(matches, "round"));
 
@@ -70,14 +70,14 @@ export default function KnockoutBrackets({
 
   return (
     <div>
-      <h2 className='text-center pb-4 font-bold'>Knockout Phase</h2>
+      <h2 className="text-center pb-4 font-bold">Knockout Phase</h2>
       <Bracket
         rounds={rounds}
         renderSeedComponent={SeedComponent}
-        bracketClassName='w-full'
+        bracketClassName="w-full"
         roundTitleComponent={(title: React.ReactNode, roundIndex: number) => {
           return (
-            <div className='text-[14px] text-center font-bold text-primary'>
+            <div className="text-[14px] text-center font-bold text-primary">
               {title}
             </div>
           );
@@ -90,14 +90,14 @@ export default function KnockoutBrackets({
 const SeedComponent = ({ seed }: IRenderSeedProps) => {
   return (
     <Seed style={{ width: "250px" }}>
-      <p className='pt-[2px] text-xs'>
+      <p className="pt-[2px] text-xs">
         {seed.time ? seed.time : "No Time Provided"}
       </p>
       <SeedItem style={{ backgroundColor: "#64748b" }}>
         {addSeedTeam(seed.teams[0])}
         {addSeedTeam(seed.teams[1])}
       </SeedItem>
-      <p className='pt-[2px] text-xs'>
+      <p className="pt-[2px] text-xs">
         {seed.date ? seed.date : "No Date Provided"}
       </p>
     </Seed>
@@ -107,7 +107,7 @@ const SeedComponent = ({ seed }: IRenderSeedProps) => {
 const addSeedTeam = (team: { [key: string]: any; name?: string }) => {
   return (
     <SeedTeam>
-      <div className='flex gap-2 items-center justify-center'>
+      <div className="flex gap-2 items-center justify-center">
         {team.flagUrl && (
           <Image
             src={team.flagUrl}
@@ -116,17 +116,17 @@ const addSeedTeam = (team: { [key: string]: any; name?: string }) => {
             alt={`${team.name} flag`}
           />
         )}
-        <p className='text-xs'>{team.name}</p>
+        <p className="text-xs">{team.name}</p>
       </div>
-      <div className='flex items-center justify-center gap-2'>
+      <div className="flex items-center justify-center gap-2">
         {(team.goals || team.goals === 0) && (
-          <p className='text-xs'>{`${team.goals}`}</p>
+          <p className="text-xs">{`${team.goals}`}</p>
         )}
         {(team.extraGoals || team.extraGoals === 0) && (
-          <p className='text-xs'>{`Ex(${team.extraGoals + team.goals})`}</p>
+          <p className="text-xs">{`Ex(${team.extraGoals + team.goals})`}</p>
         )}
         {(team.penaltyGoals || team.penaltyGoals === 0) && (
-          <p className='text-xs'>{`P(${team.penaltyGoals})`}</p>
+          <p className="text-xs">{`P(${team.penaltyGoals})`}</p>
         )}
       </div>
     </SeedTeam>

@@ -11,7 +11,7 @@ import { sortGroupTeams } from "@/lib/sortGroupTeams";
 
 import useGeoLocation from "@/hooks/useGeoLocation";
 
-import { TeamWithStats } from "@/types";
+import { TableHeadProps, TeamWithStats } from "@/types";
 
 import {
   Table,
@@ -29,11 +29,6 @@ import PartsLink from "@/components/home/PartsLink";
 import { LoadingSpinner } from "@/components/Skeletons";
 import { EmptyImageUrls } from "@/types/enums";
 
-interface TableHeadProps {
-  labels: Array<{ name: string; className?: string | null }>;
-  className: string;
-}
-
 interface SeasonProps {
   id: number;
   year: string;
@@ -50,8 +45,7 @@ interface SeasonProps {
 interface StandingProps {
   groupName: string | null;
   groupId: number | null;
-  tournamentOrLeagueId: number;
-  type: "leagues" | "tournaments";
+  seasonId: number;
   teams: TeamWithStats[];
 }
 
@@ -80,21 +74,12 @@ export default function Standings({
       setIsStandingsLoading(true);
       if (record) {
         try {
-          if (!record.league.isClubs) {
-            const res = await fetch(`/api/edition-standings/${record.slug}`);
-            const data = await res.json();
+          const res = await fetch(`/api/season-standings/${record.slug}`);
+          const data = await res.json();
 
-            setStandings(data);
+          setStandings(data);
 
-            setIsStandingsLoading(false);
-          } else {
-            const res = await fetch(`/api/season-standings/${record.slug}`);
-            const data = await res.json();
-
-            setStandings(data);
-
-            setIsStandingsLoading(false);
-          }
+          setIsStandingsLoading(false);
         } catch (error) {
           console.error(error);
           setIsStandingsLoading(false);
@@ -108,7 +93,7 @@ export default function Standings({
   }, [record]);
 
   useEffect(() => {
-    async function getTournamentsAndLeagues() {
+    async function getLeagues() {
       setIsLoading(true);
       try {
         const res = await fetch(`/api/seasons/${date}/${location?.country}`);
@@ -127,7 +112,7 @@ export default function Standings({
       }
     }
 
-    getTournamentsAndLeagues();
+    getLeagues();
   }, [date, location?.country]);
 
   if (isLoading || geoLocationLoading)
@@ -164,7 +149,7 @@ export default function Standings({
               standings.length > 0 &&
               standings.slice(0, 2).map((standing) => (
                 <Table
-                  key={standing.tournamentOrLeagueId}
+                  key={standing.seasonId}
                   className="dark:border-primary/10 border"
                 >
                   {standing.groupId !== null && (

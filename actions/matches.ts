@@ -3,11 +3,7 @@
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
-import {
-  LeagueMatchSchema,
-  MatchScoreSchema,
-  MatchStatusSchema,
-} from "@/schemas";
+import { MatchSchema, MatchScoreSchema, MatchStatusSchema } from "@/schemas";
 import { IsPopularOptions, MatchStatusOptions } from "@/types/enums";
 import { ZodError } from "zod";
 
@@ -50,12 +46,22 @@ interface ScoreReturnType {
   customError?: string | null;
 }
 
-export async function addLeagueMatch(
+interface StatusFields {
+  status?: string | null;
+}
+
+interface StatusReturnType {
+  errors: Record<keyof StatusFields, string | undefined> | undefined;
+  success: boolean;
+  customError?: string | null;
+}
+
+export async function addMatch(
   prevState: ReturnType,
   formData: FormData
 ): Promise<ReturnType> {
   try {
-    const result = LeagueMatchSchema.safeParse(
+    const result = MatchSchema.safeParse(
       Object.fromEntries(formData.entries())
     );
 
@@ -133,7 +139,7 @@ export async function addLeagueMatch(
       },
     });
 
-    revalidatePath("/dashboard/league-matches");
+    revalidatePath("/dashboard/matches");
     return { errors: undefined, success: true, customError: null };
   } catch (error) {
     const zodError = error as ZodError;
@@ -162,13 +168,13 @@ export async function addLeagueMatch(
   }
 }
 
-export async function updateLeagueMatch(
+export async function updateMatch(
   id: number,
   prevState: ReturnType,
   formData: FormData
 ): Promise<ReturnType> {
   try {
-    const result = LeagueMatchSchema.safeParse(
+    const result = MatchSchema.safeParse(
       Object.fromEntries(formData.entries())
     );
 
@@ -252,7 +258,7 @@ export async function updateLeagueMatch(
       },
     });
 
-    revalidatePath("/dashboard/league-matches");
+    revalidatePath("/dashboard/matches");
     return { errors: undefined, success: true, customError: null };
   } catch (error) {
     const zodError = error as ZodError;
@@ -281,7 +287,7 @@ export async function updateLeagueMatch(
   }
 }
 
-export async function updateLeagueMatchFeaturedStatus(
+export async function updateMatchFeaturedStatus(
   id: number,
   isFeatured: boolean
 ) {
@@ -299,13 +305,37 @@ export async function updateLeagueMatchFeaturedStatus(
       },
     });
 
-    revalidatePath("/dashboard/league-matches");
+    revalidatePath("/dashboard/matches");
   } catch (error) {
     console.log(error);
   }
 }
 
-export async function updateLeagueMatchScore(
+export async function updateMatchKnockoutStatus(
+  id: number,
+  isKnockout: boolean
+) {
+  try {
+    const currentMatch = await prisma.match.findUnique({
+      where: { id },
+    });
+
+    if (currentMatch == null) return notFound();
+
+    await prisma.match.update({
+      where: { id },
+      data: {
+        isKnockout: !isKnockout,
+      },
+    });
+
+    revalidatePath("/dashboard/matches");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateMatchScore(
   id: number,
   prevState: ScoreReturnType,
   formData: FormData
@@ -357,7 +387,7 @@ export async function updateLeagueMatchScore(
       },
     });
 
-    revalidatePath("/dashboard/league-matches");
+    revalidatePath("/dashboard/matches");
     return { errors: undefined, success: true, customError: null };
   } catch (error) {
     const zodError = error as ZodError;
@@ -377,20 +407,22 @@ export async function updateLeagueMatchScore(
   }
 }
 
-export async function updateLeagueMatchStatus(
-  args: { id: number },
+export async function updateMatchStatus(
+  id: number,
   prevState: unknown,
   formData: FormData
-) {
+): Promise<StatusReturnType> {
   try {
-    const { id } = args;
-
     const result = MatchStatusSchema.safeParse(
       Object.fromEntries(formData.entries())
     );
 
     if (result.success === false) {
-      return result.error.formErrors.fieldErrors;
+      const errors: Record<keyof StatusFields, string | undefined> = {
+        status: result.error.formErrors.fieldErrors.status?.[0],
+      };
+
+      return { errors, success: false, customError: null };
     }
 
     const data = result.data;
@@ -408,8 +440,17 @@ export async function updateLeagueMatchStatus(
       },
     });
 
-    revalidatePath("/dashboard/league-matches");
+    revalidatePath("/dashboard/matches");
+    return { errors: undefined, success: true, customError: null };
   } catch (error) {
-    console.log(error);
+    const zodError = error as ZodError;
+    const errorMap = zodError.flatten().fieldErrors;
+    return {
+      success: false,
+      customError: null,
+      errors: {
+        status: errorMap["status"]?.[0],
+      },
+    };
   }
 }

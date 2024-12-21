@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormState } from "react-dom";
-import { useSearchParams } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -22,32 +21,19 @@ import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { LeagueStages } from "@/types/enums";
 
-import { updateTournamentEditionCurrentStage } from "@/actions/editions";
-import { updateLeagueSeasonCurrentStage } from "@/actions/seasons";
+import { updateSeasonCurrentStage } from "@/actions/seasons";
 
 export default function PopoverStageUpdator({
   id,
   stage,
-  type,
   children,
 }: {
   id: number;
-  type: "tournaments" | "leagues";
   stage?: string | null;
   children: React.ReactNode;
 }) {
-  const searchParams = useSearchParams();
-
-  const [error, action] = useFormState(
-    type === "tournaments"
-      ? updateTournamentEditionCurrentStage.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        })
-      : updateLeagueSeasonCurrentStage.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        }),
+  const [formState, formAction] = useFormState(
+    updateSeasonCurrentStage.bind(null, id),
     null
   );
 
@@ -59,7 +45,7 @@ export default function PopoverStageUpdator({
           <h4 className="font-medium leading-none text-center border-b pb-4">
             Update Stage
           </h4>
-          <form action={action} className="flex flex-col gap-4">
+          <form action={formAction} className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <Label htmlFor="currentStage">Stage</Label>
 
@@ -68,16 +54,14 @@ export default function PopoverStageUpdator({
                   <SelectValue placeholder="Choose Stage" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(
-                    type === "tournaments" ? LeagueStages : LeagueStages
-                  ).map((opt) => (
+                  {Object.values(LeagueStages).map((opt) => (
                     <SelectItem value={opt} key={opt}>
                       {opt}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <FormFieldError error={error?.currentStage} />
+              <FormFieldError error={formState?.errors?.currentStage} />
             </div>
 
             <SubmitButton />

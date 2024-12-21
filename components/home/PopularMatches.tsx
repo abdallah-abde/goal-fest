@@ -57,8 +57,8 @@ export default function PopularMatches({ date }: { date: string }) {
 
   return (
     <div className="space-y-2">
-      {/* popular League and tournament matches separated by leagues and tournaments, and filtered by date and country */}
-      <PartsTitle title={`Popular League's and Tournament's Matches`} />
+      {/* popular League matches separated by leagues and filtered by date and country */}
+      <PartsTitle title={`Popular League's Matches`} />
       <div className="space-y-2">
         {results.map(([leagueName, list], idx) => {
           const {

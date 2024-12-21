@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { LeagueSchema } from "@/schemas";
 import { ZodError } from "zod";
-import { IsPopularOptions, LeagueTypes } from "@/types/enums";
+import { ImagesFolders, IsPopularOptions, LeagueTypes } from "@/types/enums";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
 
 interface Fields {
@@ -57,7 +57,10 @@ export async function addLeague(
       };
     }
 
-    const flagUrlPath = await writeImageFile(data.flagUrl, "tournaments");
+    const flagUrlPath = await writeImageFile(
+      data.flagUrl,
+      ImagesFolders.Leagues
+    );
 
     await prisma.league.create({
       data: {
@@ -132,7 +135,7 @@ export async function updateLeague(
 
     const flagUrlPath = await deleteAndWriteImageFile(
       data.flagUrl,
-      "tournaments",
+      ImagesFolders.Leagues,
       league.flagUrl
     );
 
@@ -185,6 +188,51 @@ export async function updateLeaguePopularStatus(
       where: { id },
       data: {
         isPopular: !isPopular,
+      },
+    });
+
+    revalidatePath("/dashboard/leagues");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateLeagueIsClubsStatus(id: number, isClubs: boolean) {
+  try {
+    const currentLeague = await prisma.league.findUnique({
+      where: { id },
+    });
+
+    if (currentLeague == null) return notFound();
+
+    await prisma.league.update({
+      where: { id },
+      data: {
+        isClubs: !isClubs,
+      },
+    });
+
+    revalidatePath("/dashboard/leagues");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateLeagueIsDomesticStatus(
+  id: number,
+  isDomestic: boolean
+) {
+  try {
+    const currentLeague = await prisma.league.findUnique({
+      where: { id },
+    });
+
+    if (currentLeague == null) return notFound();
+
+    await prisma.league.update({
+      where: { id },
+      data: {
+        isDomestic: !isDomestic,
       },
     });
 

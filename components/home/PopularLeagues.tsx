@@ -40,7 +40,7 @@ export default async function PopularLeagues() {
 
   return (
     <div className="space-y-2">
-      <PartsTitle title="Popular Tournaments and Leagues" />
+      <PartsTitle title="Popular Leagues" />
       <div className="bg-primary/10">
         <div className="flex flex-col items-start justify-center">
           {leagues.map(
@@ -53,7 +53,7 @@ export default async function PopularLeagues() {
               idx
             ) => (
               // <Link key={idx} href={`/${type}/${slug}/info`} className="w-full">
-              <Link key={idx} href={`#`} className="w-full">
+              <Link key={idx} href={`/leagues/${slug}/info`} className="w-full">
                 <div className="w-full flex gap-4 items-center px-4 py-2 border-b border-primary/20 hover:bg-primary/20 transition duration-300">
                   <Image
                     width={25}

@@ -215,7 +215,7 @@ export default function Filters({
           </TooltipProvider>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="overflow-auto w-[640px]">
+      <PopoverContent className="overflow-auto w-[960px]">
         <p className="text-muted-foreground pb-1">Filters</p>
         <div className="flex justify-center items-stretch gap-2 flex-wrap *:w-[280px]">
           {flagFilters.length > 0 &&

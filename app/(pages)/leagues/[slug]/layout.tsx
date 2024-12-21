@@ -25,7 +25,7 @@ export default async function LeaguesLayout({
           name={
             season?.flagUrl
               ? `${season?.league?.name} ${season?.year}`
-              : "Tournament Logo"
+              : "League Logo"
           }
         />
       )}

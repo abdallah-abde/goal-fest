@@ -36,7 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 .env
-/public/images/tournaments
+/public/images/leagues
 /public/images/teams
 /public/images/countries
 /prisma/dev.db

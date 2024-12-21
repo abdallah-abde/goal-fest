@@ -8,16 +8,13 @@ import PageHeader from "@/components/PageHeader";
 
 import { Badge } from "@/components/ui/badge";
 import { EmptyImageUrls } from "@/types/enums";
+import { LeagueProps } from "@/types";
 
 interface SeasonProps extends Season {
   league: LeagueProps;
   winner: Team | null;
   titleHolder: Team | null;
   hostingCountries: Country[];
-}
-
-interface LeagueProps extends League {
-  country: Country | null;
 }
 
 export default async function LeaguesHistory({

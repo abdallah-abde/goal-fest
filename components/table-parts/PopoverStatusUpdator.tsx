@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormState } from "react-dom";
-import { useSearchParams } from "next/navigation";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -22,48 +21,19 @@ import FormFieldError from "@/components/forms/parts/FormFieldError";
 
 import { MatchStatusOptions } from "@/types/enums";
 
-import { updateGroupMatchStatus } from "@/actions/groupMatches";
-import { updateKnockoutMatchStatus } from "@/actions/knockoutMatches";
-import { updateLeagueMatchStatus } from "@/actions/leagueMatches";
-import { updateLeagueKnockoutMatchStatus } from "@/actions/leagueKnockoutMatches";
+import { updateMatchStatus } from "@/actions/matches";
 
 export default function PopoverStatusUpdator({
   id,
   status,
-  type,
   children,
 }: {
   id: number;
   status?: string | null;
-  type:
-    | "matches"
-    | "knockoutMatches"
-    | "leagueMatches"
-    | "leagueKnockoutMatches";
   children: React.ReactNode;
 }) {
-  const searchParams = useSearchParams();
-
-  const [error, action] = useFormState(
-    type === "matches"
-      ? updateGroupMatchStatus.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        })
-      : type === "knockoutMatches"
-      ? updateKnockoutMatchStatus.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        })
-      : type === "leagueMatches"
-      ? updateLeagueMatchStatus.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        })
-      : updateLeagueKnockoutMatchStatus.bind(null, {
-          id,
-          searchParams: searchParams.toString(),
-        }),
+  const [formState, formAction] = useFormState(
+    updateMatchStatus.bind(null, id),
     null
   );
 
@@ -75,7 +45,7 @@ export default function PopoverStatusUpdator({
           <h4 className="font-medium leading-none text-center border-b pb-4">
             Update Status
           </h4>
-          <form action={action} className="flex flex-col gap-4">
+          <form action={formAction} className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <Label htmlFor="status">Status</Label>
               <Select name="status" defaultValue={status || ""}>
@@ -90,7 +60,7 @@ export default function PopoverStatusUpdator({
                   ))}
                 </SelectContent>
               </Select>
-              <FormFieldError error={error?.status} />
+              <FormFieldError error={formState?.errors?.status} />
             </div>
             <SubmitButton />
           </form>

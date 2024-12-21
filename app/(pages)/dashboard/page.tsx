@@ -29,14 +29,6 @@ export default async function DashboardPage() {
           </Card>
         </Link>
         <Link
-          href="/dashboard/tournaments"
-          className="hover:bg-primary/20 transition duration-300"
-        >
-          <Card className="bg-transparent border-0 shadow-none">
-            <CardTitle>Tournaments</CardTitle>
-          </Card>
-        </Link>
-        <Link
           href="/dashboard/leagues"
           className="hover:bg-primary/20 transition duration-300"
         >

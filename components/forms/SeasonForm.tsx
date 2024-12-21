@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 
 import { Season, League, Team, Country } from "@prisma/client";
 
-import { addLeagueSeason, updateLeagueSeason } from "@/actions/seasons";
+import { addSeason, updateSeason } from "@/actions/seasons";
 
 import PageHeader from "@/components/PageHeader";
 import {
@@ -31,11 +31,11 @@ import MultipleSelector, {
 } from "@/components/ui/multiple-selector";
 
 import {
-  searchCountry,
   searchLeague,
   searchLeagueCountry,
   searchLeagueTeam,
 } from "@/lib/api-functions";
+import { LeagueProps } from "@/types";
 
 interface SeasonProps extends Season {
   league: LeagueProps;
@@ -49,10 +49,6 @@ interface TeamProps extends Team {
   country: Country | null;
 }
 
-interface LeagueProps extends League {
-  country: Country | null;
-}
-
 export default function SeasonForm({
   season,
 }: {
@@ -61,7 +57,7 @@ export default function SeasonForm({
   const formRef = useRef<HTMLFormElement>(null);
 
   const [formState, formAction] = useFormState(
-    season == null ? addLeagueSeason : updateLeagueSeason.bind(null, season.id),
+    season == null ? addSeason : updateSeason.bind(null, season.id),
     { errors: undefined, success: false, customError: null }
   );
 
@@ -107,30 +103,30 @@ export default function SeasonForm({
   const [winnerKey, setWinnerKey] = useState(+new Date());
   const [titleHolderKey, setTitleHolderKey] = useState(+new Date());
 
-  const [teams, setTeams] = useState<Team[] | null>(null);
+  // const [teams, setTeams] = useState<Team[] | null>(null);
 
-  const [isTeamsLoading, setIsTeamsLoading] = useState(false);
+  // const [isTeamsLoading, setIsTeamsLoading] = useState(false);
 
   const [league, setLeague] = useState<League | null>(null);
 
   const [isLeagueLoading, setIsLeagueLoading] = useState(false);
 
   useEffect(() => {
-    async function getTeams() {
-      setIsTeamsLoading(true);
+    // async function getTeams() {
+    //   setIsTeamsLoading(true);
 
-      if (selectedLeague.length > 0) {
-        const res = await fetch(
-          "/api/league-country-teams/" + selectedLeague[0].dbValue
-        );
-        const data = await res.json();
+    //   if (selectedLeague.length > 0) {
+    //     const res = await fetch(
+    //       "/api/league-country-teams/" + selectedLeague[0].dbValue
+    //     );
+    //     const data = await res.json();
 
-        setTeams(data);
-      } else {
-        setTeams([]);
-      }
-      setIsTeamsLoading(false);
-    }
+    //     setTeams(data);
+    //   } else {
+    //     setTeams([]);
+    //   }
+    //   setIsTeamsLoading(false);
+    // }
 
     async function getLeague() {
       setIsLeagueLoading(true);
@@ -146,7 +142,7 @@ export default function SeasonForm({
       setIsLeagueLoading(false);
     }
 
-    getTeams();
+    // getTeams();
     getLeague();
   }, [selectedLeague]);
 
@@ -155,49 +151,49 @@ export default function SeasonForm({
 
   const [selectedTeams, setSelectedTeams] = useState<Option[]>(
     season
-      ? season.teams.map(({ id, name, country, continent }) => {
+      ? season.teams.map(({ id, name, country, continent, isClub }) => {
           return {
-            label: `${name} (${continent})`,
-            value: `${name} (${continent})`,
+            label: `${name} (${isClub ? country?.name : continent})`,
+            value: `${name} (${isClub ? country?.name : continent})`,
             dbValue: id.toString(),
           };
         })
       : []
   );
 
-  const [countries, setCountries] = useState<Country[] | null>(null);
+  // const [countries, setCountries] = useState<Country[] | null>(null);
 
-  const [isCountriesLoading, setIsCountriesLoading] = useState(false);
+  // const [isCountriesLoading, setIsCountriesLoading] = useState(false);
 
-  useEffect(() => {
-    async function getCountries() {
-      setIsCountriesLoading(true);
+  // useEffect(() => {
+  //   async function getCountries() {
+  //     setIsCountriesLoading(true);
 
-      if (selectedLeague.length > 0) {
-        const res = await fetch(
-          "/api/season-countries/" + selectedLeague[0].dbValue
-        );
-        const data = await res.json();
+  //     if (selectedLeague.length > 0) {
+  //       const res = await fetch(
+  //         "/api/season-countries/" + selectedLeague[0].dbValue
+  //       );
+  //       const data = await res.json();
 
-        setCountries(data);
-      } else {
-        setCountries([]);
-      }
-      setIsCountriesLoading(false);
-    }
+  //       setCountries(data);
+  //     } else {
+  //       setCountries([]);
+  //     }
+  //     setIsCountriesLoading(false);
+  //   }
 
-    getCountries();
-  }, [selectedLeague]);
+  //   getCountries();
+  // }, [selectedLeague]);
 
   const countriesRef = useRef<MultipleSelectorRef>(null);
   const [countriesKey, setCountriesKey] = useState(+new Date());
 
   const [selectedCountries, setSelectedCountries] = useState<Option[]>(
     season
-      ? season.hostingCountries.map(({ id, name }) => {
+      ? season.hostingCountries.map(({ id, name, continent }) => {
           return {
-            label: name,
-            value: name,
+            label: `${name} (${continent})`,
+            value: `${name} (${continent})`,
             dbValue: id.toString(),
           };
         })
@@ -537,8 +533,8 @@ export default function SeasonForm({
         <SubmitButton
           isDisabled={
             selectedLeague.length === 0 ||
-            isTeamsLoading ||
-            isCountriesLoading ||
+            // isTeamsLoading ||
+            // isCountriesLoading ||
             isLeagueLoading
           }
         />

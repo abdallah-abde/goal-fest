@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { LegacyRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormState } from "react-dom";
 
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 
 import { Country, Team } from "@prisma/client";
 
-import { addLeagueTeam, updateLeagueTeam } from "@/actions/leagueTeams";
+import { addTeam, updateTeam } from "@/actions/teams";
 
 import PageHeader from "@/components/PageHeader";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
@@ -42,11 +42,11 @@ interface TeamProps extends Team {
   country: Country | null;
 }
 
-export default function LeagueTeamForm({ team }: { team?: TeamProps | null }) {
+export default function TeamForm({ team }: { team?: TeamProps | null }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [formState, formAction] = useFormState(
-    team == null ? addLeagueTeam : updateLeagueTeam.bind(null, team.id),
+    team == null ? addTeam : updateTeam.bind(null, team.id),
     { errors: undefined, success: false, customError: null }
   );
 

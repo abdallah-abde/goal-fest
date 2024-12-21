@@ -1,5 +1,4 @@
 export const publicRoutes = ["/", "/auth/new-verification"];
-export const tournamentsPublicPrefix = "/tournaments";
 export const leaguesPublicPrefix = "/leagues";
 
 export const authRoutes = [

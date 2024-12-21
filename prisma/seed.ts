@@ -4,11 +4,28 @@ import {
   LeagueStages,
   LeagueTypes,
   MatchStatusOptions,
-  LeagueStages,
-  TournamentTypes,
 } from "@/types/enums";
 
 async function main() {
+  const germayCountry = await prisma.country.create({
+    data: {
+      name: "Germany",
+      code: "GER",
+      flagUrl:
+        "/images/countries/91c80dec-81de-472f-9829-76f9ba38191c-germany (1).png",
+      continent: Continents.Europe,
+    },
+  });
+
+  const europeCountry = await prisma.country.create({
+    data: {
+      name: "Europe",
+      code: null,
+      flagUrl: null,
+      continent: Continents.Europe,
+    },
+  });
+
   const teams = await prisma.team.createMany({
     data: [
       {
@@ -16,166 +33,190 @@ async function main() {
         code: "GER",
         flagUrl:
           "/images/teams/d87feb39-e41a-4237-9ee0-7749ef89d50e-germany (1).png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Switzerland",
         code: "SUI",
         flagUrl:
           "/images/teams/f3d63190-f1fe-4f54-b153-110eb0b005d8-switzerland.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Hungary",
         code: "HUN",
         flagUrl:
           "/images/teams/d2d2056b-2b97-4e54-83b9-934b10637525-hungary.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Scotland",
         code: "SCO",
         flagUrl:
           "/images/teams/f7e71cf5-a49b-4b01-90fa-396c8ad40ce3-scotland.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Spain",
         code: "ESP",
         flagUrl:
           "/images/teams/33e87f35-f778-4f29-ad5c-ecaa8c316745-flag (1).png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Italy",
         code: "ITA",
         flagUrl: "/images/teams/08434f97-7fbb-4153-915c-5c587077b837-italy.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Croatia",
         code: "CRO",
         flagUrl:
           "/images/teams/c1eb3bd5-a5d2-4b83-9359-22b9438d5b81-croatia.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Albania",
         code: "ALB",
         flagUrl:
           "/images/teams/b3ac1eb0-e1b4-4025-b0be-eff4c29a6233-albania.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "England",
         code: "ENG",
         flagUrl:
           "/images/teams/d9d3ffa7-0c19-4606-bb97-78e5146626da-flag (2).png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Denmark",
         code: "DEN",
         flagUrl:
           "/images/teams/b98ac3b0-ba2a-48aa-8f97-14959fa59b98-denmark.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Slovenia",
         code: "SVN",
         flagUrl:
           "/images/teams/63518901-ca68-4ad6-866a-e4001870b886-flag (1).png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Serbia",
         code: "SRB",
         flagUrl:
           "/images/teams/446eb1af-77a5-40ae-8c33-992d007cf735-flag (2).png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Austria",
         code: "AUT",
         flagUrl:
           "/images/teams/73a3d555-6f01-451f-ab42-3ebd7586c1b4-austria.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "France",
         code: "FRA",
         flagUrl:
           "/images/teams/de153c75-acd3-42ea-ad98-ca40705c9139-france.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Netherlands",
         code: "NED",
         flagUrl: "/images/teams/f4b5ea04-5db6-498a-b2ab-e421455ec1e5-flag.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Poland",
         code: "POL",
         flagUrl:
           "/images/teams/6bc6d2bd-cfb6-49c9-ad04-8551c8cf26f2-poland.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Romania",
         code: "ROU",
         flagUrl:
           "/images/teams/f6167677-5a87-499b-bf69-17a42e109423-romania.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Belgium",
         code: "BEL",
         flagUrl:
           "/images/teams/a83cfe24-b578-4c6e-8ca6-607b10e376f3-belgium.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Slovakia",
         code: "SVK",
         flagUrl:
           "/images/teams/14366d44-6c0f-45f6-954e-34aabfdb50ab-slovakia.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Ukraine",
         code: "UKR",
         flagUrl:
           "/images/teams/0d123b32-3ef7-45f6-ae83-ef099a4a5958-ukraine.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Portugal",
         code: "POR",
         flagUrl:
           "/images/teams/391a6483-650e-47ab-9664-71a60c0a9794-portugal.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Turkiye",
         code: "TUR",
         flagUrl:
           "/images/teams/190bd4fd-23e8-496d-a21f-19e0cdb49a12-turkey.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Georgia",
         code: "GEO",
         flagUrl:
           "/images/teams/f902790b-b766-4df3-a82b-361081fb98df-georgia.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
       {
         name: "Czechia",
         code: "CZE",
         flagUrl:
           "/images/teams/2f89dc1c-badc-44be-aa97-d2b7a5be3fef-czech-republic.png",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        countryId: europeCountry.id,
       },
     ],
   });
@@ -215,31 +256,22 @@ async function main() {
   const portugal = await prisma.team.findFirst({ where: { name: "Portugal" } });
   const czechia = await prisma.team.findFirst({ where: { name: "Czechia" } });
 
-  const countries = await prisma.country.create({
-    data: {
-      name: "Germany",
-      code: "GER",
-      flagUrl:
-        "/images/countries/91c80dec-81de-472f-9829-76f9ba38191c-germany (1).png",
-      type: Continents.Europe,
-    },
-  });
-
-  const tournament = await prisma.tournament.create({
+  const euro2024Tournament = await prisma.league.create({
     data: {
       name: "Euro",
-      type: TournamentTypes.Europe,
+      continent: Continents.Europe,
       isPopular: true,
+      countryId: europeCountry.id,
     },
   });
 
-  const edition = await prisma.tournamentEdition.create({
+  const euro2024Edition = await prisma.season.create({
     data: {
       startYear: 2024,
       endYear: 2024,
       year: "2024",
-      currentStage: "Finished",
-      tournamentId: tournament.id,
+      currentStage: LeagueStages.Finished,
+      leagueId: euro2024Tournament.id,
       slug: "euro-1",
       winnerId: spain?.id,
       titleHolderId: italy?.id,
@@ -284,7 +316,7 @@ async function main() {
   const groupA = await prisma.group.create({
     data: {
       name: "Group A",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -302,7 +334,7 @@ async function main() {
   const groupB = await prisma.group.create({
     data: {
       name: "Group B",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -320,7 +352,7 @@ async function main() {
   const groupC = await prisma.group.create({
     data: {
       name: "Group C",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -338,7 +370,7 @@ async function main() {
   const groupD = await prisma.group.create({
     data: {
       name: "Group D",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -356,7 +388,7 @@ async function main() {
   const groupE = await prisma.group.create({
     data: {
       name: "Group E",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -374,7 +406,7 @@ async function main() {
   const groupF = await prisma.group.create({
     data: {
       name: "Group F",
-      tournamentEditionId: edition.id,
+      seasonId: euro2024Edition.id,
       teams: {
         connect: await prisma.team.findMany({
           where: {
@@ -390,12 +422,12 @@ async function main() {
     },
   });
 
-  const matches = await prisma.match.createMany({
+  const euro2024GroupMatches = await prisma.match.createMany({
     data: [
       {
         homeTeamId: germany ? germany.id : 0,
         awayTeamId: scotland ? scotland.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 14, 2024 21:00:00"),
         round: "Round 1",
@@ -406,7 +438,7 @@ async function main() {
       {
         homeTeamId: hungary ? hungary.id : 0,
         awayTeamId: switzerland ? switzerland.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 15, 2024 15:00:00"),
         round: "Round 1",
@@ -417,7 +449,7 @@ async function main() {
       {
         homeTeamId: spain ? spain.id : 0,
         awayTeamId: croatia ? croatia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 15, 2024 18:00:00"),
         round: "Round 1",
@@ -428,7 +460,7 @@ async function main() {
       {
         homeTeamId: italy ? italy.id : 0,
         awayTeamId: albania ? albania.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 15, 2024 21:00:00"),
         round: "Round 1",
@@ -439,7 +471,7 @@ async function main() {
       {
         homeTeamId: poland ? poland.id : 0,
         awayTeamId: netherlands ? netherlands.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 16, 2024 15:00:00"),
         round: "Round 1",
@@ -450,7 +482,7 @@ async function main() {
       {
         homeTeamId: slovenia ? slovenia.id : 0,
         awayTeamId: denmark ? denmark.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 16, 2024 18:00:00"),
         round: "Round 1",
@@ -461,7 +493,7 @@ async function main() {
       {
         homeTeamId: serbia ? serbia.id : 0,
         awayTeamId: england ? england.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 16, 2024 21:00:00"),
         round: "Round 1",
@@ -472,7 +504,7 @@ async function main() {
       {
         homeTeamId: romania ? romania.id : 0,
         awayTeamId: ukraine ? ukraine.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 17, 2024 15:00:00"),
         round: "Round 1",
@@ -483,7 +515,7 @@ async function main() {
       {
         homeTeamId: belgium ? belgium.id : 0,
         awayTeamId: slovakia ? slovakia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 17, 2024 18:00:00"),
         round: "Round 1",
@@ -494,7 +526,7 @@ async function main() {
       {
         homeTeamId: austria ? austria.id : 0,
         awayTeamId: france ? france.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 17, 2024 21:00:00"),
         round: "Round 1",
@@ -505,7 +537,7 @@ async function main() {
       {
         homeTeamId: turkiye ? turkiye.id : 0,
         awayTeamId: georgia ? georgia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 18, 2024 18:00:00"),
         round: "Round 1",
@@ -516,7 +548,7 @@ async function main() {
       {
         homeTeamId: portugal ? portugal.id : 0,
         awayTeamId: czechia ? czechia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 18, 2024 21:00:00"),
         round: "Round 1",
@@ -527,7 +559,7 @@ async function main() {
       {
         homeTeamId: croatia ? croatia.id : 0,
         awayTeamId: albania ? albania.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 19, 2024 15:00:00"),
         round: "Round 2",
@@ -538,7 +570,7 @@ async function main() {
       {
         homeTeamId: germany ? germany.id : 0,
         awayTeamId: hungary ? hungary.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 19, 2024 18:00:00"),
         round: "Round 2",
@@ -549,7 +581,7 @@ async function main() {
       {
         homeTeamId: scotland ? scotland.id : 0,
         awayTeamId: switzerland ? switzerland.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 19, 2024 21:00:00"),
         round: "Round 2",
@@ -560,7 +592,7 @@ async function main() {
       {
         homeTeamId: slovenia ? slovenia.id : 0,
         awayTeamId: serbia ? serbia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 20, 2024 15:00:00"),
         round: "Round 2",
@@ -571,7 +603,7 @@ async function main() {
       {
         homeTeamId: denmark ? denmark.id : 0,
         awayTeamId: england ? england.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 20, 2024 18:00:00"),
         round: "Round 2",
@@ -582,7 +614,7 @@ async function main() {
       {
         homeTeamId: spain ? spain.id : 0,
         awayTeamId: italy ? italy.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 20, 2024 21:00:00"),
         round: "Round 2",
@@ -593,7 +625,7 @@ async function main() {
       {
         homeTeamId: slovakia ? slovakia.id : 0,
         awayTeamId: ukraine ? ukraine.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 21, 2024 15:00:00"),
         round: "Round 2",
@@ -604,7 +636,7 @@ async function main() {
       {
         homeTeamId: poland ? poland.id : 0,
         awayTeamId: austria ? austria.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 21, 2024 18:00:00"),
         round: "Round 2",
@@ -615,7 +647,7 @@ async function main() {
       {
         homeTeamId: netherlands ? netherlands.id : 0,
         awayTeamId: france ? france.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 21, 2024 21:00:00"),
         round: "Round 2",
@@ -626,7 +658,7 @@ async function main() {
       {
         homeTeamId: georgia ? georgia.id : 0,
         awayTeamId: czechia ? czechia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 22, 2024 15:00:00"),
         round: "Round 2",
@@ -637,7 +669,7 @@ async function main() {
       {
         homeTeamId: turkiye ? turkiye.id : 0,
         awayTeamId: portugal ? portugal.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 22, 2024 18:00:00"),
         round: "Round 2",
@@ -648,7 +680,7 @@ async function main() {
       {
         homeTeamId: belgium ? belgium.id : 0,
         awayTeamId: romania ? romania.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 22, 2024 21:00:00"),
         round: "Round 2",
@@ -659,7 +691,7 @@ async function main() {
       {
         homeTeamId: switzerland ? switzerland.id : 0,
         awayTeamId: germany ? germany.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 23, 2024 21:00:00"),
         round: "Round 3",
@@ -670,7 +702,7 @@ async function main() {
       {
         homeTeamId: scotland ? scotland.id : 0,
         awayTeamId: hungary ? hungary.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupA ? groupA.id : 0,
         date: new Date("June 23, 2024 21:00:00"),
         round: "Round 3",
@@ -681,7 +713,7 @@ async function main() {
       {
         homeTeamId: albania ? albania.id : 0,
         awayTeamId: spain ? spain.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 24, 2024 21:00:00"),
         round: "Round 3",
@@ -692,7 +724,7 @@ async function main() {
       {
         homeTeamId: croatia ? croatia.id : 0,
         awayTeamId: italy ? italy.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupB ? groupB.id : 0,
         date: new Date("June 24, 2024 21:00:00"),
         round: "Round 3",
@@ -703,7 +735,7 @@ async function main() {
       {
         homeTeamId: netherlands ? netherlands.id : 0,
         awayTeamId: austria ? austria.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 25, 2024 18:00:00"),
         round: "Round 3",
@@ -714,7 +746,7 @@ async function main() {
       {
         homeTeamId: france ? france.id : 0,
         awayTeamId: poland ? poland.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupD ? groupD.id : 0,
         date: new Date("June 25, 2024 18:00:00"),
         round: "Round 3",
@@ -725,7 +757,7 @@ async function main() {
       {
         homeTeamId: england ? england.id : 0,
         awayTeamId: slovenia ? slovenia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 25, 2024 21:00:00"),
         round: "Round 3",
@@ -736,7 +768,7 @@ async function main() {
       {
         homeTeamId: denmark ? denmark.id : 0,
         awayTeamId: serbia ? serbia.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupC ? groupC.id : 0,
         date: new Date("June 25, 2024 21:00:00"),
         round: "Round 3",
@@ -747,7 +779,7 @@ async function main() {
       {
         homeTeamId: slovakia ? slovakia.id : 0,
         awayTeamId: romania ? romania.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 26, 2024 18:00:00"),
         round: "Round 3",
@@ -758,7 +790,7 @@ async function main() {
       {
         homeTeamId: ukraine ? ukraine.id : 0,
         awayTeamId: belgium ? belgium.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupE ? groupE.id : 0,
         date: new Date("June 26, 2024 18:00:00"),
         round: "Round 3",
@@ -769,7 +801,7 @@ async function main() {
       {
         homeTeamId: czechia ? czechia.id : 0,
         awayTeamId: turkiye ? turkiye.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 26, 2024 21:00:00"),
         round: "Round 3",
@@ -780,7 +812,7 @@ async function main() {
       {
         homeTeamId: georgia ? georgia.id : 0,
         awayTeamId: portugal ? portugal.id : 0,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         groupId: groupF ? groupF.id : 0,
         date: new Date("June 26, 2024 21:00:00"),
         round: "Round 3",
@@ -791,32 +823,34 @@ async function main() {
     ],
   });
 
-  const knockoutMatches = await prisma.knockoutMatch.createMany({
+  const euro2024KnockoutMatches = await prisma.match.createMany({
     data: [
       {
         homeTeamId: switzerland?.id,
         awayTeamId: italy?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("June 29, 2024 18:00:00"),
         round: "Round of 16",
         homeGoals: 2,
         awayGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: germany?.id,
         awayTeamId: denmark?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("June 29, 2024 21:00:00"),
         round: "Round of 16",
         homeGoals: 2,
         awayGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: england?.id,
         awayTeamId: slovakia?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("June 30, 2024 18:00:00"),
         round: "Round of 16",
         homeGoals: 1,
@@ -824,31 +858,34 @@ async function main() {
         homeExtraTimeGoals: 1,
         awayExtraTimeGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: spain?.id,
         awayTeamId: georgia?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("June 30, 2024 21:00:00"),
         round: "Round of 16",
         homeGoals: 4,
         awayGoals: 1,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: france?.id,
         awayTeamId: belgium?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 01, 2024 18:00:00"),
         round: "Round of 16",
         homeGoals: 1,
         awayGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: portugal?.id,
         awayTeamId: slovenia?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 01, 2024 21:00:00"),
         round: "Round of 16",
         homeGoals: 0,
@@ -858,31 +895,34 @@ async function main() {
         homePenaltyGoals: 3,
         awayPenaltyGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: romania?.id,
         awayTeamId: netherlands?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 02, 2024 18:00:00"),
         round: "Round of 16",
         homeGoals: 0,
         awayGoals: 3,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: austria?.id,
         awayTeamId: turkiye?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 02, 2024 21:00:00"),
         round: "Round of 16",
         homeGoals: 1,
         awayGoals: 2,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: spain?.id,
         awayTeamId: germany?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 05, 2024 18:00:00"),
         round: "Quarter Final",
         homeGoals: 1,
@@ -890,11 +930,12 @@ async function main() {
         homeExtraTimeGoals: 1,
         awayExtraTimeGoals: 0,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: portugal?.id,
         awayTeamId: france?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 05, 2024 21:00:00"),
         round: "Quarter Final",
         homeGoals: 0,
@@ -904,11 +945,12 @@ async function main() {
         homePenaltyGoals: 3,
         awayPenaltyGoals: 5,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: england?.id,
         awayTeamId: switzerland?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 06, 2024 18:00:00"),
         round: "Quarter Final",
         homeGoals: 1,
@@ -918,46 +960,51 @@ async function main() {
         homePenaltyGoals: 5,
         awayPenaltyGoals: 3,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: netherlands?.id,
         awayTeamId: turkiye?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 06, 2024 21:00:00"),
         round: "Quarter Final",
         homeGoals: 2,
         awayGoals: 1,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: spain?.id,
         awayTeamId: france?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 09, 2024 21:00:00"),
         round: "Semi Final",
         homeGoals: 2,
         awayGoals: 1,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: netherlands?.id,
         awayTeamId: england?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 10, 2024 21:00:00"),
         round: "Semi Final",
         homeGoals: 1,
         awayGoals: 2,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
       {
         homeTeamId: spain?.id,
         awayTeamId: england?.id,
-        tournamentEditionId: edition.id,
+        seasonId: euro2024Edition.id,
         date: new Date("July 14, 2024 21:00:00"),
         round: "Final",
         homeGoals: 2,
         awayGoals: 1,
         status: MatchStatusOptions.Ended,
+        isKnockout: true,
       },
     ],
   });
@@ -968,85 +1015,107 @@ async function main() {
       code: "ESP",
       flagUrl:
         "/images/teams/33e87f35-f778-4f29-ad5c-ecaa8c316745-flag (1).png",
-      type: Continents.Europe,
+      continent: Continents.Europe,
     },
   });
 
-  const league = await prisma.league.create({
+  const laLigaLeague = await prisma.league.create({
     data: {
       name: "LaLiga",
-      type: LeagueTypes.Domestic,
+      continent: Continents.Europe,
+      isClubs: true,
+      isDomestic: true,
       countryId: spainCountry?.id,
       isPopular: true,
     },
   });
 
-  const leagueSeason = await prisma.leagueSeason.create({
+  const laLigaSeason = await prisma.season.create({
     data: {
       startYear: 2024,
       endYear: 2025,
       year: "2024-2025",
-      leagueId: league.id,
+      leagueId: laLigaLeague.id,
       slug: "laliga-1",
       currentStage: LeagueStages.Running,
     },
   });
 
-  const leagueTeams = await prisma.leagueTeam.createMany({
+  const laLigaTeams = await prisma.team.createMany({
     data: [
       {
         name: "Barcelona",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
+        code: "FCB",
+        isPopular: true,
       },
       {
         name: "Real Madrid",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
+        code: "RMA",
+        isPopular: true,
       },
       {
         name: "Seville",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
       {
         name: "Valencia",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
       {
         name: "Reyal Maiorca",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
       {
         name: "Reyal Valadwalid",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
       {
         name: "Elchie",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
       {
         name: "Osasuna",
-        type: Continents.Europe,
+        continent: Continents.Europe,
+        isClub: true,
+        countryId: spainCountry.id,
       },
     ],
   });
 
-  const leagueMatches = await prisma.leagueMatch.createMany({
+  const leagueMatches = await prisma.match.createMany({
     data: [
       {
         homeTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Barcelona" },
             })
           )?.id || 0,
         awayTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Real Madrid" },
             })
           )?.id || 0,
         seasonId:
           (
-            await prisma.leagueSeason.findFirst({
+            await prisma.season.findFirst({
               where: { year: "2024-2025" },
             })
           )?.id || 0,
@@ -1055,19 +1124,19 @@ async function main() {
       {
         homeTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Elchie" },
             })
           )?.id || 0,
         awayTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Osasuna" },
             })
           )?.id || 0,
         seasonId:
           (
-            await prisma.leagueSeason.findFirst({
+            await prisma.season.findFirst({
               where: { year: "2024-2025" },
             })
           )?.id || 0,
@@ -1076,19 +1145,19 @@ async function main() {
       {
         homeTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Seville" },
             })
           )?.id || 0,
         awayTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Valencia" },
             })
           )?.id || 0,
         seasonId:
           (
-            await prisma.leagueSeason.findFirst({
+            await prisma.season.findFirst({
               where: { year: "2024-2025" },
             })
           )?.id || 0,
@@ -1097,19 +1166,19 @@ async function main() {
       {
         homeTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Reyal Maiorca" },
             })
           )?.id || 0,
         awayTeamId:
           (
-            await prisma.leagueTeam.findFirst({
+            await prisma.team.findFirst({
               where: { name: "Reyal Valadwalid" },
             })
           )?.id || 0,
         seasonId:
           (
-            await prisma.leagueSeason.findFirst({
+            await prisma.season.findFirst({
               where: { year: "2024-2025" },
             })
           )?.id || 0,
@@ -1122,7 +1191,7 @@ async function main() {
     data: {
       name: "Italy",
       code: "ITA",
-      type: Continents.Europe,
+      continent: Continents.Europe,
     },
   });
 
@@ -1130,29 +1199,33 @@ async function main() {
     data: {
       name: "England",
       code: "ENG",
-      type: Continents.Europe,
+      continent: Continents.Europe,
     },
   });
 
   const seriaALeague = await prisma.league.create({
     data: {
       name: "Seria A",
-      type: LeagueTypes.Domestic,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
       isPopular: true,
+      isClubs: true,
+      isDomestic: true,
     },
   });
 
-  const PermierLeague = await prisma.league.create({
+  const PremierLeague = await prisma.league.create({
     data: {
-      name: "Permier League",
-      type: LeagueTypes.Domestic,
+      name: "Premier League",
+      continent: Continents.Europe,
       countryId: englandCountry.id,
       isPopular: true,
+      isClubs: true,
+      isDomestic: true,
     },
   });
 
-  const seriaASeason2024 = await prisma.leagueSeason.create({
+  const seriaASeason2024 = await prisma.season.create({
     data: {
       startYear: 2024,
       endYear: 2025,
@@ -1162,298 +1235,348 @@ async function main() {
       currentStage: LeagueStages.Running,
     },
   });
-  const permierLeagueSeason2024 = await prisma.leagueSeason.create({
+  const permierSeason2024 = await prisma.season.create({
     data: {
       startYear: 2024,
       endYear: 2025,
       year: "2024-2025",
-      leagueId: PermierLeague.id,
+      leagueId: PremierLeague.id,
       slug: "premier-league-1",
       currentStage: LeagueStages.Running,
     },
   });
-  const napoliTeam = await prisma.leagueTeam.create({
+
+  const napoliTeam = await prisma.team.create({
     data: {
       name: "Napoli",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const juventusTeam = await prisma.leagueTeam.create({
+  const juventusTeam = await prisma.team.create({
     data: {
       name: "Juventus",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const acMilanTeam = await prisma.leagueTeam.create({
+  const acMilanTeam = await prisma.team.create({
     data: {
       name: "AC Milan",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const interMilanTeam = await prisma.leagueTeam.create({
+  const interMilanTeam = await prisma.team.create({
     data: {
       name: "Inter Milan",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const torinoTeam = await prisma.leagueTeam.create({
+  const torinoTeam = await prisma.team.create({
     data: {
       name: "Torino",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const empoliTeam = await prisma.leagueTeam.create({
+  const empoliTeam = await prisma.team.create({
     data: {
       name: "Empoli",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const lazioTeam = await prisma.leagueTeam.create({
+  const lazioTeam = await prisma.team.create({
     data: {
       name: "Lazio",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const udineseTeam = await prisma.leagueTeam.create({
+  const udineseTeam = await prisma.team.create({
     data: {
       name: "Udinese",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const asRomaTeam = await prisma.leagueTeam.create({
+  const asRomaTeam = await prisma.team.create({
     data: {
       name: "AS Roma",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const comoTeam = await prisma.leagueTeam.create({
+  const comoTeam = await prisma.team.create({
     data: {
       name: "Como",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const fiorentinaTeam = await prisma.leagueTeam.create({
+  const fiorentinaTeam = await prisma.team.create({
     data: {
       name: "Fiorentina",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const atalantaTeam = await prisma.leagueTeam.create({
+  const atalantaTeam = await prisma.team.create({
     data: {
       name: "Atalanta",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const bolognaTeam = await prisma.leagueTeam.create({
+  const bolognaTeam = await prisma.team.create({
     data: {
       name: "Bologna",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const hellasVeronaTeam = await prisma.leagueTeam.create({
+  const hellasVeronaTeam = await prisma.team.create({
     data: {
       name: "Hellas Verona",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const parmaTeam = await prisma.leagueTeam.create({
+  const parmaTeam = await prisma.team.create({
     data: {
       name: "Parma",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const genoaTeam = await prisma.leagueTeam.create({
+  const genoaTeam = await prisma.team.create({
     data: {
       name: "Genoa",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const cagliariTeam = await prisma.leagueTeam.create({
+  const cagliariTeam = await prisma.team.create({
     data: {
       name: "Cagliari",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const lecceTeam = await prisma.leagueTeam.create({
+  const lecceTeam = await prisma.team.create({
     data: {
       name: "Lecce",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const veneziaTeam = await prisma.leagueTeam.create({
+  const veneziaTeam = await prisma.team.create({
     data: {
       name: "Venezia",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const monzaTeam = await prisma.leagueTeam.create({
+  const monzaTeam = await prisma.team.create({
     data: {
       name: "Monza",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: italyCountry.id,
+      isClub: true,
     },
   });
-  const liverpoolTeam = await prisma.leagueTeam.create({
+  const liverpoolTeam = await prisma.team.create({
     data: {
       name: "Liverpool",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const manchesterCityTeam = await prisma.leagueTeam.create({
+  const manchesterCityTeam = await prisma.team.create({
     data: {
       name: "Manchester City",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const arsenalTeam = await prisma.leagueTeam.create({
+  const arsenalTeam = await prisma.team.create({
     data: {
       name: "Arsenal",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const chelseaTeam = await prisma.leagueTeam.create({
+  const chelseaTeam = await prisma.team.create({
     data: {
       name: "Chelsea",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const astonVillaTeam = await prisma.leagueTeam.create({
+  const astonVillaTeam = await prisma.team.create({
     data: {
       name: "Aston Villa",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const fulhamTeam = await prisma.leagueTeam.create({
+  const fulhamTeam = await prisma.team.create({
     data: {
       name: "Fulham",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const newCastleTeam = await prisma.leagueTeam.create({
+  const newCastleTeam = await prisma.team.create({
     data: {
       name: "NewCastle",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const tottenhamTeam = await prisma.leagueTeam.create({
+  const tottenhamTeam = await prisma.team.create({
     data: {
       name: "Tottenham",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const brightonTeam = await prisma.leagueTeam.create({
+  const brightonTeam = await prisma.team.create({
     data: {
       name: "Brighton",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const nottinghamForestTeam = await prisma.leagueTeam.create({
+  const nottinghamForestTeam = await prisma.team.create({
     data: {
       name: "Nottingham Forest",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const bournemouthTeam = await prisma.leagueTeam.create({
+  const bournemouthTeam = await prisma.team.create({
     data: {
       name: "Bournemouth",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const brentfordTeam = await prisma.leagueTeam.create({
+  const brentfordTeam = await prisma.team.create({
     data: {
       name: "Brentford",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const manchesterUnitedTeam = await prisma.leagueTeam.create({
+  const manchesterUnitedTeam = await prisma.team.create({
     data: {
       name: "Manchester United",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
+      isPopular: true,
     },
   });
-  const westHamTeam = await prisma.leagueTeam.create({
+  const westHamTeam = await prisma.team.create({
     data: {
       name: "West Ham",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const ipswichTeam = await prisma.leagueTeam.create({
+  const ipswichTeam = await prisma.team.create({
     data: {
       name: "Ipswich",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const evertonTeam = await prisma.leagueTeam.create({
+  const evertonTeam = await prisma.team.create({
     data: {
       name: "Everton",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const leicesterTeam = await prisma.leagueTeam.create({
+  const leicesterTeam = await prisma.team.create({
     data: {
       name: "Leicester",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const crystalPalaceTeam = await prisma.leagueTeam.create({
+  const crystalPalaceTeam = await prisma.team.create({
     data: {
       name: "Crystal Palace",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const southhamptonTeam = await prisma.leagueTeam.create({
+  const southhamptonTeam = await prisma.team.create({
     data: {
       name: "Southhampton",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
-  const wolvesTeam = await prisma.leagueTeam.create({
+  const wolvesTeam = await prisma.team.create({
     data: {
       name: "Wolves",
-      type: Continents.Europe,
+      continent: Continents.Europe,
       countryId: englandCountry.id,
+      isClub: true,
     },
   });
 
-  const seriaAandPremeirLeagueMatches = await prisma.leagueMatch.createMany({
+  const seriaAandPremeirLeagueMatches = await prisma.match.createMany({
     data: [
       {
         homeTeamId: napoliTeam.id,
@@ -1542,7 +1665,7 @@ async function main() {
       {
         homeTeamId: crystalPalaceTeam.id,
         awayTeamId: liverpoolTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 14:30:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1550,7 +1673,7 @@ async function main() {
       {
         homeTeamId: arsenalTeam.id,
         awayTeamId: southhamptonTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 17:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1558,7 +1681,7 @@ async function main() {
       {
         homeTeamId: brentfordTeam.id,
         awayTeamId: wolvesTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 17:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1566,7 +1689,7 @@ async function main() {
       {
         homeTeamId: leicesterTeam.id,
         awayTeamId: bournemouthTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 17:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1574,7 +1697,7 @@ async function main() {
       {
         homeTeamId: manchesterCityTeam.id,
         awayTeamId: fulhamTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 17:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1582,7 +1705,7 @@ async function main() {
       {
         homeTeamId: westHamTeam.id,
         awayTeamId: ipswichTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 17:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1590,7 +1713,7 @@ async function main() {
       {
         homeTeamId: evertonTeam.id,
         awayTeamId: newCastleTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 5, 2024 19:30:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1598,7 +1721,7 @@ async function main() {
       {
         homeTeamId: astonVillaTeam.id,
         awayTeamId: manchesterUnitedTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 6, 2024 16:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1606,7 +1729,7 @@ async function main() {
       {
         homeTeamId: chelseaTeam.id,
         awayTeamId: nottinghamForestTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 6, 2024 16:00:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,
@@ -1614,7 +1737,7 @@ async function main() {
       {
         homeTeamId: brightonTeam.id,
         awayTeamId: tottenhamTeam.id,
-        seasonId: permierLeagueSeason2024.id,
+        seasonId: permierSeason2024.id,
         date: new Date("October 6, 2024 18:30:00"),
         round: "Round 7",
         status: MatchStatusOptions.Scheduled,

@@ -22,16 +22,6 @@ export function getFormattedDateTime(date: string, short: boolean = false) {
   return `${getFormattedDate(date, short)}; ${getFormattedTime(date, short)}`;
 }
 
-export function getUTCDateValueForDateTimeInput(date: Date) {
-  let [datePart, timePart] = date.toISOString().split("T");
-
-  timePart = timePart.split(".")[0];
-  const hh = timePart.split(":")[0];
-  const mm = timePart.split(":")[1];
-
-  return `${datePart}T${hh}:${mm}`;
-}
-
 export function getDateValueForDateTimeInput(date: Date) {
   const [datePart, timePart] = date
     .toLocaleString("en-US", {

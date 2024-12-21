@@ -5,9 +5,9 @@ import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { CurrentStageSchema, SeasonSchema } from "@/schemas";
 import { generateSlug } from "@/lib/generateSlug";
-import { LeagueStages } from "@/types/enums";
 import { ZodError } from "zod";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
+import { ImagesFolders } from "@/types/enums";
 
 interface Fields {
   startYear: string;
@@ -27,7 +27,17 @@ interface ReturnType {
   customError?: string | null;
 }
 
-export async function addLeagueSeason(
+interface StageFields {
+  currentStage?: string | null;
+}
+
+interface StageReturnType {
+  errors: Record<keyof StageFields, string | undefined> | undefined;
+  success: boolean;
+  customError?: string | null;
+}
+
+export async function addSeason(
   prevState: ReturnType,
   formData: FormData
 ): Promise<ReturnType> {
@@ -97,15 +107,18 @@ export async function addLeagueSeason(
       league.name.toLowerCase().trim().split(" ").join("-")
     );
 
-    let exists = await prisma.season.findUnique({ where: { slug } });
-    while (exists) {
+    let existedSeason = await prisma.season.findUnique({ where: { slug } });
+    while (existedSeason) {
       slug = generateSlug(
         league.name.toLowerCase().trim().split(" ").join("-")
       ); // Generate a new slug if the one exists
-      exists = await prisma.season.findUnique({ where: { slug } });
+      existedSeason = await prisma.season.findUnique({ where: { slug } });
     }
 
-    const flagUrlPath = await writeImageFile(data.flagUrl, "tournaments");
+    const flagUrlPath = await writeImageFile(
+      data.flagUrl,
+      ImagesFolders.Leagues
+    );
 
     const teams = await prisma.team.findMany({
       where: {
@@ -177,7 +190,7 @@ export async function addLeagueSeason(
   }
 }
 
-export async function updateLeagueSeason(
+export async function updateSeason(
   id: number,
   prevState: ReturnType,
   formData: FormData
@@ -242,7 +255,7 @@ export async function updateLeagueSeason(
 
     const flagUrlPath = await deleteAndWriteImageFile(
       data.flagUrl,
-      "tournaments",
+      ImagesFolders.Leagues,
       currentSeason.flagUrl
     );
 
@@ -316,20 +329,22 @@ export async function updateLeagueSeason(
   }
 }
 
-export async function updateLeagueSeasonCurrentStage(
-  args: { id: number },
+export async function updateSeasonCurrentStage(
+  id: number,
   prevState: unknown,
   formData: FormData
-) {
+): Promise<StageReturnType> {
   try {
-    const { id } = args;
-
     const result = CurrentStageSchema.safeParse(
       Object.fromEntries(formData.entries())
     );
 
     if (result.success === false) {
-      return result.error.formErrors.fieldErrors;
+      const errors: Record<keyof StageFields, string | undefined> = {
+        currentStage: result.error.formErrors.fieldErrors.currentStage?.[0],
+      };
+
+      return { errors, success: false, customError: null };
     }
 
     const data = result.data;
@@ -348,7 +363,16 @@ export async function updateLeagueSeasonCurrentStage(
     });
 
     revalidatePath("/dashboard/seasons");
+    return { errors: undefined, success: true, customError: null };
   } catch (error) {
-    console.log(error);
+    const zodError = error as ZodError;
+    const errorMap = zodError.flatten().fieldErrors;
+    return {
+      success: false,
+      customError: null,
+      errors: {
+        currentStage: errorMap["currentStage"]?.[0],
+      },
+    };
   }
 }

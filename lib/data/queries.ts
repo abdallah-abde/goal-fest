@@ -145,7 +145,7 @@ SELECT
   t.code AS teamCode,
   t.flagUrl AS teamFlagUrl,
 
-  -- Sum of clean sheets in knockout matches (main time + extra time) for the specific tournament edition or league season
+  -- Sum of clean sheets in matches (main time + extra time) for the specific season
   COALESCE((
       SELECT SUM(CASE 
           WHEN m.homeTeamId = t.id AND m.awayExtraTimeGoals is null AND m.awayGoals = 0 THEN 1 

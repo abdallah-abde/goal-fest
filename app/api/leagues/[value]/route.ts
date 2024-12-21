@@ -15,10 +15,10 @@ export async function GET(
       data.map((a) => {
         return {
           label: `${a.name} ${
-            a.country ? `(${a.country.name})` : `(${a.type})`
+            a.country ? `(${a.country.name})` : `(${a.continent})`
           }`,
           value: `${a.name} ${
-            a.country ? `(${a.country.name})` : `(${a.type})`
+            a.country ? `(${a.country.name})` : `(${a.continent})`
           }`,
           dbValue: a.id.toString(),
         };

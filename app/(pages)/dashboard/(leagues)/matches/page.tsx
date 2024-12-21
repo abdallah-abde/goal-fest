@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { PAGE_RECORDS_COUNT } from "@/lib/constants";
 
 import {
+  Continents,
   FlagFilterOptions,
   MatchStatusOptions,
   SortDirectionOptions,
@@ -42,7 +43,7 @@ import NotProvidedSpan from "@/components/NotProvidedSpan";
 import DateTimeTableCell from "@/components/table-parts/DateTimeTableCell";
 import ScoreTableCell from "@/components/table-parts/ScoreTableCell";
 
-import LeagueMatchForm from "@/components/forms/LeagueMatchForm";
+import MatchForm from "@/components/forms/MatchForm";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -250,14 +251,16 @@ export default async function DashboardLeagueMatchesPage({
   });
 
   const sortingList = [
-    { label: "Country", fieldName: "country" },
     { label: "Continent", fieldName: "continent" },
+    { label: "Country", fieldName: "country" },
     { label: "League", fieldName: "league" },
     { label: "Season", fieldName: "season" },
-    { label: "Home Team", fieldName: "homeTeam" },
-    { label: "Away Team", fieldName: "awayTeam" },
     { label: "Group", fieldName: "group" },
     { label: "Round", fieldName: "round" },
+    { label: "Home Team", fieldName: "homeTeam" },
+    { label: "Away Team", fieldName: "awayTeam" },
+    { label: "Date", fieldName: "date" },
+    { label: "Status", fieldName: "status" },
     {
       label: "Is Featured",
       fieldName: "isFeatured",
@@ -266,8 +269,6 @@ export default async function DashboardLeagueMatchesPage({
       label: "Is Knockout",
       fieldName: "isKnockout",
     },
-    { label: "Date", fieldName: "date" },
-    { label: "Status", fieldName: "status" },
   ];
 
   const flagFilters = [
@@ -321,6 +322,13 @@ export default async function DashboardLeagueMatchesPage({
       placeholder: "Choose status...",
       options: Object.values(MatchStatusOptions),
     },
+    {
+      title: "Continent",
+      fieldName: "continent",
+      searchParamName: "continent",
+      placeholder: "Choose Continent...",
+      options: Object.values(Continents),
+    },
   ];
 
   const textFilters = [
@@ -345,6 +353,11 @@ export default async function DashboardLeagueMatchesPage({
       searchParamName: "group",
     },
     {
+      title: "Round",
+      fieldName: "round",
+      searchParamName: "round",
+    },
+    {
       title: "Team",
       fieldName: "team",
       searchParamName: "team",
@@ -366,7 +379,7 @@ export default async function DashboardLeagueMatchesPage({
           }}
           textFilters={textFilters}
         />
-        <SearchFieldComponent placeholder="Search by league names, years, continents, countries, group names, rounds, teams ..." />
+        <SearchFieldComponent placeholder="Search by league names, years, continents, countries, groups, rounds, teams ..." />
         <FormDialog id={null} />
       </div>
       {matches.length > 0 ? (
@@ -522,8 +535,9 @@ export default async function DashboardLeagueMatchesPage({
                           <TooltipTrigger>
                             <FieldSwitcher
                               id={id}
-                              type="leagueMatches"
+                              type="matches"
                               value={isFeatured}
+                              field="isFeatured"
                             />
                           </TooltipTrigger>
                           <TooltipContent>
@@ -538,8 +552,9 @@ export default async function DashboardLeagueMatchesPage({
                           <TooltipTrigger>
                             <FieldSwitcher
                               id={id}
-                              type="leagueMatches"
+                              type="matches"
                               value={isKnockout}
+                              field="isKnockout"
                             />
                           </TooltipTrigger>
                           <TooltipContent>
@@ -552,11 +567,7 @@ export default async function DashboardLeagueMatchesPage({
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger>
-                            <PopoverStatusUpdator
-                              id={id}
-                              status={status}
-                              type="leagueMatches"
-                            >
+                            <PopoverStatusUpdator id={id} status={status}>
                               <span className="hover:underline">
                                 {status || <NotProvidedSpan hover={true} />}
                               </span>
@@ -620,7 +631,7 @@ async function FormDialog({ id }: { id: number | null }) {
         )}
       </DialogTrigger>
       <DialogContent className="w-full md:w-3/4 lg:w-2/3 h-3/4">
-        <LeagueMatchForm match={match} />
+        <MatchForm match={match} />
       </DialogContent>
     </Dialog>
   );

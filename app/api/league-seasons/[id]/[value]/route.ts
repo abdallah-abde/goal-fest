@@ -17,8 +17,8 @@ export async function GET(
     .then((data) =>
       data.map((a) => {
         return {
-          label: `${a.league.name} ${a.year}`,
-          value: `${a.league.name} ${a.year}`,
+          label: `${a.league.name} (${a.year})`,
+          value: `${a.league.name} (${a.year})`,
           dbValue: a.id.toString(),
         };
       })

@@ -6,12 +6,16 @@ import { notFound } from "next/navigation";
 import { TeamSchema } from "@/schemas";
 import { ZodError } from "zod";
 import { deleteAndWriteImageFile, writeImageFile } from "@/lib/writeImageFile";
+import { IsPopularOptions } from "@/types/enums";
 
 interface Fields {
   name: string;
   flagUrl?: string | null;
+  countryId?: string | null;
   code?: string | null;
-  type: string;
+  continent: string;
+  isPopular: string;
+  isClub: string;
 }
 
 interface ReturnType {
@@ -31,8 +35,11 @@ export async function addTeam(
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
+        countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+        isClub: result.error.formErrors.fieldErrors.isClub?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -48,7 +55,7 @@ export async function addTeam(
       return {
         errors: undefined,
         success: false,
-        customError: "Team existed",
+        customError: "League team existed",
       };
     }
 
@@ -59,7 +66,10 @@ export async function addTeam(
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
-        type: data.type,
+        countryId: data.countryId ? +data.countryId : null,
+        continent: data.continent,
+        isClub: data.isClub === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -75,7 +85,10 @@ export async function addTeam(
         name: errorMap["name"]?.[0],
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
-        type: errorMap["type"]?.[0],
+        countryId: errorMap["countryId"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isClub: errorMap["isClub"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
   }
@@ -93,8 +106,11 @@ export async function updateTeam(
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
         flagUrl: result.error.formErrors.fieldErrors.flagUrl?.[0],
+        countryId: result.error.formErrors.fieldErrors.countryId?.[0],
         code: result.error.formErrors.fieldErrors.code?.[0],
-        type: result.error.formErrors.fieldErrors.type?.[0],
+        continent: result.error.formErrors.fieldErrors.continent?.[0],
+        isPopular: result.error.formErrors.fieldErrors.isPopular?.[0],
+        isClub: result.error.formErrors.fieldErrors.isClub?.[0],
       };
 
       return { errors, success: false, customError: null };
@@ -110,7 +126,7 @@ export async function updateTeam(
       return {
         errors: undefined,
         success: false,
-        customError: "Team existed",
+        customError: "League team existed",
       };
     }
 
@@ -130,7 +146,10 @@ export async function updateTeam(
         name: data.name,
         code: data.code ? data.code : null,
         flagUrl: flagUrlPath,
-        type: data.type,
+        countryId: data.countryId ? +data.countryId : null,
+        continent: data.continent,
+        isClub: data.isClub === IsPopularOptions.Yes ? true : false,
+        isPopular: data.isPopular === IsPopularOptions.Yes ? true : false,
       },
     });
 
@@ -146,8 +165,53 @@ export async function updateTeam(
         name: errorMap["name"]?.[0],
         flagUrl: errorMap["flagUrl"]?.[0],
         code: errorMap["code"]?.[0],
-        type: errorMap["type"]?.[0],
+        countryId: errorMap["countryId"]?.[0],
+        continent: errorMap["continent"]?.[0],
+        isClub: errorMap["isClub"]?.[0],
+        isPopular: errorMap["isPopular"]?.[0],
       },
     };
+  }
+}
+
+export async function updateTeamIsClubStatus(id: number, isClub: boolean) {
+  try {
+    const currentteam = await prisma.team.findUnique({
+      where: { id },
+    });
+
+    if (currentteam == null) return notFound();
+
+    await prisma.team.update({
+      where: { id },
+      data: {
+        isClub: !isClub,
+      },
+    });
+
+    revalidatePath("/dashboard/teams");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateTeamPopularStatus(id: number, isPopular: boolean) {
+  try {
+    const currentteam = await prisma.team.findUnique({
+      where: { id },
+    });
+
+    if (currentteam == null) return notFound();
+
+    await prisma.team.update({
+      where: { id },
+      data: {
+        isPopular: !isPopular,
+      },
+    });
+
+    revalidatePath("/dashboard/teams");
+  } catch (error) {
+    console.log(error);
   }
 }

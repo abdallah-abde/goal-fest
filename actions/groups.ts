@@ -8,7 +8,7 @@ import { ZodError } from "zod";
 
 interface Fields {
   name: string;
-  tournamentEditionId: string;
+  seasonId: string;
   teams: string[];
 }
 
@@ -18,7 +18,7 @@ interface ReturnType {
   customError?: string | null;
 }
 
-export async function addTournamentGroup(
+export async function addGroup(
   prevState: ReturnType,
   formData: FormData
 ): Promise<ReturnType> {
@@ -30,8 +30,7 @@ export async function addTournamentGroup(
     if (result.success === false) {
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
-        tournamentEditionId:
-          result.error.formErrors.fieldErrors.tournamentEditionId?.[0],
+        seasonId: result.error.formErrors.fieldErrors.seasonId?.[0],
         teams: result.error.formErrors.fieldErrors.teams?.[0],
       };
 
@@ -41,10 +40,7 @@ export async function addTournamentGroup(
     const data = result.data;
 
     const group = await prisma.group.findFirst({
-      where: {
-        name: data.name,
-        tournamentEditionId: +data.tournamentEditionId,
-      },
+      where: { name: data.name, seasonId: +data.seasonId },
     });
 
     if (group) {
@@ -70,7 +66,7 @@ export async function addTournamentGroup(
     await prisma.group.create({
       data: {
         name: data.name,
-        tournamentEditionId: +data.tournamentEditionId,
+        seasonId: +data.seasonId,
         teams: {
           connect: ts,
         },
@@ -87,13 +83,14 @@ export async function addTournamentGroup(
       customError: null,
       errors: {
         name: errorMap["name"]?.[0],
-        tournamentEditionId: errorMap["tournamentEditionId"]?.[0],
+        seasonId: errorMap["seasonId"]?.[0],
         teams: errorMap["teams"]?.[0],
       },
     };
   }
 }
-export async function updateTournamentGroup(
+
+export async function updateGroup(
   id: number,
   prevState: ReturnType,
   formData: FormData
@@ -106,8 +103,7 @@ export async function updateTournamentGroup(
     if (result.success === false) {
       const errors: Record<keyof Fields, string | undefined> = {
         name: result.error.formErrors.fieldErrors.name?.[0],
-        tournamentEditionId:
-          result.error.formErrors.fieldErrors.tournamentEditionId?.[0],
+        seasonId: result.error.formErrors.fieldErrors.seasonId?.[0],
         teams: result.error.formErrors.fieldErrors.teams?.[0],
       };
 
@@ -119,7 +115,7 @@ export async function updateTournamentGroup(
     const group = await prisma.group.findFirst({
       where: {
         AND: [
-          { name: data.name, tournamentEditionId: +data.tournamentEditionId },
+          { name: data.name, seasonId: +data.seasonId },
           { id: { not: id } },
         ],
       },
@@ -156,7 +152,7 @@ export async function updateTournamentGroup(
       where: { id },
       data: {
         name: data.name,
-        tournamentEditionId: +data.tournamentEditionId,
+        seasonId: +data.seasonId,
         teams: {
           disconnect: currentGroup?.teams,
           connect: ts,
@@ -174,7 +170,7 @@ export async function updateTournamentGroup(
       customError: null,
       errors: {
         name: errorMap["name"]?.[0],
-        tournamentEditionId: errorMap["tournamentEditionId"]?.[0],
+        seasonId: errorMap["seasonId"]?.[0],
         teams: errorMap["teams"]?.[0],
       },
     };

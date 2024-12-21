@@ -16,7 +16,6 @@ import {
 
 import { getSidebarRoutes } from "@/lib/data/sidebarRoutes";
 import {
-  dashboardTournamentsRoutes,
   dashboardLeaguesRoutes,
   dashboardOtherRoutes,
 } from "@/lib/data/dashboardRoutes";
@@ -30,36 +29,23 @@ export default function Sidebar({
 }: {
   logoUrl?: string | null;
   name?: string | null;
-  source:
-    | "tournaments"
-    | "leagues"
-    | "dashboard_tournaments"
-    | "dashboard_leagues"
-    | "dashboard_others";
+  source: "leagues" | "dashboard_leagues" | "dashboard_others";
 }) {
   const params = useParams();
   const pathname = usePathname();
 
-  // const routes = getSidebarRoutes(params, source);
-
   const routes =
-    source === "dashboard_tournaments"
-      ? dashboardTournamentsRoutes
-      : source === "dashboard_leagues"
+    source === "dashboard_leagues"
       ? dashboardLeaguesRoutes
       : source === "dashboard_others"
       ? dashboardOtherRoutes
-      : source === "tournaments"
-      ? getSidebarRoutes(params, source)
       : source === "leagues"
-      ? getSidebarRoutes(params, source)
+      ? getSidebarRoutes(params)
       : null;
 
-  const isDashboardRoute = [
-    "dashboard_tournaments",
-    "dashboard_leagues",
-    "dashboard_others",
-  ].includes(source);
+  const isDashboardRoute = ["dashboard_leagues", "dashboard_others"].includes(
+    source
+  );
 
   if (!routes) return;
 

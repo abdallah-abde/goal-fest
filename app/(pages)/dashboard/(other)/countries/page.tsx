@@ -81,9 +81,9 @@ export default async function DashboardCountriesPage({
   // });
 
   const sortingList = [
+    { label: "Continent", fieldName: "continent" },
     { label: "Name", fieldName: "name" },
     { label: "Code", fieldName: "code" },
-    { label: "Continent", fieldName: "continent" },
   ];
 
   const listFilters = [

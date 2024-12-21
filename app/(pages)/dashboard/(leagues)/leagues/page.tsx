@@ -139,9 +139,9 @@ export default async function DashboardleaguesPage({
   });
 
   const sortingList = [
-    { label: "Name", fieldName: "name" },
-    { label: "Country", fieldName: "country" },
     { label: "Continent", fieldName: "continent" },
+    { label: "Country", fieldName: "country" },
+    { label: "Name", fieldName: "name" },
     {
       label: "Is Popular",
       fieldName: "isPopular",
@@ -166,13 +166,6 @@ export default async function DashboardleaguesPage({
       placeholder: "Choose continent...",
       options: Object.values(Continents),
     },
-    // {
-    //   title: "Country",
-    //   fieldName: "country",
-    //   searchParamName: "country",
-    //   placeholder: "Choose country...",
-    //   options: countries.map((a) => a.name),
-    // },
   ];
 
   const textFilters = [
@@ -263,13 +256,13 @@ export default async function DashboardleaguesPage({
         <Table className="dashboard-table">
           <TableHeader>
             <TableRow className="dashboard-head-table-row">
-              <TableHead className="dashboard-head-table-cell">Name</TableHead>
-              <TableHead className="dashboard-head-table-cell">
-                Country
-              </TableHead>
               <TableHead className="dashboard-head-table-cell">
                 Continent
               </TableHead>
+              <TableHead className="dashboard-head-table-cell">
+                Country
+              </TableHead>
+              <TableHead className="dashboard-head-table-cell">Name</TableHead>
               <TableHead className="dashboard-head-table-cell">
                 Is Popular
               </TableHead>
@@ -294,13 +287,13 @@ export default async function DashboardleaguesPage({
                 isDomestic,
               }) => (
                 <TableRow key={id} className="dashboard-table-row">
-                  <TableCell className="dashboard-table-cell">{name}</TableCell>
-                  <TableCell className="dashboard-table-cell">
-                    {country?.name || <NotProvidedSpan />}
-                  </TableCell>
                   <TableCell className="dashboard-table-cell">
                     {continent}
                   </TableCell>
+                  <TableCell className="dashboard-table-cell">
+                    {country?.name || <NotProvidedSpan />}
+                  </TableCell>
+                  <TableCell className="dashboard-table-cell">{name}</TableCell>
                   <TableCell className="dashboard-table-cell">
                     <TooltipProvider>
                       <Tooltip>
@@ -309,6 +302,7 @@ export default async function DashboardleaguesPage({
                             id={id}
                             type="leagues"
                             value={isPopular}
+                            field="isPopular"
                           />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -325,6 +319,7 @@ export default async function DashboardleaguesPage({
                             id={id}
                             type="leagues"
                             value={isClubs}
+                            field="isClubs"
                           />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -341,6 +336,7 @@ export default async function DashboardleaguesPage({
                             id={id}
                             type="leagues"
                             value={isDomestic}
+                            field="isDomestic"
                           />
                         </TooltipTrigger>
                         <TooltipContent>

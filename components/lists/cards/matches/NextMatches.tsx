@@ -8,12 +8,12 @@ import CardsSectionContainer from "@/components/lists/cards/templates/CardsSecti
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { EmptyImageUrls } from "@/types/enums";
 import { Country, Group, League, Match, Season, Team } from "@prisma/client";
+import { LeagueProps } from "@/types";
 
 interface MatchProps extends Match {
   group: Group | null;
   homeTeam: Team | null;
   awayTeam: Team | null;
-  // season: SeasonProps;
 }
 
 interface SeasonProps extends Season {
@@ -24,10 +24,6 @@ interface SeasonProps extends Season {
   titleHolder: Team | null;
   matches: MatchProps[];
   hostingCountries: Country[];
-}
-
-interface LeagueProps extends League {
-  country: Country | null;
 }
 
 export default function NextMatches({ matches }: { matches: MatchProps[] }) {

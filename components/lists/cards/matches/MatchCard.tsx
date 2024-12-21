@@ -5,20 +5,15 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-import { NeutralMatch } from "@/types";
-
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { Country, Group, League, Match, Season, Team } from "@prisma/client";
+import { LeagueProps } from "@/types";
 
 interface MatchProps extends Match {
   group: Group | null;
   homeTeam: Team | null;
   awayTeam: Team | null;
   season: SeasonProps;
-}
-
-interface LeagueProps extends League {
-  country: Country | null;
 }
 
 interface SeasonProps extends Season {

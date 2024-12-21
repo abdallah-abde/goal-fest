@@ -18,14 +18,12 @@ export async function GET(
     .then((data) =>
       data?.teams.map((a) => {
         return {
-          label: `${a.name} (${a.continent})`,
-          value: `${a.name} (${a.continent})`,
+          label: `${a.name} (${a.isClub ? a.country?.name : a.continent})`,
+          value: `${a.name} (${a.isClub ? a.country?.name : a.continent})`,
           dbValue: a.id.toString(),
         };
       })
     );
-
-  console.log("TEAMS: ", data);
 
   return Response.json(data);
 }

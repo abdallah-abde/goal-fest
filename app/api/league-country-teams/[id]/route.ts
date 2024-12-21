@@ -1,5 +1,4 @@
 import prisma from "@/lib/db";
-import { Continents } from "@/types/enums";
 
 export async function GET(
   request: Request,
@@ -15,16 +14,6 @@ export async function GET(
   if (!league) {
     return Response.json([]);
   }
-  const isContinent = league.country?.name
-    ? Object.values(Continents)
-        .map((a) => a.toString())
-        .includes(league.country?.name)
-    : false;
-
-  // const countryCondition =
-  //   league.countryId && !isContinent
-  //     ? { countryId: league.countryId }
-  //     : { continent: league.continent };
 
   const countryCondition =
     league.countryId && league.isDomestic

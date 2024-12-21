@@ -16,10 +16,13 @@ import {
 
 import { Match, Team, League, Season, Group, Country } from "@prisma/client";
 
-import { addLeagueMatch, updateLeagueMatch } from "@/actions/leagueMatches";
+import { addMatch, updateMatch } from "@/actions/matches";
 
 import PageHeader from "@/components/PageHeader";
-import { MultipleSelectorLoadingIndicator } from "@/components/Skeletons";
+import {
+  LoadingSpinner,
+  MultipleSelectorLoadingIndicator,
+} from "@/components/Skeletons";
 import SubmitButton from "@/components/forms/parts/SubmitButton";
 import FormField from "@/components/forms/parts/FormField";
 import FormFieldError from "@/components/forms/parts/FormFieldError";
@@ -38,10 +41,10 @@ import {
   searchLeague,
   searchSeason,
   searchLeagueGroup,
-  searchLeagueTeam,
   searchTeamMatch,
 } from "@/lib/api-functions";
 import { IsPopularOptions } from "@/types/enums";
+import { LeagueProps } from "@/types";
 
 interface MatchProps extends Match {
   season: SeasonProps;
@@ -55,23 +58,15 @@ interface SeasonProps extends Season {
   groups: Group[];
 }
 
-interface LeagueProps extends League {
-  country: Country | null;
-}
-
 interface TeamProps extends Team {
   country: Country | null;
 }
 
-export default function LeagueMatchForm({
-  match,
-}: {
-  match?: MatchProps | null;
-}) {
+export default function MatchForm({ match }: { match?: MatchProps | null }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const [formState, formAction] = useFormState(
-    match == null ? addLeagueMatch : updateLeagueMatch.bind(null, match.id),
+    match == null ? addMatch : updateMatch.bind(null, match.id),
     { errors: undefined, success: false, customError: null }
   );
 
@@ -80,7 +75,9 @@ export default function LeagueMatchForm({
       formRef.current?.reset();
       if (match == null) {
         setHomeTeamKey(+new Date());
+        setSelectedHomeTeam([]);
         setAwayTeamKey(+new Date());
+        setSelectedAwayTeam([]);
 
         setIsKnockoutValue(IsPopularOptions.No);
         setIsKnockoutKey(+new Date());
@@ -129,8 +126,8 @@ export default function LeagueMatchForm({
       ? [
           {
             dbValue: match?.seasonId.toString(),
-            label: `${match?.season.league.name} ${match?.season.year}`,
-            value: `${match?.season.league.name} ${match?.season.year}`,
+            label: `${match?.season.league.name} (${match?.season.year})`,
+            value: `${match?.season.league.name} (${match?.season.year})`,
           },
         ]
       : []
@@ -236,8 +233,16 @@ export default function LeagueMatchForm({
       ? [
           {
             dbValue: match.homeTeamId?.toString(),
-            label: `${match.homeTeam?.name}`,
-            value: `${match.homeTeam?.name}`,
+            label: `${match.homeTeam?.name} (${
+              match.homeTeam?.isClub
+                ? match.homeTeam.country?.name
+                : match.homeTeam?.continent
+            })`,
+            value: `${match.homeTeam?.name} (${
+              match.homeTeam?.isClub
+                ? match.homeTeam.country?.name
+                : match.homeTeam?.continent
+            })`,
           },
         ]
       : []
@@ -251,8 +256,16 @@ export default function LeagueMatchForm({
       ? [
           {
             dbValue: match.awayTeamId?.toString(),
-            label: `${match.awayTeam?.name}`,
-            value: `${match.awayTeam?.name}`,
+            label: `${match.awayTeam?.name} (${
+              match.awayTeam?.isClub
+                ? match.awayTeam.country?.name
+                : match.awayTeam?.continent
+            })`,
+            value: `${match.awayTeam?.name} (${
+              match.awayTeam?.isClub
+                ? match.awayTeam.country?.name
+                : match.awayTeam?.continent
+            })`,
           },
         ]
       : []
@@ -260,14 +273,6 @@ export default function LeagueMatchForm({
 
   const [awayTeamKey, setAwayTeamKey] = useState(+new Date());
   const awayTeamRef = useRef<MultipleSelectorRef>(null);
-
-  // const [homeTeamValue, setHomeTeamValue] = useState<string | undefined>(
-  //   match?.homeTeamId?.toString() || undefined
-  // );
-
-  // const [awayTeamValue, setAwayTeamValue] = useState<string | undefined>(
-  //   match?.awayTeamId?.toString() || undefined
-  // );
 
   const [isKnockoutValue, setIsKnockoutValue] = useState<string | undefined>(
     match?.isKnockout === true
@@ -356,7 +361,10 @@ export default function LeagueMatchForm({
             name="isKnockout"
             key={isKnockoutKey}
             defaultValue={isKnockoutValue || undefined}
-            onValueChange={(value) => setIsKnockoutValue(value)}
+            onValueChange={(value) => {
+              setIsKnockoutValue(value);
+              setSelectedGroup([]);
+            }}
           >
             <SelectTrigger className="flex-1">
               <SelectValue placeholder="Choose Knockout Option" />
@@ -371,6 +379,12 @@ export default function LeagueMatchForm({
           </Select>
           <FormFieldError error={formState.errors?.isKnockout} />
         </FormField>
+
+        {isSeasonLoading && (
+          <FormField>
+            <LoadingSpinner />
+          </FormField>
+        )}
 
         {season &&
           season.groups.length > 0 &&
@@ -465,51 +479,14 @@ export default function LeagueMatchForm({
             disabled={
               selectedLeague.length === 0 ||
               selectedSeason.length === 0 ||
-              (season && season.groups.length > 0
+              (season &&
+              season.groups.length > 0 &&
+              isKnockoutValue === IsPopularOptions.No
                 ? selectedGroup.length === 0
                 : false)
             }
           />
         </FormField>
-
-        {/* {teams && teams.length > 0 && !isTeamsLoading ? (
-          <FormField>
-            <Label htmlFor="homeTeamId">Home Team</Label>
-            <Select
-              name="homeTeamId"
-              key={homeTeamKey}
-              defaultValue={homeTeamValue}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Home Team" />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map(({ id, name, country }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}{" "}
-                    {country ? (
-                      <Badge
-                        variant="secondary"
-                        className="text-muted-foreground text-xs ml-2"
-                      >
-                        {`${country.name}`}
-                      </Badge>
-                    ) : (
-                      ""
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={formState.errors?.homeTeamId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isTeamsLoading}
-            label="Loading Teams..."
-            notFoundText="There is no teams, add some!"
-          />
-        )} */}
 
         <FormField>
           <Label htmlFor="awayTeamId">Away Team</Label>
@@ -545,52 +522,14 @@ export default function LeagueMatchForm({
             disabled={
               selectedLeague.length === 0 ||
               selectedSeason.length === 0 ||
-              (season && season.groups.length > 0
+              (season &&
+              season.groups.length > 0 &&
+              isKnockoutValue === IsPopularOptions.No
                 ? selectedGroup.length === 0
                 : false)
             }
-            // disabled={selectedLeague.length === 0}
           />
         </FormField>
-
-        {/* {teams && teams.length > 0 && !isTeamsLoading ? (
-          <FormField>
-            <Label htmlFor="awayTeamId">Away Team</Label>
-            <Select
-              name="awayTeamId"
-              key={awayTeamKey}
-              defaultValue={awayTeamValue}
-            >
-              <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Choose Away Team" />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map(({ id, name, country }) => (
-                  <SelectItem value={id.toString()} key={id}>
-                    {name}{" "}
-                    {country ? (
-                      <Badge
-                        variant="secondary"
-                        className="text-muted-foreground text-xs ml-2"
-                      >
-                        {`${country.name}`}
-                      </Badge>
-                    ) : (
-                      ""
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormFieldError error={formState.errors?.awayTeamId} />
-          </FormField>
-        ) : (
-          <FormFieldLoadingState
-            isLoading={isTeamsLoading}
-            label="Loading Teams..."
-            notFoundText="There is no teams, add some!"
-          />
-        )} */}
 
         <FormField>
           <Label htmlFor="homeGoals">
@@ -731,9 +670,10 @@ export default function LeagueMatchForm({
           isDisabled={
             selectedLeague.length === 0 ||
             selectedSeason.length === 0 ||
+            (isKnockoutValue === IsPopularOptions.No &&
+              selectedGroup.length === 0) ||
             isTeamsLoading ||
-            !teams ||
-            teams.length === 0
+            (teams && teams.length === 0)
           }
         />
       </form>

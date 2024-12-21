@@ -19,16 +19,6 @@ export enum LeagueStages {
   Running = "Running",
 }
 
-export enum TournamentTypes {
-  International = "International",
-  Europe = "Europe",
-  Asia = "Asia",
-  Africa = "Africa",
-  NorthAmerica = "North America",
-  SouthAmerica = "South America",
-  Oceanosia = "Oceanosia",
-}
-
 export enum Continents {
   International = "International",
   Europe = "Europe",
@@ -69,8 +59,14 @@ export enum MatchStatusOptions {
   Scheduled = "Scheduled",
 }
 
+export enum ImagesFolders {
+  Countries = "countries",
+  Teams = "teams",
+  Leagues = "leagues",
+}
+
 export enum EmptyImageUrls {
-  Team = "/images/teams/team-empty-logo.png",
-  Country = "/images/countries/empty-flag.png",
-  League = "/images/tournaments/tournament-empty-logo.png",
+  Team = `/images/${ImagesFolders.Teams}/team-empty-logo.png`,
+  Country = `/images/${ImagesFolders.Countries}/empty-flag.png`,
+  League = `/images/${ImagesFolders.Leagues}/league-empty-logo.png`,
 }

@@ -25,7 +25,7 @@ export async function GET(
     const standings = await Promise.all(
       season.teams.map(async (team) => ({
         ...team,
-        stats: await calculateTeamStatsBySlug(team.id, slug, "leagues"),
+        stats: await calculateTeamStatsBySlug(team.id, slug),
       }))
     );
 
@@ -33,8 +33,7 @@ export async function GET(
       {
         groupName: null,
         groupId: null,
-        tournamentOrLeagueId: season.id,
-        type: "leagues",
+        seasonId: season.id,
         teams: standings,
       },
     ]);
@@ -59,11 +58,7 @@ export async function GET(
         teams: await Promise.all(
           group.teams.map(async (team) => ({
             ...team,
-            stats: await calculateTeamStatsByGroup(
-              team.id,
-              group.id,
-              "leagues"
-            ),
+            stats: await calculateTeamStatsByGroup(team.id, group.id),
           }))
         ),
       }))
@@ -74,8 +69,7 @@ export async function GET(
         return {
           groupName: stand.name,
           groupId: stand.id,
-          tournamentOrLeagueId: stand.seasonId,
-          type: "leagues",
+          seasonId: stand.seasonId,
           teams: stand.teams,
         };
       })
