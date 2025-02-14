@@ -670,8 +670,8 @@ export default function MatchForm({ match }: { match?: MatchProps | null }) {
           isDisabled={
             selectedLeague.length === 0 ||
             selectedSeason.length === 0 ||
-            (isKnockoutValue === IsPopularOptions.No &&
-              selectedGroup.length === 0) ||
+            // (isKnockoutValue === IsPopularOptions.No &&
+            //   selectedGroup.length === 0) ||
             isTeamsLoading ||
             (teams && teams.length === 0)
           }

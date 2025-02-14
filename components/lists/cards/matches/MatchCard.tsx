@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { getFormattedDate, getFormattedTime } from "@/lib/getFormattedDate";
 import { Country, Group, League, Match, Season, Team } from "@prisma/client";
 import { LeagueProps } from "@/types";
+import { IoMdTime } from "react-icons/io";
+import { HiCalendarDateRange } from "react-icons/hi2";
 
 interface MatchProps extends Match {
   group: Group | null;
@@ -83,17 +85,23 @@ export default function MatchCard({ match }: { match: MatchProps }) {
             variant={match.date ? "default" : "destructive"}
             className="hidden sm:inline-block hover:bg-primary"
           >
-            {match.date
-              ? getFormattedDate(match.date.toString())
-              : "No date info"}
+            <div className="flex items-center justify-center gap-1">
+              <HiCalendarDateRange className="w-4 h-4" />
+              {match.date
+                ? getFormattedDate(match.date.toString())
+                : "No date info"}
+            </div>
           </Badge>
           <Badge
             variant={match.date ? "default" : "destructive"}
             className="hidden max-sm:inline-block hover:bg-primary"
           >
-            {match.date
-              ? getFormattedDate(match.date.toString(), true)
-              : "No date info"}
+            <div className="flex items-center justify-center gap-1">
+              <HiCalendarDateRange className="w-4 h-4" />
+              {match.date
+                ? getFormattedDate(match.date.toString(), true)
+                : "No date info"}
+            </div>
           </Badge>
         </div>
 
@@ -103,17 +111,23 @@ export default function MatchCard({ match }: { match: MatchProps }) {
             variant={match.date ? "default" : "destructive"}
             className="hidden sm:inline-block hover:bg-primary"
           >
-            {match.date
-              ? getFormattedTime(match.date.toString(), false, true)
-              : "No time info"}
+            <div className="flex items-center justify-center gap-1">
+              <IoMdTime className="w-4 h-4" />
+              {match.date
+                ? getFormattedTime(match.date.toString(), false, true)
+                : "No time info"}
+            </div>
           </Badge>
           <Badge
             variant={match.date ? "default" : "destructive"}
             className="hidden max-sm:inline-block hover:bg-primary"
           >
-            {match.date
-              ? getFormattedTime(match.date.toString(), false, false)
-              : "No time info"}
+            <div className="flex items-center justify-center gap-1">
+              <IoMdTime className="w-4 h-4" />
+              {match.date
+                ? getFormattedTime(match.date.toString(), false, false)
+                : "No time info"}
+            </div>
           </Badge>
         </div>
       </CardContent>

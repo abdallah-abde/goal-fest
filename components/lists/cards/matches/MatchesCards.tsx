@@ -19,6 +19,7 @@ import PageHeader from "@/components/PageHeader";
 
 import { GroupByOptions } from "@/types/enums";
 import { LeagueProps } from "@/types";
+import Link from "next/link";
 
 interface MatchProps extends Match {
   group: Group | null;
@@ -100,7 +101,12 @@ export default function MatchesCards({
                 <ListTitle groupBy={groupBy} divider={divider} />
                 <div className="w-full space-y-2">
                   {list.map((match) => (
-                    <MatchCard key={match.id} match={match} />
+                    <Link
+                      key={match.id}
+                      href={`/leagues/${season.slug}/matches/${match.id}`}
+                    >
+                      <MatchCard match={match} />
+                    </Link>
                   ))}
                 </div>
               </div>

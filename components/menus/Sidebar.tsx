@@ -78,7 +78,7 @@ export default function Sidebar({
             href={href}
           >
             <div>
-              <Icon />
+              <Icon className="w-7 h-7" />
             </div>
 
             <p>{label}</p>
