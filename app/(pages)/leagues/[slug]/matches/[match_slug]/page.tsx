@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import {
   Booking,
+  Goal,
   Lineup,
   MatchStat,
   Player,
@@ -33,6 +34,17 @@ interface LineupProps extends Lineup {
 interface SubstitutionProps extends Substitution {
   playerIn: Player;
   playerOut: Player;
+  team: Team;
+}
+
+interface GoalProps extends Goal {
+  player: Player;
+  team: Team;
+}
+
+interface BookingProps extends Booking {
+  player: Player;
+  team: Team;
 }
 
 export default async function MatchPage({
@@ -65,7 +77,12 @@ export default async function MatchPage({
             player: true,
           },
         },
-        bookings: true,
+        bookings: {
+          include: {
+            player: true,
+            team: true,
+          },
+        },
         matchStats: true,
         referee: true,
         stadium: true,
@@ -73,6 +90,13 @@ export default async function MatchPage({
           include: {
             playerIn: true,
             playerOut: true,
+            team: true,
+          },
+        },
+        goals: {
+          include: {
+            player: true,
+            team: true,
           },
         },
         group: true,
@@ -135,6 +159,16 @@ export default async function MatchPage({
                 referee={match.referee}
                 stadium={match.stadium}
                 attendance={match.attendance}
+              />
+
+              {/* Match Events */}
+
+              <_MatchEvents
+                homeTeam={match.homeTeam}
+                awayTeam={match.awayTeam}
+                bookings={match.bookings}
+                substitutions={match.substitutions}
+                goals={match.goals}
               />
 
               <div>Match Events</div>
@@ -377,19 +411,11 @@ function _LineUp({
       {homeTeam && awayTeam && (
         <Tabs defaultValue={homeTeam?.id?.toString()}>
           <TabsList className="w-full">
-            <TabsTrigger
-              key={homeTeam.id.toString()}
-              value={homeTeam.id.toString()}
-              className="w-full"
-            >
+            <TabsTrigger value={homeTeam.id.toString()} className="w-full">
               {homeTeam.name}
               <span className="text-xs ml-1">({homeTeamFormation})</span>
             </TabsTrigger>
-            <TabsTrigger
-              key={awayTeam.id.toString()}
-              value={awayTeam.id.toString()}
-              className="w-full"
-            >
+            <TabsTrigger value={awayTeam.id.toString()} className="w-full">
               {awayTeam.name}
               <span className="text-xs ml-1">({awayTeamFormation})</span>
             </TabsTrigger>
@@ -644,4 +670,269 @@ function _MatchInfo({
       </div>
     </div>
   );
+}
+
+function _MatchEvents({
+  homeTeam,
+  awayTeam,
+  bookings,
+  substitutions,
+  goals,
+}: {
+  homeTeam: Team | null;
+  awayTeam: Team | null;
+  bookings: BookingProps[];
+  substitutions: SubstitutionProps[];
+  goals: GoalProps[];
+}) {
+  const results: {
+    id: number;
+    matchId: number;
+    teamId: number;
+    teamName: string;
+    playerId: number;
+    playerName: string;
+    playerInId?: number | null;
+    playerInName?: string | null;
+    minute: string;
+    type: string;
+  }[] = bookings
+    .map((a) => {
+      return {
+        id: a.id,
+        matchId: a.matchId,
+        playerId: a.playerId,
+        playerName: a.player.name,
+        teamId: a.teamId,
+        teamName: a.team.name,
+        minute: `${a.minute} ${a.extraMinute ? "+" + a.extraMinute : ""}`,
+        type: `${a.cardType === "yellow" ? "yellowCard" : "redCard"}`,
+      };
+    })
+    .concat(
+      goals.map((a) => {
+        return {
+          id: a.id,
+          matchId: a.matchId,
+          playerId: a.playerId,
+          playerName: a.player.name,
+          teamId: a.teamId,
+          teamName: a.team.name,
+          minute: `${a.minute} ${a.extraMinute ? "+" + a.extraMinute : ""}`,
+          type: `${a.isOwn ? "ownGoal" : "goal"}`,
+        };
+      }),
+      substitutions.map((a) => {
+        return {
+          id: a.id,
+          matchId: a.matchId,
+          playerId: a.playerOutId,
+          playerName: a.playerOut.name,
+          playerInId: a.playerInId,
+          playerInName: a.playerIn.name,
+          teamId: a.teamId,
+          teamName: a.team.name,
+          minute: `${a.minute} ${a.extraMinute ? "+" + a.extraMinute : ""}`,
+          type: "substitution",
+        };
+      })
+    )
+    .sort((a, b) =>
+      a.minute !== b.minute ? (a.minute < b.minute ? -1 : 1) : 0
+    );
+
+  return (
+    <div className="bg-primary/10 p-6 rounded-md">
+      <_SectionTitle title="Match Events" />
+
+      <div className="space-y-4">
+        {results.map((a) => {
+          const home = a.teamId === homeTeam?.id;
+
+          return (
+            <div
+              key={`${a.id}_${a.type}`}
+              className="flex items-center justify-between px-4 w-full"
+            >
+              <div className={`flex items-center justify-between w-[50%]`}>
+                <div
+                  className={`flex flex-${
+                    home ? "row" : "row-reverse"
+                  } gap-4 items-center justify-${home ? "start" : "end"}`}
+                >
+                  <_PlayerImage />
+                  {a.playerInId && <_PlayerImage />}
+                  <div className="flex flex-col">
+                    <p className={`${a.playerInId ? "text-green-500" : ""}`}>
+                      {a.playerInName}
+                    </p>
+                    {a.playerInId && (
+                      <p className="text-destructive">{a.playerName}</p>
+                    )}
+                    {!a.playerInId && (
+                      <p className="text-[11px] text-primary/55 font-semibold">
+                        Position
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={`flex flex-${
+                    home ? "row" : "row-reverse"
+                  } items-center justify-between gap-8`}
+                >
+                  <_IconByType type={a.type} />
+                  <span className="text-sm">{a.minute}</span>
+                </div>
+                {/* <div className="flex gap-4 items-center justify-end w-[45%]"></div> */}
+              </div>
+            </div>
+          );
+        })}
+        {/* <div className="flex items-center justify-between px-4">
+          <div className="flex gap-4 items-center justify-start w-[45%]">
+            <_PlayerImage />
+            <div className="flex flex-col">
+              <p>Name</p>
+              <p className="text-[11px] text-primary/55 font-semibold">
+                Position
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <CirclePlus size="26" className="text-destructive rounded-md " />
+            <span className="text-sm">12</span>
+            <RectangleVertical
+              size="26"
+              className=" text-destructive fill-destructive rounded-md "
+            />
+          </div>
+          <div className="flex gap-4 items-center justify-end w-[45%]">
+            <div className="flex flex-col">
+              <p>Name</p>
+              <p className="text-[11px] text-primary/55 font-semibold">
+                Position
+              </p>
+            </div>
+            <_PlayerImage />
+          </div>
+        </div> */}
+        {/* <div className="flex items-center justify-between px-4">
+          <div className="flex gap-4 items-center justify-start w-[45%]">
+            <_PlayerImage />
+            <div className="flex flex-col">
+              <p>Name</p>
+              <p className="text-[11px] text-primary/55 font-semibold">
+                Position
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <CirclePlus size="26" className="text-destructive rounded-md " />
+            <span className="text-sm">12</span>
+            <RectangleVertical
+              size="26"
+              className=" text-destructive fill-destructive rounded-md "
+            />
+          </div>
+          <div className="flex gap-4 items-center justify-end w-[45%]">
+            <div className="flex flex-col">
+              <p>Name</p>
+              <p className="text-[11px] text-primary/55 font-semibold">
+                Position
+              </p>
+            </div>
+            <_PlayerImage />
+          </div>
+        </div> */}
+        {/* <div className="flex items-center justify-between px-4">
+          <div className="flex gap-4 items-center justify-start w-[45%]">
+            <_PlayerImage />
+            <div className="flex flex-col">
+              <p>Name</p>
+              <p className="text-[11px] text-primary/55 font-semibold">
+                Position
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <CirclePlus size="26" className="text-destructive rounded-md " />
+            <span className="text-sm">12</span>
+            <RectangleVertical
+              size="26"
+              className=" text-destructive fill-destructive rounded-md "
+            />
+          </div>
+          <div className="flex gap-4 items-center justify-end w-[45%]">
+            <div className="flex flex-col">
+              <p className="text-green-500">Name</p>
+              <p className="text-destructive">Name</p>
+            </div>
+            <_PlayerImage />
+            <_PlayerImage />
+          </div>
+        </div> */}
+        {/* <div className="flex items-center justify-between px-4">
+          <div className="flex gap-4 items-center justify-start w-[45%]">
+            <_PlayerImage />
+            <_PlayerImage />
+            <div className="flex flex-col">
+              <p className="text-green-500">Name</p>
+              <p className="text-destructive">Name</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <CirclePlus size="26" className="text-destructive rounded-md " />
+            <span className="text-sm">12</span>
+            <RectangleVertical
+              size="26"
+              className=" text-destructive fill-destructive rounded-md "
+            />
+          </div>
+          <div className="flex gap-4 items-center justify-end w-[45%]">
+            <div className="flex flex-col">
+              <p className="text-green-500">Name</p>
+              <p className="text-destructive">Name</p>
+            </div>
+            <_PlayerImage />
+            <_PlayerImage />
+          </div>
+        </div> */}
+      </div>
+    </div>
+  );
+}
+
+function _IconByType({ type }: { type: string }) {
+  switch (type) {
+    case "yellowCard":
+      return (
+        <RectangleVertical
+          size="26"
+          className="text-yellow-500 fill-yellow-500 rounded-md"
+        />
+      );
+    case "redCard":
+      return (
+        <RectangleVertical
+          size="26"
+          className="text-destructive fill-destructive rounded-md"
+        />
+      );
+    case "goal":
+      return <IoFootball className="w-[26px] h-[26px]" />;
+
+    case "ownGoal":
+      return <IoFootball className="w-[26px] h-[26px] text-destructive" />;
+
+    case "substitution":
+      return (
+        <div className="pl-4 flex flex-col items-center">
+          <MdOutlineDoubleArrow className="w-5 h-5 text-green-500" />
+          <MdOutlineDoubleArrow className="w-5 h-5 text-destructive -translate-x-2 rotate-180" />
+        </div>
+      );
+    default:
+      return <></>;
+  }
 }

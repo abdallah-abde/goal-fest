@@ -81,14 +81,12 @@ model Team {
   country      Country? @relation(fields: [countryId], references: [id])
 
   players        Player[]
-  // defendingStats  DefendingStats[]
-  // attackingStats  AttackingStats[]
-  // possessionStats PossessionStats[]
   matchStatsHome MatchStat[]    @relation("homeTeamStats")
   matchStatsAway MatchStat[]    @relation("awayTeamStats")
   lineups        Lineup[]
   substitutions  Substitution[]
   bookings       Booking[]
+  goals          Goal[]
 }
 
 model Match {
@@ -126,16 +124,11 @@ model Match {
   homeFormation String?
   awayFormation String?
 
-  // possessionStats PossessionStats[]
-  // attackingStats  AttackingStats[]
-  // defendingStats  DefendingStats[]
-  matchStats MatchStat[]
-
-  lineups Lineup[]
-
+  matchStats    MatchStat[]
+  lineups       Lineup[]
   substitutions Substitution[]
-
-  bookings Booking[]
+  bookings      Booking[]
+  goals         Goal[]
 }
 
 model MatchStat {
@@ -157,67 +150,8 @@ model MatchStat {
   awayTeamStat Float
 }
 
-// model PossessionStats {
-//   id Int @id @default(autoincrement())
-
-//   matchId Int
-//   match   Match @relation(fields: [matchId], references: [id])
-
-//   teamId Int
-//   team   Team @relation(fields: [teamId], references: [id])
-
-//   possession Float
-// }
-
-// model AttackingStats {
-//   id Int @id @default(autoincrement())
-
-//   matchId Int
-//   match   Match @relation(fields: [matchId], references: [id])
-
-//   teamId Int
-//   team   Team @relation(fields: [teamId], references: [id])
-
-//   expectedGoals         Float
-//   totalShots            Int
-//   shotsOntarget         Int
-//   bigChancesCreated     Int
-//   corners               Int
-//   offsides              Int
-//   passesCompleted       Int
-//   attacks               Int
-//   shotsOffTarget        Int
-//   expectedGoalsOnTarget Float
-//   freeKicks             Int
-//   totalPasses           Int
-//   expectedAssists       Float
-//   crosses               Int
-//   substitutions         Int
-// }
-
-// model DefendingStats {
-//   id Int @id @default(autoincrement())
-
-//   matchId Int
-//   match   Match @relation(fields: [matchId], references: [id])
-
-//   teamId Int
-//   team   Team @relation(fields: [teamId], references: [id])
-
-//   shotsBlocked          Int
-//   throwIns              Int
-//   goalKicks             Int
-//   expectedGoalsConceded Float
-//   goalkeeperSaves       Int
-//   tackles               Int
-//   fouls                 Int
-// }
-
 model Lineup {
   id Int @id @default(autoincrement())
-
-  // matchesHome Match[] @relation("homeTeamLineups")
-  // matchesAway Match[] @relation("awayTeamLineups")
 
   matchId Int
   match   Match @relation(fields: [matchId], references: [id])
@@ -236,9 +170,6 @@ model Lineup {
   isBench    Boolean @default(false)
   isCoach    Boolean @default(false)
   goals      Int
-  // coachId     Int?
-
-  // coach       Coach?   @relation(fields: [coachId], references: [id])
 }
 
 model Substitution {
@@ -246,9 +177,6 @@ model Substitution {
 
   matchId Int
   match   Match @relation(fields: [matchId], references: [id])
-
-  // matchesHome Match[] @relation("homeTeamSubstitutions")
-  // matchesAway Match[] @relation("awayTeamSubstitutions")
 
   teamId Int
   team   Team @relation(fields: [teamId], references: [id])
@@ -259,7 +187,8 @@ model Substitution {
   playerOutId Int
   playerOut   Player @relation("PlayerOut", fields: [playerOutId], references: [id])
 
-  minute Int
+  minute      Int
+  extraMinute Int @default(0)
 }
 
 model Booking {
@@ -268,8 +197,22 @@ model Booking {
   matchId Int
   match   Match @relation(fields: [matchId], references: [id])
 
-  // matchesHome Match[] @relation("homeTeamBookings")
-  // matchesAway Match[] @relation("awayTeamBookings")
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id])
+
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [id])
+
+  cardType    String // "yellow" or "red"
+  minute      Int
+  extraMinute Int    @default(0)
+}
+
+model Goal {
+  id Int @id @default(autoincrement())
+
+  matchId Int
+  match   Match @relation(fields: [matchId], references: [id])
 
   teamId Int
   team   Team @relation(fields: [teamId], references: [id])
@@ -277,8 +220,9 @@ model Booking {
   playerId Int
   player   Player @relation(fields: [playerId], references: [id])
 
-  cardType String // "yellow" or "red"
-  minute   Int
+  isOwn       Boolean @default(false)
+  minute      Int
+  extraMinute Int     @default(0)
 }
 
 model Referee {
@@ -297,13 +241,6 @@ model Stadium {
   matches  Match[]
 }
 
-// model Coach {
-//   id          Int     @id @default(autoincrement())
-//   name        String
-//   nationality String
-//   lineups     Lineup[]
-// }
-
 model Player {
   id       Int     @id @default(autoincrement())
   name     String
@@ -318,6 +255,7 @@ model Player {
   substitutionsIn  Substitution[] @relation("PlayerIn")
   substitutionsOut Substitution[] @relation("PlayerOut")
   bookings         Booking[]
+  goals            Goal[]
 }
 
 model User {
