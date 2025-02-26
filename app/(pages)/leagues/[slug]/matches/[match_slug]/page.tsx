@@ -754,7 +754,13 @@ function _MatchEvents({
               key={`${a.id}_${a.type}`}
               className="flex items-center justify-between px-4 w-full"
             >
-              <div className={`flex items-center justify-between w-[50%]`}>
+              <div
+                className={`flex flex-${
+                  home ? "row" : "row-reverse"
+                } items-center justify-between w-[50%] ${
+                  !home ? "ml-auto" : ""
+                }`}
+              >
                 <div
                   className={`flex flex-${
                     home ? "row" : "row-reverse"
@@ -770,9 +776,12 @@ function _MatchEvents({
                       <p className="text-destructive">{a.playerName}</p>
                     )}
                     {!a.playerInId && (
-                      <p className="text-[11px] text-primary/55 font-semibold">
-                        Position
-                      </p>
+                      <>
+                        <p>{a.playerName}</p>
+                        <p className="text-[11px] text-primary/55 font-semibold">
+                          Position
+                        </p>
+                      </>
                     )}
                   </div>
                 </div>
@@ -784,120 +793,10 @@ function _MatchEvents({
                   <_IconByType type={a.type} />
                   <span className="text-sm">{a.minute}</span>
                 </div>
-                {/* <div className="flex gap-4 items-center justify-end w-[45%]"></div> */}
               </div>
             </div>
           );
         })}
-        {/* <div className="flex items-center justify-between px-4">
-          <div className="flex gap-4 items-center justify-start w-[45%]">
-            <_PlayerImage />
-            <div className="flex flex-col">
-              <p>Name</p>
-              <p className="text-[11px] text-primary/55 font-semibold">
-                Position
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-8">
-            <CirclePlus size="26" className="text-destructive rounded-md " />
-            <span className="text-sm">12</span>
-            <RectangleVertical
-              size="26"
-              className=" text-destructive fill-destructive rounded-md "
-            />
-          </div>
-          <div className="flex gap-4 items-center justify-end w-[45%]">
-            <div className="flex flex-col">
-              <p>Name</p>
-              <p className="text-[11px] text-primary/55 font-semibold">
-                Position
-              </p>
-            </div>
-            <_PlayerImage />
-          </div>
-        </div> */}
-        {/* <div className="flex items-center justify-between px-4">
-          <div className="flex gap-4 items-center justify-start w-[45%]">
-            <_PlayerImage />
-            <div className="flex flex-col">
-              <p>Name</p>
-              <p className="text-[11px] text-primary/55 font-semibold">
-                Position
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-8">
-            <CirclePlus size="26" className="text-destructive rounded-md " />
-            <span className="text-sm">12</span>
-            <RectangleVertical
-              size="26"
-              className=" text-destructive fill-destructive rounded-md "
-            />
-          </div>
-          <div className="flex gap-4 items-center justify-end w-[45%]">
-            <div className="flex flex-col">
-              <p>Name</p>
-              <p className="text-[11px] text-primary/55 font-semibold">
-                Position
-              </p>
-            </div>
-            <_PlayerImage />
-          </div>
-        </div> */}
-        {/* <div className="flex items-center justify-between px-4">
-          <div className="flex gap-4 items-center justify-start w-[45%]">
-            <_PlayerImage />
-            <div className="flex flex-col">
-              <p>Name</p>
-              <p className="text-[11px] text-primary/55 font-semibold">
-                Position
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-8">
-            <CirclePlus size="26" className="text-destructive rounded-md " />
-            <span className="text-sm">12</span>
-            <RectangleVertical
-              size="26"
-              className=" text-destructive fill-destructive rounded-md "
-            />
-          </div>
-          <div className="flex gap-4 items-center justify-end w-[45%]">
-            <div className="flex flex-col">
-              <p className="text-green-500">Name</p>
-              <p className="text-destructive">Name</p>
-            </div>
-            <_PlayerImage />
-            <_PlayerImage />
-          </div>
-        </div> */}
-        {/* <div className="flex items-center justify-between px-4">
-          <div className="flex gap-4 items-center justify-start w-[45%]">
-            <_PlayerImage />
-            <_PlayerImage />
-            <div className="flex flex-col">
-              <p className="text-green-500">Name</p>
-              <p className="text-destructive">Name</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-8">
-            <CirclePlus size="26" className="text-destructive rounded-md " />
-            <span className="text-sm">12</span>
-            <RectangleVertical
-              size="26"
-              className=" text-destructive fill-destructive rounded-md "
-            />
-          </div>
-          <div className="flex gap-4 items-center justify-end w-[45%]">
-            <div className="flex flex-col">
-              <p className="text-green-500">Name</p>
-              <p className="text-destructive">Name</p>
-            </div>
-            <_PlayerImage />
-            <_PlayerImage />
-          </div>
-        </div> */}
       </div>
     </div>
   );
