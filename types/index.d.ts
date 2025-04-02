@@ -44,10 +44,12 @@ export interface MatchProps {
   awayTeam: {
     flagUrl?: string | null | undefined;
     name: string;
+    code: string | undefined;
   };
   homeTeam: {
     flagUrl?: string | null | undefined;
     name: string;
+    code: string | undefined;
   };
   date: Date;
   groupId?: number | null | undefined;

@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 
-import PartsTitle from "@/components/home/PartsTitle";
+import PartsTitle from "@/app/(pages)/_components/PartsTitle";
 import { EmptyImageUrls } from "@/types/enums";
 
 export default async function PopularTeams() {

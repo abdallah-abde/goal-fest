@@ -16,12 +16,14 @@ export async function getMatches(where: {}) {
         select: {
           flagUrl: true,
           name: true,
+          code: true,
         },
       },
       homeTeam: {
         select: {
           flagUrl: true,
           name: true,
+          code: true,
         },
       },
       date: true,
@@ -44,6 +46,7 @@ export async function getMatches(where: {}) {
               name: true,
               id: true,
               flagUrl: true,
+              code: true,
             },
           },
           flagUrl: true,
@@ -57,6 +60,7 @@ export async function getMatches(where: {}) {
                   name: true,
                   id: true,
                   flagUrl: true,
+                  code: true,
                 },
               },
             },

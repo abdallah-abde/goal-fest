@@ -13,14 +13,17 @@ export default function PartsLink({
     <Button
       variant="ghost"
       asChild
-      className="text-center rounded-none w-full p-0 m-0 border-t-1 border-primary/25 hover:bg-transparent"
+      className=" text-center rounded-none w-full p-0 m-0 border-t-1 border-primary/25 hover:bg-transparent group"
     >
       <Link
         href={href}
-        className="font-bold flex items-center gap-2 hover:no-underline"
+        className="font-bold flex items-center gap-2 hover:no-underline  "
       >
         {label}
-        <ChevronRight size="15" />
+        <ChevronRight
+          size="15"
+          className="duration-500 group-hover:translate-x-2"
+        />
       </Link>
     </Button>
   );

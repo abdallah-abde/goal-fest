@@ -19,16 +19,37 @@ export default function CategorizedMatchCard({ match }: { match: MatchProps }) {
     awayGoals,
   } = match;
 
+  console.log(homeTeam);
+
   return (
     <div className="first:border-t-2 border-primary/25 border-b-2 bg-primary/20">
       <div className="flex items-center gap-4 p-2 py-6 relative">
-        <p className="flex-1 text-right text-sm">{homeTeam?.name || ""}</p>
+        <p className="hidden xs:inline-block lg:hidden xl:inline-block flex-1 text-right text-sm">
+          {homeTeam?.name || ""}
+        </p>
+        <p className="hidden max-xs:inline-block lg:inline-block xl:hidden flex-1 text-right text-sm">
+          {homeTeam?.code || homeTeam?.name || ""}
+        </p>
         <Image
-          width={80}
-          height={80}
+          width={50}
+          height={50}
           src={homeTeam?.flagUrl || EmptyImageUrls.Team}
-          alt="team"
-          className="aspect-video object-contain"
+          alt={`${homeTeam?.name} flag` || "Team flag"}
+          className="hidden max-xs:block aspect-video object-contain"
+        />
+        <Image
+          width={75}
+          height={75}
+          src={homeTeam?.flagUrl || EmptyImageUrls.Team}
+          alt={`${homeTeam?.name} flag` || "Team flag"}
+          className="hidden xs:block md:hidden lg:inline-block xl:hidden aspect-video object-contain"
+        />
+        <Image
+          width={100}
+          height={100}
+          src={homeTeam?.flagUrl || EmptyImageUrls.Team}
+          alt={`${homeTeam?.name} flag` || "Team flag"}
+          className="hidden md:block lg:hidden xl:inline-block aspect-video object-contain"
         />
         <>
           {status && (
@@ -88,13 +109,32 @@ export default function CategorizedMatchCard({ match }: { match: MatchProps }) {
         </>
 
         <Image
-          width={80}
-          height={80}
+          width={50}
+          height={50}
           src={awayTeam?.flagUrl || EmptyImageUrls.Team}
-          alt="team"
-          className="aspect-video object-contain"
+          alt={`${awayTeam?.name} flag` || "Team flag"}
+          className="hidden max-xs:block aspect-video object-contain"
         />
-        <p className="flex-1 text-sm">{awayTeam?.name || ""}</p>
+        <Image
+          width={75}
+          height={75}
+          src={awayTeam?.flagUrl || EmptyImageUrls.Team}
+          alt={`${awayTeam?.name} flag` || "Team flag"}
+          className="hidden xs:block md:hidden lg:inline-block xl:hidden aspect-video object-contain"
+        />
+        <Image
+          width={100}
+          height={100}
+          src={awayTeam?.flagUrl || EmptyImageUrls.Team}
+          alt={`${awayTeam?.name} flag` || "Team flag"}
+          className="hidden md:block lg:hidden xl:inline-block aspect-video object-contain"
+        />
+        <p className="hidden xs:inline-block lg:hidden xl:inline-block flex-1 text-left text-sm">
+          {awayTeam?.name || ""}
+        </p>
+        <p className="hidden max-xs:inline-block lg:inline-block xl:hidden flex-1 text-left text-sm">
+          {awayTeam?.code || awayTeam?.name || ""}
+        </p>
       </div>
     </div>
   );

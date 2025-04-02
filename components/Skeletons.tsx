@@ -16,6 +16,41 @@ export default function Skeletons() {
   );
 }
 
+export function PopularMatchesSkeleton({ text }: { text: string }) {
+  return (
+    <div>
+      <p className="pb-2 text-muted-foreground text-sm">{text}</p>
+      <Skeleton className="rounded-none w-auto h-[210px] bg-primary/20 flex flex-col gap-1">
+        <div className="flex items-center justify-between mx-2 my-2 h-[50px]">
+          <div className="flex items-center justify-start gap-2">
+            <Skeleton className="w-20 h-[40px] bg-primary/30" />
+            <div className="flex flex-col items-start justify-center gap-2">
+              <Skeleton className="w-20 h-[15px] bg-primary/30" />
+              <Skeleton className="w-16 h-[12px] bg-primary/30" />
+            </div>
+          </div>
+
+          <Skeleton className="w-20 h-[15px] bg-primary/30" />
+        </div>
+        <div className="h-[160px] mx-2 space-y-2">
+          {Array.from({ length: 3 }).map((a, _) => (
+            <div
+              key={_}
+              className="flex items-center justify-center gap-8 h-[40px]"
+            >
+              <Skeleton className="w-14 h-[15px] bg-primary/30" />
+              <Skeleton className="w-10 h-[30px] bg-primary/30" />
+
+              <Skeleton className="w-10 h-[30px] bg-primary/30" />
+              <Skeleton className="w-14 h-[15px] bg-primary/30" />
+            </div>
+          ))}
+        </div>
+      </Skeleton>
+    </div>
+  );
+}
+
 export function MultipleSelectorLoadingIndicator() {
   return (
     <p className="py-2 text-center text-lg leading-10 text-muted-foreground">
@@ -137,31 +172,43 @@ export function EditionHomeSkeleton() {
   );
 }
 
-export function GroupsSkeleton() {
+export function GroupsSkeleton({
+  text,
+  numberOfTables = 2,
+}: {
+  text?: string;
+  numberOfTables?: number;
+}) {
   const _SmallField = () => <Skeleton className="h-[25px] w-[70px]" />;
   const _BigField = () => <Skeleton className="h-[25px] w-[75%]" />;
 
   return (
-    <div className="md:overflow-auto grow md:pr-2 space-y-8">
-      {Array.from({ length: 2 }).map((a, _) => (
-        <div key={_}>
-          <Skeleton className="h-[40px] w-full rounded-none bg-primary/10 flex items-center justify-center">
-            <_SmallField />
-          </Skeleton>
-          <Skeleton className="h-[60px] w-full rounded-none bg-primary/15 flex items-center justify-around">
-            <_SmallField />
-            <_BigField />
-          </Skeleton>
-          <Skeleton className="h-[240px] w-full rounded-none bg-primary/25 flex flex-col justify-evenly items-center gap-2">
-            {Array.from({ length: 4 }).map((a, _) => (
-              <div key={_} className="flex items-center justify-around w-full">
-                <_SmallField />
-                <_BigField />
-              </div>
-            ))}
-          </Skeleton>
-        </div>
-      ))}
+    <div>
+      <p className="pb-2 text-muted-foreground text-sm">{text}</p>
+      <div className="md:overflow-auto grow md:pr-2 space-y-8">
+        {Array.from({ length: numberOfTables }).map((a, _) => (
+          <div key={_}>
+            <Skeleton className="h-[40px] w-full rounded-none bg-primary/10 flex items-center justify-center">
+              <_SmallField />
+            </Skeleton>
+            <Skeleton className="h-[60px] w-full rounded-none bg-primary/15 flex items-center justify-around">
+              <_SmallField />
+              <_BigField />
+            </Skeleton>
+            <Skeleton className="h-[240px] w-full rounded-none bg-primary/25 flex flex-col justify-evenly items-center gap-2">
+              {Array.from({ length: 4 }).map((a, _) => (
+                <div
+                  key={_}
+                  className="flex items-center justify-around w-full"
+                >
+                  <_SmallField />
+                  <_BigField />
+                </div>
+              ))}
+            </Skeleton>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

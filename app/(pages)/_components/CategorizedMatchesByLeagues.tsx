@@ -9,8 +9,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import CategorizedMatchCard from "@/components/home/CategorizedMatchCard";
-import PartsLink from "@/components/home/PartsLink";
+import CategorizedMatchCard from "@/app/(pages)/_components/CategorizedMatchCard";
+import PartsLink from "@/app/(pages)/_components/PartsLink";
 import { EmptyImageUrls } from "@/types/enums";
 
 export default function CategorizedMatchesByLeagues({
